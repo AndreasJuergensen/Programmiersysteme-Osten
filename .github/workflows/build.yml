@@ -1,4 +1,6 @@
-# Nach dieser Anleitung: https://loiane.com/2024/03/github-actions-for-angular-projects-cicd-pipeline-for-testing-building-and-ng-update/
+# Nach diesen Anleitungen: 
+# - https://loiane.com/2024/03/github-actions-for-angular-projects-cicd-pipeline-for-testing-building-and-ng-update/
+# - https://github.com/pnpm/action-setup
 
 name: Angular Build
 
