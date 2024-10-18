@@ -1,12 +1,11 @@
-import {Injectable, OnDestroy} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {Diagram} from '../classes/diagram/diagram';
+import { Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { Diagram } from '../classes/diagram/diagram';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class DisplayService implements OnDestroy {
-
     private _diagram$: BehaviorSubject<Diagram>;
 
     constructor() {
@@ -28,5 +27,4 @@ export class DisplayService implements OnDestroy {
     public display(net: Diagram) {
         this._diagram$.next(net);
     }
-
 }

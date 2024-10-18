@@ -1,14 +1,14 @@
-<div class="border flexRowAlignStartTop"
-     draggable="true"
-     (mouseenter)="hoverStart($event)"
-     (mouseleave)="hoverEnd($event)"
-     (dragstart)="addFileLink($event)">
-    <div class="square flexRowAlignCenterCenter itemNoGrow">
-        ♥
-    </div>
+<div
+    class="border flexRowAlignStartTop"
+    draggable="true"
+    (mouseenter)="hoverStart($event)"
+    (mouseleave)="hoverEnd($event)"
+    (dragstart)="addFileLink($event)"
+>
+    <div class="square flexRowAlignCenterCenter itemNoGrow">♥</div>
     <div class="description flexColumnAlignTopCenter itemGrow">
-        <span>{{title}}</span>
-        <hr class="width100">
-        <span class="description-min-height">{{description}}</span>
+        <span>{{ title }}</span>
+        <hr class="width100" />
+        <span class="description-min-height">{{ description }}</span>
     </div>
 </div>

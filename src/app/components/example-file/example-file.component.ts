@@ -1,20 +1,18 @@
-import {Component, Input} from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
     selector: 'app-example-file',
     templateUrl: './example-file.component.html',
-    styleUrls: ['./example-file.component.css']
+    styleUrls: ['./example-file.component.css'],
 })
 export class ExampleFileComponent {
-
     public static readonly META_DATA_CODE = 'drag-file-location';
 
     @Input() title: string | undefined;
     @Input() description: string | undefined;
-    @Input({required: true}) link: string = '';
+    @Input({ required: true }) link: string = '';
 
-    constructor() {
-    }
+    constructor() {}
 
     prevent(e: Event) {
         e.preventDefault();
@@ -23,13 +21,13 @@ export class ExampleFileComponent {
 
     hoverStart(e: MouseEvent) {
         this.prevent(e);
-        const target = (e.target as HTMLElement);
+        const target = e.target as HTMLElement;
         target.classList.add('mouse-hover');
     }
 
     hoverEnd(e: MouseEvent) {
         this.prevent(e);
-        const target = (e.target as HTMLElement);
+        const target = e.target as HTMLElement;
         target.classList.remove('mouse-hover');
     }
 
@@ -39,5 +37,4 @@ export class ExampleFileComponent {
         e.dataTransfer!.effectAllowed = 'link';
         e.dataTransfer!.setData(ExampleFileComponent.META_DATA_CODE, this.link);
     }
-
 }
