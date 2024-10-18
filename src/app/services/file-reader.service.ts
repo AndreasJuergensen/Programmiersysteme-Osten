@@ -1,11 +1,10 @@
-import {Injectable} from "@angular/core";
-import {Observable, ReplaySubject} from "rxjs";
+import { Injectable } from '@angular/core';
+import { Observable, ReplaySubject } from 'rxjs';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class FileReaderService {
-
     public readFile(file: File): Observable<string> {
         const reader = new FileReader();
         const result = new ReplaySubject<string>(1);
@@ -16,9 +15,8 @@ export class FileReaderService {
         reader.onloadend = () => {
             result.next(reader.result as string);
             result.complete();
-        }
+        };
         reader.readAsText(file);
         return result.asObservable();
     }
-
 }

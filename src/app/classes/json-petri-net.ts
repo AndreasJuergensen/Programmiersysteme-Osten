@@ -1,23 +1,22 @@
 export interface JsonPetriNet {
-    places: Array<string>,
-    transitions: Array<string>,
+    places: Array<string>;
+    transitions: Array<string>;
     arcs?: {
-        [idPair: string]: number
-    },
-    actions?: Array<string>,
+        [idPair: string]: number;
+    };
+    actions?: Array<string>;
     labels?: {
-        [transitionId: string]: string
-    },
+        [transitionId: string]: string;
+    };
     marking?: {
-        [placeId: string]: number
-    },
+        [placeId: string]: number;
+    };
     layout?: {
-        [idOrIdPair: string]: Coords | Array<Coords>
-    }
+        [idOrIdPair: string]: Coords | Array<Coords>;
+    };
 }
 
 export interface Coords {
-    x: number,
-    y: number
+    x: number;
+    y: number;
 }
-
