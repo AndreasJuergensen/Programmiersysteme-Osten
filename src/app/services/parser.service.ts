@@ -1,15 +1,13 @@
-import {Injectable} from '@angular/core';
-import {Diagram} from '../classes/diagram/diagram';
-import {Element} from '../classes/diagram/element';
-import {Coords, JsonPetriNet} from "../classes/json-petri-net";
+import { Injectable } from '@angular/core';
+import { Diagram } from '../classes/diagram/diagram';
+import { Element } from '../classes/diagram/element';
+import { Coords, JsonPetriNet } from '../classes/json-petri-net';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class ParserService {
-
-    constructor() {
-    }
+    constructor() {}
 
     parse(text: string): Diagram | undefined {
         try {
@@ -30,10 +28,13 @@ export class ParserService {
             return [];
         }
 
-        return placeIds.map(pid => new Element(pid));
+        return placeIds.map((pid) => new Element(pid));
     }
 
-    private setPosition(elements: Array<Element>, layout: JsonPetriNet['layout']) {
+    private setPosition(
+        elements: Array<Element>,
+        layout: JsonPetriNet['layout'],
+    ) {
         if (layout === undefined) {
             return;
         }

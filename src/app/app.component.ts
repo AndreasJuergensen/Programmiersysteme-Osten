@@ -1,19 +1,20 @@
-import {Component} from '@angular/core';
-import {FormControl} from '@angular/forms';
-import {ParserService} from './services/parser.service';
-import {DisplayService} from './services/display.service';
+import { Component } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { ParserService } from './services/parser.service';
+import { DisplayService } from './services/display.service';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+    styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-
     public textareaFc: FormControl;
 
-    constructor(private _parserService: ParserService,
-                private _displayService: DisplayService) {
+    constructor(
+        private _parserService: ParserService,
+        private _displayService: DisplayService,
+    ) {
         this.textareaFc = new FormControl();
         this.textareaFc.disable();
     }

@@ -53,5 +53,4 @@ export class Element {
         }
         this._svgElement.setAttribute('fill', 'black');
     }
-
 }
