@@ -10,7 +10,6 @@ import { DisplayService } from '../../services/display.service';
 import { catchError, of, Subscription, take } from 'rxjs';
 import { SvgService } from '../../services/svg.service';
 import { Diagram } from '../../classes/diagram/diagram';
-import { ExampleFileComponent } from '../example-file/example-file.component';
 import { FileReaderService } from '../../services/file-reader.service';
 import { HttpClient } from '@angular/common/http';
 
@@ -46,20 +45,6 @@ export class DisplayComponent implements OnDestroy {
     ngOnDestroy(): void {
         this._sub.unsubscribe();
         this.fileContent.complete();
-    }
-
-    public processDropEvent(e: DragEvent) {
-        e.preventDefault();
-
-        const fileLocation = e.dataTransfer?.getData(
-            ExampleFileComponent.META_DATA_CODE,
-        );
-
-        if (fileLocation) {
-            this.fetchFile(fileLocation);
-        } else {
-            this.readFile(e.dataTransfer?.files);
-        }
     }
 
     public prevent(e: DragEvent) {
