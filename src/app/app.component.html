@@ -17,24 +17,7 @@
     ></app-display>
 
     <div class="flexRowAlignSpaceEvenlyStart">
-        <app-example-button title="Button"></app-example-button>
-
-        <app-example-file
-            title="File"
-            link="assets/example.json"
-            description="An example .json Petri net"
-        ></app-example-file>
-
-        <mat-form-field appearance="outline" class="textarea">
-            <mat-label>File content</mat-label>
-            <textarea
-                matInput
-                cdkTextareaAutosize
-                cdkAutosizeMinRows="10"
-                cdkAutosizeMaxRows="20"
-                [formControl]="textareaFc"
-            ></textarea>
-        </mat-form-field>
+        <button mat-flat-button (click)="openDialog()">Input Event Log</button>
     </div>
 
     <!--  Footer  -->

@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ParserService } from './services/parser.service';
 import { DisplayService } from './services/display.service';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { EventLogDialogComponent } from './components/event-log-dialog/event-log-dialog.component';
+import { EventLog } from './classes/event-log';
 
 @Component({
     selector: 'app-root',
@@ -14,6 +17,7 @@ export class AppComponent {
     constructor(
         private _parserService: ParserService,
         private _displayService: DisplayService,
+        private _matDialog: MatDialog,
     ) {
         this.textareaFc = new FormControl();
         this.textareaFc.disable();
@@ -26,5 +30,18 @@ export class AppComponent {
         if (result !== undefined) {
             this._displayService.display(result);
         }
+    }
+
+    public openDialog(): void {
+        const config: MatDialogConfig = { width: '800px' };
+        const dialogRef = this._matDialog.open<
+            EventLogDialogComponent,
+            MatDialogConfig,
+            EventLog
+        >(EventLogDialogComponent, config);
+
+        dialogRef.afterClosed().subscribe((result) => {
+            console.log(result);
+        });
     }
 }
