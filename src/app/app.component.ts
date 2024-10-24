@@ -5,6 +5,7 @@ import { DisplayService } from './services/display.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { EventLogDialogComponent } from './components/event-log-dialog/event-log-dialog.component';
 import { EventLog } from './classes/event-log';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-root',
@@ -40,8 +41,9 @@ export class AppComponent {
             EventLog
         >(EventLogDialogComponent, config);
 
-        dialogRef.afterClosed().subscribe((result) => {
-            console.log(result);
+        const sub: Subscription = dialogRef.afterClosed().subscribe({
+            next: (result) => console.log(result),
+            complete: () => sub.unsubscribe(),
         });
     }
 }
