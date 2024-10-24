@@ -3,7 +3,7 @@ export interface EventLog {
 }
 
 export interface Trace {
-    events: Activity[];
+    activities: Activity[];
 }
 
 export interface Activity {
