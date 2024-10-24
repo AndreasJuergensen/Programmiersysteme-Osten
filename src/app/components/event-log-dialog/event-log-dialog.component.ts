@@ -5,6 +5,7 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { EventLog } from 'src/app/classes/event-log';
+import { EventLogParserService } from 'src/app/services/event-log-parser.service';
 
 @Component({
     selector: 'app-event-log-dialog',
@@ -21,13 +22,16 @@ import { EventLog } from 'src/app/classes/event-log';
     styleUrl: './event-log-dialog.component.css',
 })
 export class EventLogDialogComponent {
+
     constructor(
         private dialogRef: MatDialogRef<EventLogDialogComponent, EventLog>,
+        private eventLogParserService: EventLogParserService
     ) {}
+
     public eventLogInput: string = '';
 
     public onOkClick(): void {
-        const eventLog: EventLog = { traces: [] };
+        const eventLog: EventLog = this.eventLogParserService.parse(this.eventLogInput);
         this.dialogRef.close(eventLog);
     }
 }
