@@ -1,13 +1,13 @@
 export interface PetriNet {
-    places: Array<Place>;
-    transitions: Array<PetriNetTransition>;
-    arcs: Array<PlaceToTransitionArc | TransitionToPlaceArc>;
+    places: Set<Place>;
+    transitions: Map<string, PetriNetTransition>;
+    arcs: Set<PlaceToTransitionArc | TransitionToPlaceArc>;
 }
 
-export interface DFG extends PetriNetTransition {
-    transitions: Array<DFGTransition>;
-    arcs: Array<TransitionToTransitionArc>;
-}
+// export interface DFG extends PetriNetTransition {
+//     transitions: Set<DFGTransition>;
+//     arcs: Set<TransitionToTransitionArc>;
+// }
 
 export interface Place {
     id: string;

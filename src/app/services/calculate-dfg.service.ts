@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
 import { EventLog } from '../classes/event-log';
-import {
-    DFG,
-    DFGTransition,
-    TransitionToTransitionArc,
-} from '../classes/petri-net';
+import { DFGTransition, TransitionToTransitionArc } from '../classes/petri-net';
+import { DFG } from '../classes/dfg';
 
 @Injectable({
     providedIn: 'root',
@@ -16,48 +13,74 @@ export class CalculateDfgService {
         const playTransition: DFGTransition = { id: 'play', name: 'play' };
         const stopTransition: DFGTransition = { id: 'stop', name: 'stop' };
 
-        const dfg: DFG = {
-            id: 'pnt1',
-            transitions: [playTransition],
-            arcs: [],
-        };
+        const dfg: DFG = new DFG();
+        // dfg.transitions.set(playTransition);
+        dfg.transitions.set(playTransition.name, playTransition);
 
         if (eventLog.traces.length === 0) {
-            const playToStopArc: TransitionToTransitionArc = {
+            const playToStop: TransitionToTransitionArc = {
                 start: playTransition,
                 end: stopTransition,
             };
-            dfg.arcs = [playToStopArc];
+            dfg.arcs.add(playToStop);
         }
 
+        // iterate over all traces and their activities
+        let count: number = 0;
         eventLog.traces.forEach((trace) => {
             trace.activities.forEach((activity, i, activities) => {
-                const dfgt: DFGTransition = {
-                    id: 'dfgt' + (i + 1),
-                    name: activity.name,
-                };
+                let dfgt: DFGTransition | undefined = dfg.transitions.get(activity.name);
+                if (dfgt === undefined) {
+                    dfgt = {
+                        id: 'dfgt' + ++count,
+                        name: activity.name,
+                    };
+                }
 
-                dfg.transitions.push(dfgt);
+                // check DFG for occurence of dfgt representing current activity
+                if (!dfg.transitions.has(dfgt.name)) {
+                    dfg.transitions.set(dfgt.name, dfgt);
+                }
 
+                // add arc from play to dfgt if not existing yet
                 if (i === 0) {
                     const playToDfgt: TransitionToTransitionArc = {
                         start: playTransition,
                         end: dfgt,
                     };
-                    dfg.arcs.push(playToDfgt);
+                    if (!dfg.containsArc(playToDfgt)) {
+                        dfg.arcs.add(playToDfgt);
+                    }
+
+                    // add arc from prev dfgt to current dfgt if not existing yet
                 } else {
+                    const prevTrans: DFGTransition | undefined =
+                        dfg.transitions.get(activities[i - 1].name);
+                    // or use non-null assertion for get-method
+                    if (prevTrans !== undefined) {
+                        const tta: TransitionToTransitionArc = {
+                            start: prevTrans,
+                            end: dfgt,
+                        };
+                        if (!dfg.containsArc(tta)) {
+                            dfg.arcs.add(tta);
+                        }
+                    }
                 }
 
-                if (activities.length - 1 === i) {
+                // add arc from current dfgt to stop if not existing yet
+                if (i === activities.length - 1) {
                     const dfgtToStop: TransitionToTransitionArc = {
                         start: dfgt,
                         end: stopTransition,
                     };
-                    dfg.arcs.push(dfgtToStop);
+                    if (!dfg.containsArc(dfgtToStop)) {
+                        dfg.arcs.add(dfgtToStop);
+                    }
                 }
             });
         });
-        dfg.transitions.push(stopTransition);
+        dfg.transitions.set(stopTransition.name, stopTransition);
         return dfg;
     }
 }
