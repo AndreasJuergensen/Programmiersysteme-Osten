@@ -1,3 +1,4 @@
+import { transition } from '@angular/animations';
 import {
     DFGTransition,
     PetriNetTransition,
@@ -85,5 +86,20 @@ export class DFG implements PetriNetTransition {
         }
 
         return dfgt;
+    }
+
+    // to iterate over arcs in inductive-miner-service
+    getArcs(): Set<TransitionToTransitionArc> {
+        return this.arcs;
+    }
+
+    // to retrieve arc from dfg at testing
+    getArcByStartEndName(start: string, end: string) {
+        for (const arc of this.arcs) {
+            if (start === arc.start.name && end === arc.end.name) {
+                return arc;
+            }
+        }
+        return undefined;
     }
 }
