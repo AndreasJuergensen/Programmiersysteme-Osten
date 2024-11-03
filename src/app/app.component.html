@@ -11,10 +11,23 @@
     </h2>
 
     <!--    Main content    -->
-
+    <app-drawing-area></app-drawing-area>
 
     <div class="flexRowAlignSpaceEvenlyStart">
-        <button mat-flat-button (click)="openDialog()">Input Event Log</button>
+        <button
+            mat-mini-fab
+            (click)="openDialog()"
+            matToolTip="Input Event Log"
+        >
+            <mat-icon>edit_note</mat-icon>
+        </button>
+        <button
+            mat-mini-fab
+            (click)="drawMyStuff()"
+            matToolTip="Create static circles"
+        >
+            <mat-icon>app_registration</mat-icon>
+        </button>
     </div>
 
     <!--  Footer  -->

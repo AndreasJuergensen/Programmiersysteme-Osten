@@ -4,11 +4,6 @@ export interface PetriNet {
     arcs: Set<PlaceToTransitionArc | TransitionToPlaceArc>;
 }
 
-// export interface DFG extends PetriNetTransition {
-//     transitions: Set<DFGTransition>;
-//     arcs: Set<TransitionToTransitionArc>;
-// }
-
 export interface Place {
     id: string;
 }

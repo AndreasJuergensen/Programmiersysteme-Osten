@@ -6,8 +6,8 @@ import {
 
 export class DFG implements PetriNetTransition {
     id: string;
-    private transitions: Map<string, DFGTransition> = new Map();
-    private arcs: Set<TransitionToTransitionArc> = new Set();
+    transitions: Map<string, DFGTransition> = new Map();
+    arcs: Set<TransitionToTransitionArc> = new Set();
     private count: number = 0;
     private readonly playTransition: DFGTransition = {
         id: 'play',

@@ -4,8 +4,14 @@ import { DFGTransition, TransitionToTransitionArc } from '../classes/petri-net';
 import { CalculateDfgService } from './calculate-dfg.service';
 
 describe('CalculateDfgService', () => {
-    const playTransition: DFGTransition = { id: 'play', name: 'play' };
-    const stopTransition: DFGTransition = { id: 'stop', name: 'stop' };
+    const playTransition: DFGTransition = {
+        id: 'play',
+        name: 'play',
+    };
+    const stopTransition: DFGTransition = {
+        id: 'stop',
+        name: 'stop',
+    };
     let sut: CalculateDfgService;
     let expectedDfg: DFG;
 
