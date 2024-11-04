@@ -1,9 +1,21 @@
+import { endWith } from 'rxjs';
 import {
     DFGTransition,
     PetriNetTransition,
-    TransitionToTransitionArc,
 } from './petri-net';
 
+export interface DfgJson {
+    transitions: TransitionJson[];
+    arcs: ArcJson[];
+}
+export interface TransitionJson {
+    id: string;
+    name: string;
+}
+export interface ArcJson {
+    start: string;
+    end: string;
+}
 export class DFG implements PetriNetTransition {
     id: string;
     private transitions: Transitions = new Transitions();
@@ -14,35 +26,48 @@ export class DFG implements PetriNetTransition {
     }
 
     addPlayToStopArc(): void {
-        this.arcs.addArc({
-            start: this.transitions.playTransition,
-            end: this.transitions.stopTransition,
-        });
+        this.arcs.addArc(new TransitionToTransitionArc(
+            this.transitions.playTransition,
+            this.transitions.stopTransition,
+        ));
     }
 
     addFromPlayArc(activityName: string): void {
-        this.arcs.addArc({
-            start: this.transitions.playTransition,
-            end: this.transitions.getTransitionByName(activityName),
-        });
+        this.arcs.addArc(
+            new TransitionToTransitionArc(
+                this.transitions.playTransition,
+                this.transitions.getTransitionByName(activityName),
+            ),
+        );
     }
 
     addToStopArc(activityName: string): void {
-        this.arcs.addArc({
-            start: this.transitions.getTransitionByName(activityName),
-            end: this.transitions.stopTransition,
-        });
+        this.arcs.addArc(
+            new TransitionToTransitionArc(
+                this.transitions.getTransitionByName(activityName),
+                this.transitions.stopTransition,
+            ),
+        );
     }
 
     addArc(startActivityName: string, endActivityName: string): void {
-        this.arcs.addArc({
-            start: this.transitions.getTransitionByName(startActivityName),
-            end: this.transitions.getTransitionByName(endActivityName),
-        });
+        this.arcs.addArc(
+            new TransitionToTransitionArc(
+                this.transitions.getTransitionByName(startActivityName),
+                this.transitions.getTransitionByName(endActivityName),
+            ),
+        );
     }
 
     createTransition(name: string): void {
         this.transitions.createTransition(name);
+    }
+
+    asJson(): DfgJson {
+        return {
+            transitions: this.transitions.asJson(),
+            arcs: this.arcs.asJson(),
+        };
     }
 }
 
@@ -63,6 +88,10 @@ export class Arcs {
         }
         return false;
     }
+
+    asJson(): ArcJson[] {
+        return Array.from(this.arcs.values()).map((arc) => arc.asJson());
+    }
 }
 
 export class Transitions {
@@ -78,7 +107,11 @@ export class Transitions {
     private readonly transitions: Map<string, DFGTransition> = new Map();
     private count: number = 0;
 
-    constructor() {}
+    constructor() {
+        this.transitions
+            .set(this.playTransition.name, this.playTransition)
+            .set(this.stopTransition.name, this.stopTransition);
+    }
 
     /**
      * Postcondition: getTransitionByName(transition.name) return this transition
@@ -108,5 +141,26 @@ export class Transitions {
             throw new Error('Transition not found');
         }
         return this.transitions.get(name)!;
+    }
+
+    asJson(): TransitionJson[] {
+        return Array.from(this.transitions.values());
+    }
+}
+
+export class TransitionToTransitionArc {
+    start: DFGTransition;
+    end: DFGTransition;
+
+    constructor(start: DFGTransition, end: DFGTransition) {
+        this.start = start;
+        this.end = end;
+    }
+
+    asJson(): ArcJson {
+        return {
+            start: this.start.id,
+            end: this.end.id
+        }
     }
 }

@@ -13,7 +13,13 @@ export class CalculateDfgService {
 
         if (eventLog.traces.length === 0) {
             dfg.addPlayToStopArc();
+            return dfg;
         }
+
+        eventLog.traces
+            .flatMap((trace) => trace.activities)
+            .map((activity) => activity.name)
+            .forEach((name) => dfg.createTransition(name));
 
         eventLog.traces.forEach((trace) => {
             trace.activities.forEach((activity, i, activities) => {
