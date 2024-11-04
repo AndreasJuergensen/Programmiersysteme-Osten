@@ -2,7 +2,8 @@ import { InductiveMinerService } from './inductive-miner.service';
 import { DFG } from '../classes/dfg';
 import { EventLog } from '../classes/event-log';
 import { CalculateDfgService } from './calculate-dfg.service';
-import { TransitionToTransitionArc } from '../classes/petri-net';
+import { DFGTransition, TransitionToTransitionArc } from '../classes/petri-net';
+import { ExclusiveCut } from '../classes/exclusive-cut';
 
 describe('InductiveMinerService', () => {
     let calcService: CalculateDfgService;
@@ -33,7 +34,10 @@ describe('InductiveMinerService', () => {
 
         const result = sut.mine(inputDFG, cutArcs);
 
-        expect(result).toEqual('excellent!');
+        const expectedCut: ExclusiveCut = new ExclusiveCut(cutArcs);
+        expectedCut.validateExclusiveCut(inputDFG);
+
+        expect(result).toEqual(expectedCut);
     });
 
     it('exclusive cut is not valid', () => {
@@ -55,6 +59,9 @@ describe('InductiveMinerService', () => {
 
         const result = sut.mine(inputDFG, cutArcs);
 
-        expect(result).not.toEqual('excellent!');
+        const expectedCut: ExclusiveCut = new ExclusiveCut(cutArcs);
+        expectedCut.validateExclusiveCut(inputDFG);
+
+        expect(result).toEqual(expectedCut.getFeedback());
     });
 });

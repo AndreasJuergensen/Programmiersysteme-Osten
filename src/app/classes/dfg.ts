@@ -88,12 +88,36 @@ export class DFG implements PetriNetTransition {
         return dfgt;
     }
 
-    // to iterate over arcs in inductive-miner-service
-    getArcs(): Set<TransitionToTransitionArc> {
-        return this.arcs;
+    // retrieve all transitions that can be reached by arcs from given transition
+    getFollowingTransitions(transition: DFGTransition): Set<DFGTransition> {
+        const followingTransitions: Set<DFGTransition> = new Set();
+        this.arcs.forEach((arc) => {
+            if (
+                arc.start.name !== 'play' &&
+                arc.end.name !== 'stop' &&
+                arc.start === transition
+            ) {
+                followingTransitions.add(arc.end);
+            }
+        });
+        return followingTransitions;
     }
 
-    // to retrieve arc from dfg at testing
+    // retrieve all transtions following the play-transition except the given one
+    getPlayFollowingTransitionsExcept(
+        exceptTransition: DFGTransition,
+    ): Set<DFGTransition> {
+        const followingTransitions: Set<DFGTransition> = new Set();
+        this.arcs.forEach((arc) => {
+            if (arc.start.name === 'play' && arc.end !== exceptTransition) {
+                followingTransitions.add(arc.end);
+            }
+        });
+        return followingTransitions;
+    }
+
+    // called by automatic test only
+    // retrieve arc from dfg
     getArcByStartEndName(start: string, end: string) {
         for (const arc of this.arcs) {
             if (start === arc.start.name && end === arc.end.name) {
