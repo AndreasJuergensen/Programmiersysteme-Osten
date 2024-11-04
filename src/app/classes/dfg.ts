@@ -6,60 +6,50 @@ import {
 
 export class DFG implements PetriNetTransition {
     id: string;
-    private transitions: Map<string, DFGTransition> = new Map();
-    private arcs: Set<TransitionToTransitionArc> = new Set();
-    private count: number = 0;
-    private readonly playTransition: DFGTransition = {
-        id: 'play',
-        name: 'play',
-    };
-    private readonly stopTransition: DFGTransition = {
-        id: 'stop',
-        name: 'stop',
-    };
+    private transitions: Transitions = new Transitions();
+    private arcs: Arcs = new Arcs();
 
     constructor(id: string) {
         this.id = id;
-        this.transitions
-            .set(this.playTransition.name, this.playTransition)
-            .set(this.stopTransition.name, this.stopTransition);
     }
 
     addPlayToStopArc(): void {
-        const playToStop: TransitionToTransitionArc = {
-            start: this.playTransition,
-            end: this.stopTransition,
-        };
-        this.addArcIntern(playToStop);
+        this.arcs.addArc({
+            start: this.transitions.playTransition,
+            end: this.transitions.stopTransition,
+        });
     }
 
     addFromPlayArc(activityName: string): void {
-        const dfgt: DFGTransition = this.getOrCreateTransition(activityName);
-        const playToDfgt: TransitionToTransitionArc = {
-            start: this.playTransition,
-            end: dfgt,
-        };
-        this.addArcIntern(playToDfgt);
+        this.arcs.addArc({
+            start: this.transitions.playTransition,
+            end: this.transitions.getTransitionByName(activityName),
+        });
     }
 
     addToStopArc(activityName: string): void {
-        const dfgt: DFGTransition = this.getOrCreateTransition(activityName);
-        const dfgtToStop: TransitionToTransitionArc = {
-            start: dfgt,
-            end: this.stopTransition,
-        };
-        this.addArcIntern(dfgtToStop);
+        this.arcs.addArc({
+            start: this.transitions.getTransitionByName(activityName),
+            end: this.transitions.stopTransition,
+        });
     }
 
     addArc(startActivityName: string, endActivityName: string): void {
-        const tta: TransitionToTransitionArc = {
-            start: this.getOrCreateTransition(startActivityName),
-            end: this.getOrCreateTransition(endActivityName),
-        };
-        this.addArcIntern(tta);
+        this.arcs.addArc({
+            start: this.transitions.getTransitionByName(startActivityName),
+            end: this.transitions.getTransitionByName(endActivityName),
+        });
     }
 
-    private addArcIntern(arc: TransitionToTransitionArc): void {
+    createTransition(name: string): void {
+        this.transitions.createTransition(name);
+    }
+}
+
+export class Arcs {
+    private arcs: Set<TransitionToTransitionArc> = new Set();
+
+    addArc(arc: TransitionToTransitionArc): void {
         if (!this.containsArc(arc)) {
             this.arcs.add(arc);
         }
@@ -73,17 +63,50 @@ export class DFG implements PetriNetTransition {
         }
         return false;
     }
+}
 
-    getOrCreateTransition(name: string): DFGTransition {
-        let dfgt: DFGTransition | undefined = this.transitions.get(name);
-        if (dfgt === undefined) {
-            dfgt = {
-                id: 'dfgt' + ++this.count,
-                name: name,
-            };
-            this.transitions.set(dfgt.name, dfgt);
+export class Transitions {
+    readonly playTransition: DFGTransition = {
+        id: 'play',
+        name: 'play',
+    };
+    readonly stopTransition: DFGTransition = {
+        id: 'stop',
+        name: 'stop',
+    };
+
+    private readonly transitions: Map<string, DFGTransition> = new Map();
+    private count: number = 0;
+
+    constructor() {}
+
+    /**
+     * Postcondition: getTransitionByName(transition.name) return this transition
+     */
+    addTransition(transition: DFGTransition): void {
+        this.transitions.set(transition.name, transition);
+    }
+
+    /**
+     * Postcondition: getTransitionByName(name) returns a transition with the given name
+     */
+    createTransition(name: string): void {
+        if (this.transitions.has(name)) {
+            return;
         }
+        this.transitions.set(name, {
+            id: 'dfgt' + ++this.count,
+            name: name,
+        });
+    }
 
-        return dfgt;
+    /**
+     * Precondition: Transition with given name must have been created or added or name must be "play" or "stop"
+     */
+    getTransitionByName(name: string): DFGTransition {
+        if (!this.transitions.has(name)) {
+            throw new Error('Transition not found');
+        }
+        return this.transitions.get(name)!;
     }
 }
