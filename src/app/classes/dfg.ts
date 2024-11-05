@@ -72,7 +72,7 @@ export class DFG implements PetriNetTransition {
 }
 
 export class Arcs {
-    private arcs: Set<TransitionToTransitionArc> = new Set();
+    private readonly arcs: Set<TransitionToTransitionArc> = new Set();
 
     addArc(arc: TransitionToTransitionArc): void {
         if (!this.containsArc(arc)) {
