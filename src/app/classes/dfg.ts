@@ -82,7 +82,7 @@ export class Arcs {
 
     private containsArc(arc: TransitionToTransitionArc): boolean {
         for (const a of this.arcs) {
-            if (a.start === arc.start && a.end === arc.end) {
+            if (a.equals(arc)) {
                 return true;
             }
         }
@@ -149,12 +149,16 @@ export class Transitions {
 }
 
 export class TransitionToTransitionArc {
-    start: DFGTransition;
-    end: DFGTransition;
+    private start: DFGTransition;
+    private end: DFGTransition;
 
     constructor(start: DFGTransition, end: DFGTransition) {
         this.start = start;
         this.end = end;
+    }
+
+    equals(other: TransitionToTransitionArc): boolean {
+        return this.start === other.start && this.end === other.end;
     }
 
     asJson(): ArcJson {
