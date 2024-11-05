@@ -1,4 +1,3 @@
-import { endWith } from 'rxjs';
 import {
     DFGTransition,
     PetriNetTransition,
