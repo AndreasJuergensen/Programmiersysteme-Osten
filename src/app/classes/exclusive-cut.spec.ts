@@ -1,5 +1,4 @@
 import { CalculateDfgService } from '../services/calculate-dfg.service';
-import { InductiveMinerService } from '../services/inductive-miner.service';
 import { DFG } from './dfg';
 import { EventLog } from './event-log';
 import { ExclusiveCut } from './exclusive-cut';
@@ -35,80 +34,7 @@ describe('ExclusiveCutClass', () => {
         expect(new ExclusiveCut(cutArcs)).toBeTruthy();
     });
 
-    it('cut contains not correct amount(1) of arcs', () => {
-        const eventLog: EventLog = {
-            traces: [
-                { activities: [{ name: 'A' }, { name: 'B' }] },
-                { activities: [{ name: 'C' }, { name: 'D' }] },
-            ],
-        };
-        inputDFG = calcService.calculate(eventLog);
-        const fromPlayArc = inputDFG.getArcByStartEndName('play', 'C');
-        const cutArcs: TransitionToTransitionArc[] = [];
-        if (fromPlayArc !== undefined) {
-            cutArcs.push(fromPlayArc);
-        }
-        sut = new ExclusiveCut(cutArcs);
-
-        sut.validateExclusiveCut(inputDFG);
-        const result: string = sut.getFeedback();
-
-        expect(result).toEqual(
-            'An exclusive cut needs to be defined by exactly two arcs.',
-        );
-    });
-
-    it('cut contains no arc from play', () => {
-        const eventLog: EventLog = {
-            traces: [
-                { activities: [{ name: 'A' }, { name: 'B' }] },
-                { activities: [{ name: 'C' }, { name: 'D' }] },
-            ],
-        };
-        inputDFG = calcService.calculate(eventLog);
-        const arc = inputDFG.getArcByStartEndName('C', 'D');
-        const toStopArc = inputDFG.getArcByStartEndName('D', 'stop');
-        const cutArcs: TransitionToTransitionArc[] = [];
-        if (arc !== undefined && toStopArc !== undefined) {
-            cutArcs.push(arc);
-            cutArcs.push(toStopArc);
-        }
-        sut = new ExclusiveCut(cutArcs);
-
-        sut.validateExclusiveCut(inputDFG);
-        const result: string = sut.getFeedback();
-
-        expect(result).toEqual(
-            'One arc from exclusive cut needs to be connected to play.',
-        );
-    });
-
-    it('cut contains no arc to stop', () => {
-        const eventLog: EventLog = {
-            traces: [
-                { activities: [{ name: 'A' }, { name: 'B' }] },
-                { activities: [{ name: 'C' }, { name: 'D' }] },
-            ],
-        };
-        inputDFG = calcService.calculate(eventLog);
-        const fromPlayArc = inputDFG.getArcByStartEndName('play', 'C');
-        const arc = inputDFG.getArcByStartEndName('C', 'D');
-        const cutArcs: TransitionToTransitionArc[] = [];
-        if (arc !== undefined && fromPlayArc !== undefined) {
-            cutArcs.push(fromPlayArc);
-            cutArcs.push(arc);
-        }
-        sut = new ExclusiveCut(cutArcs);
-
-        sut.validateExclusiveCut(inputDFG);
-        const result: string = sut.getFeedback();
-
-        expect(result).toEqual(
-            'One arc of an exclusive cut needs to be connected to stop.',
-        );
-    });
-
-    it('cut contains correct arcs, but is not a valid cut', () => {
+    it('cut contains valid arcs, but is not a valid cut', () => {
         const eventLog: EventLog = {
             traces: [
                 { activities: [{ name: 'A' }, { name: 'B' }] },
@@ -124,9 +50,9 @@ describe('ExclusiveCutClass', () => {
             cutArcs.push(fromPlayArc);
             cutArcs.push(toStopArc);
         }
+        
         sut = new ExclusiveCut(cutArcs);
-
-        sut.validateExclusiveCut(inputDFG);
+        sut.validate(inputDFG);
         const result: string = sut.getFeedback();
 
         expect(result).toEqual(
@@ -151,7 +77,7 @@ describe('ExclusiveCutClass', () => {
         }
         sut = new ExclusiveCut(cutArcs);
 
-        sut.validateExclusiveCut(inputDFG);
+        sut.validate(inputDFG);
         const result: string = sut.getFeedback();
 
         expect(result).toEqual('valid');
@@ -175,7 +101,7 @@ describe('ExclusiveCutClass', () => {
         }
         sut = new ExclusiveCut(cutArcs);
 
-        sut.validateExclusiveCut(inputDFG);
+        sut.validate(inputDFG);
         const result: string = sut.getFeedback();
 
         expect(result).toEqual('valid');
@@ -199,7 +125,7 @@ describe('ExclusiveCutClass', () => {
         }
         sut = new ExclusiveCut(cutArcs);
 
-        sut.validateExclusiveCut(inputDFG);
+        sut.validate(inputDFG);
         const result: string = sut.getFeedback();
 
         expect(result).toEqual(

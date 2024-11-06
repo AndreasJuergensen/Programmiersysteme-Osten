@@ -16,6 +16,67 @@ describe('InductiveMinerService', () => {
         inputDFG = new DFG('inputDFG');
     });
 
+    it('exclusive cut contains not correct amount(1) of arcs', () => {
+        const eventLog: EventLog = {
+            traces: [
+                { activities: [{ name: 'A' }, { name: 'B' }] },
+                { activities: [{ name: 'C' }, { name: 'D' }] },
+            ],
+        };
+        inputDFG = calcService.calculate(eventLog);
+        const fromPlayArc = inputDFG.getArcByStartEndName('play', 'C');
+        const cutArcs: TransitionToTransitionArc[] = [];
+        if (fromPlayArc !== undefined) {
+            cutArcs.push(fromPlayArc);
+        }
+
+        const result = sut.mine(eventLog, inputDFG, cutArcs);
+
+        expect(result).toEqual('No cut detected, please try again.');
+    });
+
+    it('exclusive cut contains no arc from play', () => {
+        const eventLog: EventLog = {
+            traces: [
+                { activities: [{ name: 'A' }, { name: 'B' }] },
+                { activities: [{ name: 'C' }, { name: 'D' }] },
+            ],
+        };
+        inputDFG = calcService.calculate(eventLog);
+        const arc = inputDFG.getArcByStartEndName('C', 'D');
+        const toStopArc = inputDFG.getArcByStartEndName('D', 'stop');
+        const cutArcs: TransitionToTransitionArc[] = [];
+        if (arc !== undefined && toStopArc !== undefined) {
+            cutArcs.push(arc);
+            cutArcs.push(toStopArc);
+        }
+
+        const result = sut.mine(eventLog, inputDFG, cutArcs);
+
+        expect(result).toEqual('No cut detected, please try again.');
+    });
+
+    it('exclusive cut contains no arc to stop', () => {
+        const eventLog: EventLog = {
+            traces: [
+                { activities: [{ name: 'A' }, { name: 'B' }] },
+                { activities: [{ name: 'C' }, { name: 'D' }] },
+            ],
+        };
+        inputDFG = calcService.calculate(eventLog);
+        const fromPlayArc = inputDFG.getArcByStartEndName('play', 'C');
+        const arc = inputDFG.getArcByStartEndName('C', 'D');
+        const cutArcs: TransitionToTransitionArc[] = [];
+        if (arc !== undefined && fromPlayArc !== undefined) {
+            cutArcs.push(fromPlayArc);
+            cutArcs.push(arc);
+        }
+
+        const result = sut.mine(eventLog, inputDFG, cutArcs);
+
+        expect(result).toEqual('No cut detected, please try again.');
+    });
+
     it('exclusive cut is valid', () => {
         const eventLog: EventLog = {
             traces: [
@@ -32,10 +93,18 @@ describe('InductiveMinerService', () => {
             cutArcs.push(toStopArc);
         }
 
-        const result = sut.mine(inputDFG, cutArcs);
+        const result = sut.mine(eventLog, inputDFG, cutArcs);
 
         const expectedCut: ExclusiveCut = new ExclusiveCut(cutArcs);
-        expectedCut.validateExclusiveCut(inputDFG);
+        expectedCut.feedback = 'valid';
+        expectedCut.partEventLog2 = {
+            traces: [{ activities: [{ name: 'A' }, { name: 'B' }] }],
+        };
+        expectedCut.partEventLog1 = {
+            traces: [{ activities: [{ name: 'C' }, { name: 'D' }] }],
+        };
+        expectedCut.partDFG1 = calcService.calculate(expectedCut.partEventLog1);
+        expectedCut.partDFG2 = calcService.calculate(expectedCut.partEventLog2);
 
         expect(result).toEqual(expectedCut);
     });
@@ -57,11 +126,12 @@ describe('InductiveMinerService', () => {
             cutArcs.push(toStopArc);
         }
 
-        const result = sut.mine(inputDFG, cutArcs);
+        const result = sut.mine(eventLog, inputDFG, cutArcs);
 
         const expectedCut: ExclusiveCut = new ExclusiveCut(cutArcs);
-        expectedCut.validateExclusiveCut(inputDFG);
+        expectedCut.feedback =
+            'An exclusive cut must not contain any arc between the subsets of its origin-DFG.';
 
-        expect(result).toEqual(expectedCut.getFeedback());
+        expect(result).toEqual(expectedCut.feedback);
     });
 });
