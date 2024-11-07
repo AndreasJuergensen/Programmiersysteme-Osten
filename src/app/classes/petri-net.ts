@@ -32,8 +32,3 @@ export interface TransitionToPlaceArc {
     start: PetriNetTransition;
     end: Place;
 }
-
-export interface TransitionToTransitionArc {
-    start: DFGTransition;
-    end: DFGTransition;
-}

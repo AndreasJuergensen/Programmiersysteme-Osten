@@ -1,25 +1,31 @@
-import { DFG } from '../classes/dfg';
+import { DfgJson } from '../classes/dfg';
 import { EventLog } from '../classes/event-log';
-import { DFGTransition, TransitionToTransitionArc } from '../classes/petri-net';
+import { DFGTransition } from '../classes/petri-net';
 import { CalculateDfgService } from './calculate-dfg.service';
 
 describe('CalculateDfgService', () => {
     const playTransition: DFGTransition = { id: 'play', name: 'play' };
     const stopTransition: DFGTransition = { id: 'stop', name: 'stop' };
     let sut: CalculateDfgService;
-    let expectedDfg: DFG;
 
     beforeEach(() => {
         sut = new CalculateDfgService();
-        expectedDfg = new DFG('pnt1');
     });
 
     it('empty event log -> empty dfg', () => {
         const eventLog: EventLog = { traces: [] };
 
-        const result: DFG = sut.calculate(eventLog);
+        const result: DfgJson = sut.calculate(eventLog).asJson();
 
-        expectedDfg.addPlayToStopArc();
+        const expectedDfg: DfgJson = {
+            transitions: [
+                { id: 'play', name: 'play' },
+                { id: 'stop', name: 'stop' }
+            ],
+            arcs: [
+                { start: 'play', end: 'stop' },
+            ],
+        };
         expect(result).toEqual(expectedDfg);
     });
 
@@ -28,10 +34,19 @@ describe('CalculateDfgService', () => {
             traces: [{ activities: [{ name: 'A' }] }],
         };
 
-        const result: DFG = sut.calculate(eventLog);
+        const result: DfgJson = sut.calculate(eventLog).asJson();
 
-        expectedDfg.addFromPlayArc('A');
-        expectedDfg.addToStopArc('A');
+        const expectedDfg: DfgJson = {
+            transitions: [
+                { id: 'play', name: 'play' },
+                { id: 'stop', name: 'stop' },
+                { id: 'dfgt1', name: 'A' },
+            ],
+            arcs: [
+                { start: 'play', end: 'dfgt1' },
+                { start: 'dfgt1', end: 'stop' },
+            ],
+        };
         expect(result).toEqual(expectedDfg);
     });
 
@@ -40,11 +55,21 @@ describe('CalculateDfgService', () => {
             traces: [{ activities: [{ name: 'A' }, { name: 'B' }] }],
         };
 
-        const result: DFG = sut.calculate(eventLog);
+        const result: DfgJson = sut.calculate(eventLog).asJson();
 
-        expectedDfg.addFromPlayArc('A');
-        expectedDfg.addArc('A', 'B');
-        expectedDfg.addToStopArc('B');
+        const expectedDfg: DfgJson = {
+            transitions: [
+                { id: 'play', name: 'play' },
+                { id: 'stop', name: 'stop' },
+                { id: 'dfgt1', name: 'A' },
+                { id: 'dfgt2', name: 'B' },
+            ],
+            arcs: [
+                { start: 'play', end: 'dfgt1' },
+                { start: 'dfgt1', end: 'dfgt2' },
+                { start: 'dfgt2', end: 'stop' },
+            ],
+        };
         expect(result).toEqual(expectedDfg);
     });
 
@@ -55,12 +80,22 @@ describe('CalculateDfgService', () => {
             ],
         };
 
-        const result: DFG = sut.calculate(eventLog);
+        const result: DfgJson = sut.calculate(eventLog).asJson();
 
-        expectedDfg.addFromPlayArc('A');
-        expectedDfg.addArc('A', 'B');
-        expectedDfg.addArc('B', 'A');
-        expectedDfg.addToStopArc('A');
+        const expectedDfg: DfgJson = {
+            transitions: [
+                { id: 'play', name: 'play' },
+                { id: 'stop', name: 'stop' },
+                { id: 'dfgt1', name: 'A' },
+                { id: 'dfgt2', name: 'B' },
+            ],
+            arcs: [
+                { start: 'play', end: 'dfgt1' },
+                { start: 'dfgt1', end: 'dfgt2' },
+                { start: 'dfgt2', end: 'dfgt1' },
+                { start: 'dfgt1', end: 'stop' },
+            ],
+        };
         expect(result).toEqual(expectedDfg);
     });
 
@@ -72,15 +107,26 @@ describe('CalculateDfgService', () => {
             ],
         };
 
-        const result: DFG = sut.calculate(eventLog);
+        const result: DfgJson = sut.calculate(eventLog).asJson();
 
-        expectedDfg.addFromPlayArc('A');
-        expectedDfg.addArc('A', 'B');
-        expectedDfg.addArc('B', 'A');
-        expectedDfg.addToStopArc('A');
-        expectedDfg.addFromPlayArc('B');
-        expectedDfg.addArc('B', 'C');
-        expectedDfg.addArc('C', 'A');
+        const expectedDfg: DfgJson = {
+            transitions: [
+                { id: 'play', name: 'play' },
+                { id: 'stop', name: 'stop' },
+                { id: 'dfgt1', name: 'A' },
+                { id: 'dfgt2', name: 'B' },
+                { id: 'dfgt3', name: 'C' },
+            ],
+            arcs: [
+                {start: "play", end: "dfgt1"},
+                {start: "dfgt1", end: "dfgt2"},
+                {start: "dfgt2", end: "dfgt1"},
+                {start: "dfgt1", end: "stop"},
+                {start: "play", end: "dfgt2"},
+                {start: "dfgt2", end: "dfgt3"},
+                {start: "dfgt3", end: "dfgt1"}
+            ]
+        };
         expect(result).toEqual(expectedDfg);
     });
 
@@ -96,15 +142,26 @@ describe('CalculateDfgService', () => {
             ],
         };
 
-        const result: DFG = sut.calculate(eventLog);
+        const result: DfgJson = sut.calculate(eventLog).asJson();
 
-        expectedDfg.addFromPlayArc('A');
-        expectedDfg.addArc('A', 'B');
-        expectedDfg.addArc('B', 'A');
-        expectedDfg.addToStopArc('A');
-        expectedDfg.addFromPlayArc('B');
-        expectedDfg.addArc('A', 'C');
-        expectedDfg.addToStopArc('C');
+        const expectedDfg: DfgJson = {
+            transitions: [
+                { id: 'play', name: 'play' },
+                { id: 'stop', name: 'stop' },
+                { id: 'dfgt1', name: 'A' },
+                { id: 'dfgt2', name: 'B' },
+                { id: 'dfgt3', name: 'C' },
+            ],
+            arcs: [
+                { start: 'play', end: 'dfgt1' },
+                { start: 'dfgt1', end: 'dfgt2' },
+                { start: 'dfgt2', end: 'dfgt1' },
+                { start: 'dfgt1', end: 'stop' },
+                { start: 'play', end: 'dfgt2' },
+                { start: 'dfgt1', end: 'dfgt3' },
+                { start: 'dfgt3', end: 'stop' },
+            ],
+        };
         expect(result).toEqual(expectedDfg);
     });
 });
