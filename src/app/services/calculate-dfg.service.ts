@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { EventLog } from '../classes/event-log';
-import { DFG } from '../classes/dfg';
+import { Dfg, DfgBuilder } from '../classes/dfg/dfg';
 
 @Injectable({
     providedIn: 'root',
@@ -8,33 +8,33 @@ import { DFG } from '../classes/dfg';
 export class CalculateDfgService {
     constructor() {}
 
-    public calculate(eventLog: EventLog): DFG {
-        const dfg: DFG = new DFG('pnt1');
+    public calculate(eventLog: EventLog): Dfg {
+        const dfgBuilder: DfgBuilder = new DfgBuilder();
 
         if (eventLog.traces.length === 0) {
-            dfg.addPlayToStopArc();
-            return dfg;
+            dfgBuilder.addPlayToStopArc();
+            return dfgBuilder.build();
         }
 
         eventLog.traces
             .flatMap((trace) => trace.activities)
             .map((activity) => activity.name)
-            .forEach((name) => dfg.createTransition(name));
+            .forEach((name) => dfgBuilder.createActivity(name));
 
         eventLog.traces.forEach((trace) => {
             trace.activities.forEach((activity, i, activities) => {
                 if (i === 0) {
-                    dfg.addFromPlayArc(activity.name);
+                    dfgBuilder.addFromPlayArc(activity.name);
                 } else {
-                    dfg.addArc(activities[i - 1].name, activity.name);
+                    dfgBuilder.addArc(activities[i - 1].name, activity.name);
                 }
 
                 if (i === activities.length - 1) {
-                    dfg.addToStopArc(activity.name);
+                    dfgBuilder.addToStopArc(activity.name);
                 }
             });
         });
 
-        return dfg;
+        return dfgBuilder.build();
     }
 }
