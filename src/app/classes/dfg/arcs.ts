@@ -1,32 +1,50 @@
 import { Activities, Activity } from './activities';
 
 export class Arcs {
-    private readonly arcs: Array<DfgArc> = new Array();
+    constructor(private readonly arcs: Array<DfgArc> = new Array()) {}
 
-    filter(predicate: (arc: DfgArc) => boolean): Arcs {
-        const copy: Arcs = new Arcs();
-        Array.from(this.arcs)
-            .filter(predicate)
-            .forEach((arc) => copy.addArc(arc));
-        return copy;
+    filterArcsCompletelyIn(activities: Activities): Arcs {
+        return new Arcs(
+            this.arcs.filter(
+                (arc) =>
+                    arc.startIsIncludedIn(activities) &&
+                    arc.endIsIncludedIn(activities),
+            ),
+        );
+    }
+
+    calculateReachableActivitiesFromSingleActivity(
+        startActivity: Activity,
+    ): Activities {
+        return this.calculateReachableActivities(
+            new Activities([startActivity]),
+        );
     }
 
     calculateReachableActivities(startActivities: Activities): Activities {
         return Array.from(this.arcs.values())
             .filter((arc) => arc.startIsIncludedIn(startActivities))
             .map((arc) => arc.getEnd())
-            .map((endActivity) => new Activities().addActivity(endActivity))
+            .map((endActivity) => new Activities([endActivity]))
             .reduce(
                 (prev, curr) => new Activities().addAll(prev).addAll(curr),
                 new Activities(),
             );
     }
 
+    calculateReachingActivitiesFromSingleActivity(
+        endActivity: Activity,
+    ): Activities {
+        return this.calculateReachingActivities(
+            new Activities([endActivity]),
+        );
+    }
+
     calculateReachingActivities(endActivities: Activities): Activities {
         return Array.from(this.arcs.values())
             .filter((arc) => arc.endIsIncludedIn(endActivities))
             .map((arc) => arc.getStart())
-            .map((endActivity) => new Activities().addActivity(endActivity))
+            .map((endActivity) => new Activities([endActivity]))
             .reduce(
                 (prev, curr) => new Activities().addAll(prev).addAll(curr),
                 new Activities(),
@@ -69,6 +87,26 @@ export class Arcs {
             !prevReachingActivities.containsAllActivities(reachingActivities)
         );
         return reachingActivities;
+    }
+
+    calculateFromOutsideReachableActivities(
+        activities: Activities,
+    ): Activities {
+        return new Activities(
+            this.arcs
+                .filter((arc) => arc.endIsIncludedIn(activities))
+                .filter((arc) => !arc.startIsIncludedIn(activities))
+                .map((arc) => arc.getEnd()),
+        );
+    }
+
+    calculateOutsideReachingActivities(activities: Activities): Activities {
+        return new Activities(
+            this.arcs
+                .filter((arc) => arc.startIsIncludedIn(activities))
+                .filter((arc) => !arc.endIsIncludedIn(activities))
+                .map((arc) => arc.getStart()),
+        );
     }
 
     addArc(arc: DfgArc): Arcs {
@@ -135,4 +173,4 @@ export class DfgArc {
             end: this.end.asJson(),
         };
     }
- }
+}

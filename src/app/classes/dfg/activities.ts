@@ -2,9 +2,7 @@ export class Activities {
     readonly playActivity: Activity = new Activity('play');
     readonly stopActivity: Activity = new Activity('stop');
 
-    private activities: Array<Activity> = [];
-
-    constructor() {}
+    constructor(private readonly activities: Array<Activity> = new Array()) {}
 
     addPlayAndStop(): Activities {
         this.activities.push(this.playActivity);
