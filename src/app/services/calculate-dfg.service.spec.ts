@@ -1,11 +1,8 @@
-import { DfgJson } from '../classes/dfg';
+import { DfgJson } from '../classes/dfg/dfg';
 import { EventLog } from '../classes/event-log';
-import { DFGTransition } from '../classes/petri-net';
 import { CalculateDfgService } from './calculate-dfg.service';
 
 describe('CalculateDfgService', () => {
-    const playTransition: DFGTransition = { id: 'play', name: 'play' };
-    const stopTransition: DFGTransition = { id: 'stop', name: 'stop' };
     let sut: CalculateDfgService;
 
     beforeEach(() => {
@@ -18,13 +15,8 @@ describe('CalculateDfgService', () => {
         const result: DfgJson = sut.calculate(eventLog).asJson();
 
         const expectedDfg: DfgJson = {
-            transitions: [
-                { id: 'play', name: 'play' },
-                { id: 'stop', name: 'stop' }
-            ],
-            arcs: [
-                { start: 'play', end: 'stop' },
-            ],
+            activities: ['play', 'stop'],
+            arcs: [{ start: 'play', end: 'stop' }],
         };
         expect(result).toEqual(expectedDfg);
     });
@@ -37,14 +29,10 @@ describe('CalculateDfgService', () => {
         const result: DfgJson = sut.calculate(eventLog).asJson();
 
         const expectedDfg: DfgJson = {
-            transitions: [
-                { id: 'play', name: 'play' },
-                { id: 'stop', name: 'stop' },
-                { id: 'dfgt1', name: 'A' },
-            ],
+            activities: ['play', 'stop', 'A'],
             arcs: [
-                { start: 'play', end: 'dfgt1' },
-                { start: 'dfgt1', end: 'stop' },
+                { start: 'play', end: 'A' },
+                { start: 'A', end: 'stop' },
             ],
         };
         expect(result).toEqual(expectedDfg);
@@ -58,16 +46,11 @@ describe('CalculateDfgService', () => {
         const result: DfgJson = sut.calculate(eventLog).asJson();
 
         const expectedDfg: DfgJson = {
-            transitions: [
-                { id: 'play', name: 'play' },
-                { id: 'stop', name: 'stop' },
-                { id: 'dfgt1', name: 'A' },
-                { id: 'dfgt2', name: 'B' },
-            ],
+            activities: ['play', 'stop', 'A', 'B'],
             arcs: [
-                { start: 'play', end: 'dfgt1' },
-                { start: 'dfgt1', end: 'dfgt2' },
-                { start: 'dfgt2', end: 'stop' },
+                { start: 'play', end: 'A' },
+                { start: 'A', end: 'B' },
+                { start: 'B', end: 'stop' },
             ],
         };
         expect(result).toEqual(expectedDfg);
@@ -83,17 +66,12 @@ describe('CalculateDfgService', () => {
         const result: DfgJson = sut.calculate(eventLog).asJson();
 
         const expectedDfg: DfgJson = {
-            transitions: [
-                { id: 'play', name: 'play' },
-                { id: 'stop', name: 'stop' },
-                { id: 'dfgt1', name: 'A' },
-                { id: 'dfgt2', name: 'B' },
-            ],
+            activities: ['play', 'stop', 'A', 'B'],
             arcs: [
-                { start: 'play', end: 'dfgt1' },
-                { start: 'dfgt1', end: 'dfgt2' },
-                { start: 'dfgt2', end: 'dfgt1' },
-                { start: 'dfgt1', end: 'stop' },
+                { start: 'play', end: 'A' },
+                { start: 'A', end: 'B' },
+                { start: 'B', end: 'A' },
+                { start: 'A', end: 'stop' },
             ],
         };
         expect(result).toEqual(expectedDfg);
@@ -110,22 +88,16 @@ describe('CalculateDfgService', () => {
         const result: DfgJson = sut.calculate(eventLog).asJson();
 
         const expectedDfg: DfgJson = {
-            transitions: [
-                { id: 'play', name: 'play' },
-                { id: 'stop', name: 'stop' },
-                { id: 'dfgt1', name: 'A' },
-                { id: 'dfgt2', name: 'B' },
-                { id: 'dfgt3', name: 'C' },
-            ],
+            activities: ['play', 'stop', 'A', 'B', 'C'],
             arcs: [
-                {start: "play", end: "dfgt1"},
-                {start: "dfgt1", end: "dfgt2"},
-                {start: "dfgt2", end: "dfgt1"},
-                {start: "dfgt1", end: "stop"},
-                {start: "play", end: "dfgt2"},
-                {start: "dfgt2", end: "dfgt3"},
-                {start: "dfgt3", end: "dfgt1"}
-            ]
+                { start: 'play', end: 'A' },
+                { start: 'A', end: 'B' },
+                { start: 'B', end: 'A' },
+                { start: 'A', end: 'stop' },
+                { start: 'play', end: 'B' },
+                { start: 'B', end: 'C' },
+                { start: 'C', end: 'A' },
+            ],
         };
         expect(result).toEqual(expectedDfg);
     });
@@ -145,21 +117,15 @@ describe('CalculateDfgService', () => {
         const result: DfgJson = sut.calculate(eventLog).asJson();
 
         const expectedDfg: DfgJson = {
-            transitions: [
-                { id: 'play', name: 'play' },
-                { id: 'stop', name: 'stop' },
-                { id: 'dfgt1', name: 'A' },
-                { id: 'dfgt2', name: 'B' },
-                { id: 'dfgt3', name: 'C' },
-            ],
+            activities: ['play', 'stop', 'A', 'B', 'C'],
             arcs: [
-                { start: 'play', end: 'dfgt1' },
-                { start: 'dfgt1', end: 'dfgt2' },
-                { start: 'dfgt2', end: 'dfgt1' },
-                { start: 'dfgt1', end: 'stop' },
-                { start: 'play', end: 'dfgt2' },
-                { start: 'dfgt1', end: 'dfgt3' },
-                { start: 'dfgt3', end: 'stop' },
+                { start: 'play', end: 'A' },
+                { start: 'A', end: 'B' },
+                { start: 'B', end: 'A' },
+                { start: 'A', end: 'stop' },
+                { start: 'play', end: 'B' },
+                { start: 'A', end: 'C' },
+                { start: 'C', end: 'stop' },
             ],
         };
         expect(result).toEqual(expectedDfg);
