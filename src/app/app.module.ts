@@ -13,6 +13,7 @@ import {
     provideHttpClient,
     withInterceptorsFromDi,
 } from '@angular/common/http';
+import { DrawingAreaModule } from './components/drawing-area/drawing-area.module';
 
 @NgModule({
     declarations: [AppComponent, FooterComponent],
@@ -25,6 +26,7 @@ import {
         MatButtonModule,
         MatIconModule,
         ReactiveFormsModule,
+        DrawingAreaModule,
     ],
     providers: [
         {
