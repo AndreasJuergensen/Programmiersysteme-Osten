@@ -1,4 +1,5 @@
-import { EventLog } from '../classes/event-log';
+import { Activity } from '../classes/dfg/activities';
+import { EventLog, Trace } from '../classes/event-log';
 import { EventLogParserService } from './event-log-parser.service';
 
 describe('EventLogParserService', () => {
@@ -13,19 +14,22 @@ describe('EventLogParserService', () => {
 
         const result: EventLog = sut.parse(eventLogStr);
 
-        expect(result).toEqual({ traces: [] });
+        expect(result).toEqual(new EventLog([]));
     });
 
     it('one simple trace', () => {
         const eventLogStr: string = 'A B C';
-
         const result: EventLog = sut.parse(eventLogStr);
 
-        expect(result).toEqual({
-            traces: [
-                { activities: [{ name: 'A' }, { name: 'B' }, { name: 'C' }] },
-            ],
-        });
+        const expectedEventLog = new EventLog([
+            new Trace([
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('C'),
+            ]),
+        ]);
+
+        expect(result).toEqual(expectedEventLog);
     });
 
     it('multiletter activities', () => {
@@ -33,11 +37,10 @@ describe('EventLogParserService', () => {
 
         const result: EventLog = sut.parse(eventLogStr);
 
-        expect(result).toEqual({
-            traces: [
-                { activities: [{ name: 'ABC' }, { name: 'XYZ' }] },
-            ],
-        });
+        const expectedEventLog = new EventLog([
+            new Trace([new Activity('ABC'), new Activity('XYZ')]),
+        ]);
+        expect(result).toEqual(expectedEventLog);
     });
 
     it('multiple traces with spaces around the +', () => {
@@ -45,12 +48,19 @@ describe('EventLogParserService', () => {
 
         const result: EventLog = sut.parse(eventLog);
 
-        expect(result).toEqual({
-            traces: [
-                { activities: [{ name: 'A' }, { name: 'B' }, { name: 'C' }] },
-                { activities: [{ name: 'X' }, { name: 'Y' }, { name: 'Z' }] },
-            ],
-        });
+        const expectedEventLog = new EventLog([
+            new Trace([
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('C'),
+            ]),
+            new Trace([
+                new Activity('X'),
+                new Activity('Y'),
+                new Activity('Z'),
+            ]),
+        ]);
+        expect(result).toEqual(expectedEventLog);
     });
 
     it('multiple traces without spaces around the +', () => {
@@ -58,12 +68,19 @@ describe('EventLogParserService', () => {
 
         const result: EventLog = sut.parse(eventLog);
 
-        expect(result).toEqual({
-            traces: [
-                { activities: [{ name: 'A' }, { name: 'B' }, { name: 'C' }] },
-                { activities: [{ name: 'X' }, { name: 'Y' }, { name: 'Z' }] },
-            ],
-        });
+        const expectedEventLog = new EventLog([
+            new Trace([
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('C'),
+            ]),
+            new Trace([
+                new Activity('X'),
+                new Activity('Y'),
+                new Activity('Z'),
+            ]),
+        ]);
+        expect(result).toEqual(expectedEventLog);
     });
 
     it('multiple traces in multiple lines', () => {
@@ -71,11 +88,18 @@ describe('EventLogParserService', () => {
 
         const result: EventLog = sut.parse(eventLog);
 
-        expect(result).toEqual({
-            traces: [
-                { activities: [{ name: 'A' }, { name: 'B' }, { name: 'C' }] },
-                { activities: [{ name: 'X' }, { name: 'Y' }, { name: 'Z' }] },
-            ],
-        });
+        const expectedEventLog = new EventLog([
+            new Trace([
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('C'),
+            ]),
+            new Trace([
+                new Activity('X'),
+                new Activity('Y'),
+                new Activity('Z'),
+            ]),
+        ]);
+        expect(result).toEqual(expectedEventLog);
     });
 });
