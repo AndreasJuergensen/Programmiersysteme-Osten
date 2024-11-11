@@ -13,7 +13,7 @@ export class CalculateDfgService {
 
         if (eventLog.getAllTraces().length === 0) {
             dfgBuilder.addPlayToStopArc();
-            return dfgBuilder.build();
+            return dfgBuilder.build(eventLog);
         }
 
         eventLog
@@ -38,6 +38,6 @@ export class CalculateDfgService {
             });
         });
 
-        return dfgBuilder.build();
+        return dfgBuilder.build(eventLog);
     }
 }
