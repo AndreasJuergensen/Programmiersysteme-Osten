@@ -139,4 +139,28 @@ describe('CalculateDfgService', () => {
         };
         expect(result).toEqual(expectedDfg);
     });
+
+    it('output event log with one trace containing one activity previously safed in DFG', () => {
+        const eventLog = new EventLog([new Trace([new Activity('A')])]);
+
+        const result: EventLog = sut.calculate(eventLog).getEventLog();
+
+        expect(result).toEqual(eventLog);
+    });
+
+    // it('update EventLog safed in DFG and output updated Event Log', () => {
+    //     const eventLog = new EventLog([new Trace([new Activity('A')])]);
+
+    //     const newEventLog: EventLog = new EventLog([
+    //         new Trace([new Activity('B')]),
+    //     ]);
+
+    //     const update: EventLog = sut
+    //         .calculate(eventLog)
+    //         .updateEventLog(newEventLog);
+
+    //     const result: EventLog = update.getEventLog();
+
+    //     expect(result).toEqual(newEventLog);
+    // });
 });
