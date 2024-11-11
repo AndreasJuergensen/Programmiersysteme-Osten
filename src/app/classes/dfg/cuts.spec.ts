@@ -1,3 +1,4 @@
+import { EventLog } from '../event-log';
 import { Activities } from './activities';
 import { Arcs, DfgArc } from './arcs';
 import { ExclusiveCut, ParallelCut, SequenceCut } from './cut';
@@ -5,6 +6,7 @@ import { Dfg, DfgBuilder } from './dfg';
 
 describe('A Dfg', () => {
     it('can not be cut in a1 and a2 if a1 is empty', () => {
+        const inputEventLog: EventLog = new EventLog([]);
         const sut: Dfg = new DfgBuilder()
             .createActivity('A')
             .createActivity('B')
@@ -12,7 +14,7 @@ describe('A Dfg', () => {
             .addFromPlayArc('B')
             .addToStopArc('A')
             .addToStopArc('B')
-            .build();
+            .build(inputEventLog);
         const a1: Activities = new Activities();
         const a2: Activities = new Activities()
             .createActivity('A')
@@ -24,6 +26,7 @@ describe('A Dfg', () => {
     });
 
     it('can not be cut in a1 and a2 if a2 is empty', () => {
+        const inputEventLog: EventLog = new EventLog([]);
         const sut: Dfg = new DfgBuilder()
             .createActivity('A')
             .createActivity('B')
@@ -31,7 +34,7 @@ describe('A Dfg', () => {
             .addFromPlayArc('B')
             .addToStopArc('A')
             .addToStopArc('B')
-            .build();
+            .build(inputEventLog);
         const a1: Activities = new Activities()
             .createActivity('A')
             .createActivity('B');
@@ -43,11 +46,12 @@ describe('A Dfg', () => {
     });
 
     it('can not be cut in a1 and a2 if the union of a1 and a2 does not contain all activities of the dfg', () => {
+        const inputEventLog: EventLog = new EventLog([]);
         const sut: Dfg = new DfgBuilder()
             .createActivity('A')
             .createActivity('B')
             .createActivity('C')
-            .build();
+            .build(inputEventLog);
         const a1: Activities = new Activities().createActivity('A');
         const a2: Activities = new Activities().createActivity('B');
 
@@ -57,10 +61,11 @@ describe('A Dfg', () => {
     });
 
     it('can not be cut in a1 and a2 if the union of a1 and a2 does contain more activities than the dfg', () => {
+        const inputEventLog: EventLog = new EventLog([]);
         const sut: Dfg = new DfgBuilder()
             .createActivity('A')
             .createActivity('B')
-            .build();
+            .build(inputEventLog);
         const a1: Activities = new Activities().createActivity('A');
         const a2: Activities = new Activities()
             .createActivity('B')
@@ -72,10 +77,11 @@ describe('A Dfg', () => {
     });
 
     it('can not be cut in a1 and a2 if the intersection of a1 and a2 is not empty', () => {
+        const inputEventLog: EventLog = new EventLog([]);
         const sut: Dfg = new DfgBuilder()
             .createActivity('A')
             .createActivity('B')
-            .build();
+            .build(inputEventLog);
         const a1: Activities = new Activities().createActivity('A');
         const a2: Activities = new Activities()
             .createActivity('A')
@@ -93,6 +99,7 @@ describe('A Dfg', () => {
             'and no arc between a1 and a2 exists ' +
             '(ExclusiveCut)',
         () => {
+            const inputEventLog: EventLog = new EventLog([]);
             const sut: Dfg = new DfgBuilder()
                 .createActivity('A')
                 .createActivity('B')
@@ -102,7 +109,7 @@ describe('A Dfg', () => {
                 .addArc('B', 'stop')
                 .addArc('play', 'C')
                 .addArc('C', 'stop')
-                .build();
+                .build(inputEventLog);
             const a1: Activities = new Activities()
                 .createActivity('A')
                 .createActivity('B');
@@ -122,6 +129,7 @@ describe('A Dfg', () => {
             'and no arc from a2 to a1 exists ' +
             '(SequenceCut)',
         () => {
+            const inputEventLog: EventLog = new EventLog([]);
             const sut: Dfg = new DfgBuilder()
                 .createActivity('A')
                 .createActivity('B')
@@ -135,7 +143,7 @@ describe('A Dfg', () => {
                 .addArc('D', 'C')
                 .addArc('C', 'stop')
                 .addArc('D', 'stop')
-                .build();
+                .build(inputEventLog);
             const a1: Activities = new Activities()
                 .createActivity('A')
                 .createActivity('B');
@@ -159,6 +167,7 @@ describe('A Dfg', () => {
             'every activity in a2 can be passed through on the way from play to stop only visiting activities in a2 ' +
             '(ParallelCut)',
         () => {
+            const inputEventLog: EventLog = new EventLog([]);
             const sut: Dfg = new DfgBuilder()
                 .createActivity('A')
                 .createActivity('B')
@@ -178,7 +187,7 @@ describe('A Dfg', () => {
                 .addArc('C', 'D')
                 .addArc('B', 'stop')
                 .addArc('D', 'stop')
-                .build();
+                .build(inputEventLog);
             const a1: Activities = new Activities()
                 .createActivity('A')
                 .createActivity('B');
@@ -195,6 +204,7 @@ describe('A Dfg', () => {
 
 describe('An ExclusiveCut', () => {
     it('is not possible if an arc from a1 to a2 exists', () => {
+        const inputEventLog: EventLog = new EventLog([]);
         const activities: Activities = new Activities()
             .createActivity('A')
             .createActivity('B');
@@ -214,6 +224,7 @@ describe('An ExclusiveCut', () => {
     });
 
     it('is not possible if an arc from a2 to a1 exists', () => {
+        const inputEventLog: EventLog = new EventLog([]);
         const activities: Activities = new Activities()
             .createActivity('A')
             .createActivity('B');
@@ -235,6 +246,7 @@ describe('An ExclusiveCut', () => {
 
 describe('A SequenceCut', () => {
     it('is not possible if at least one activity in a2 can not be reached from at least one activity in a1', () => {
+        const inputEventLog: EventLog = new EventLog([]);
         const activities: Activities = new Activities()
             .createActivity('A')
             .createActivity('B')
@@ -257,6 +269,7 @@ describe('A SequenceCut', () => {
     });
 
     it('is not possible if an arc from a2 to a1 exists', () => {
+        const inputEventLog: EventLog = new EventLog([]);
         const activities: Activities = new Activities()
             .createActivity('A')
             .createActivity('B');
@@ -278,6 +291,7 @@ describe('A SequenceCut', () => {
 
 describe('A ParallelCut', () => {
     it('is not possible if at least one activity in a1 has no arc to at least one activity in a2', () => {
+        const inputEventLog: EventLog = new EventLog([]);
         const activities: Activities = new Activities()
             .createActivity('A')
             .createActivity('B')
@@ -355,6 +369,7 @@ describe('A ParallelCut', () => {
     });
 
     it('is not possible if at least one activity in a1 can not be reached from at least one activity in a2', () => {
+        const inputEventLog: EventLog = new EventLog([]);
         const activities: Activities = new Activities()
             .createActivity('A')
             .createActivity('B')
@@ -432,6 +447,7 @@ describe('A ParallelCut', () => {
     });
 
     it('is not possible if at least one activity in a1 can not be passed through on the way from play to stop only visiting activities in a1', () => {
+        const inputEventLog: EventLog = new EventLog([]);
         const activities: Activities = new Activities()
             .createActivity('A')
             .createActivity('B')
@@ -491,6 +507,7 @@ describe('A ParallelCut', () => {
     });
 
     it('is not possible if at least on activity in a2 can not be passed through on the way from play to stop only visiting activities in a2', () => {
+        const inputEventLog: EventLog = new EventLog([]);
         const activities: Activities = new Activities()
             .createActivity('A')
             .createActivity('B')
