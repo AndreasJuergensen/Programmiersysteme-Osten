@@ -1,5 +1,5 @@
 import { Activity } from '../classes/dfg/activities';
-import { DfgJson } from '../classes/dfg/dfg';
+import { Dfg, DfgJson } from '../classes/dfg/dfg';
 import { EventLog, Trace } from '../classes/event-log';
 import { CalculateDfgService } from './calculate-dfg.service';
 
@@ -143,24 +143,18 @@ describe('CalculateDfgService', () => {
     it('output event log with one trace containing one activity previously safed in DFG', () => {
         const eventLog = new EventLog([new Trace([new Activity('A')])]);
 
-        const result: EventLog = sut.calculate(eventLog).getEventLog();
-
+        const dfg: Dfg = sut.calculate(eventLog);
+        const result: EventLog = dfg.getEventLog();
         expect(result).toEqual(eventLog);
     });
 
-    // it('update EventLog safed in DFG and output updated Event Log', () => {
-    //     const eventLog = new EventLog([new Trace([new Activity('A')])]);
+    it('update EventLog safed in DFG and output updated Event Log', () => {
+        const eventLog = new EventLog([new Trace([new Activity('A')])]);
+        const newEventLog = new EventLog([new Trace([new Activity('B')])]);
 
-    //     const newEventLog: EventLog = new EventLog([
-    //         new Trace([new Activity('B')]),
-    //     ]);
-
-    //     const update: EventLog = sut
-    //         .calculate(eventLog)
-    //         .updateEventLog(newEventLog);
-
-    //     const result: EventLog = update.getEventLog();
-
-    //     expect(result).toEqual(newEventLog);
-    // });
+        const dfg: Dfg = sut.calculate(eventLog);
+        dfg.updateEventLog(newEventLog);
+        const result: EventLog = dfg.getEventLog();
+        expect(result).toEqual(newEventLog);
+    });
 });
