@@ -11,9 +11,12 @@ export class CalculateDfgService {
     public calculate(eventLog: EventLog): Dfg {
         const dfgBuilder: DfgBuilder = new DfgBuilder();
 
+        dfgBuilder.addEventLog(eventLog);
+
         if (eventLog.getAllTraces().length === 0) {
             dfgBuilder.addPlayToStopArc();
-            return dfgBuilder.build(eventLog);
+
+            return dfgBuilder.build();
         }
 
         eventLog
@@ -38,6 +41,6 @@ export class CalculateDfgService {
             });
         });
 
-        return dfgBuilder.build(eventLog);
+        return dfgBuilder.build();
     }
 }

@@ -32,9 +32,9 @@ export class Dfg implements PetriNetTransition {
         };
     }
 
-    updateEventLog(newEventLog: EventLog): void {
-        this.eventLog = newEventLog;
-    }
+    // updateEventLog(newEventLog: EventLog): void {
+    //     this.eventLog = newEventLog;
+    // }
 
     getEventLog(): EventLog {
         return this.eventLog;
@@ -44,6 +44,7 @@ export class Dfg implements PetriNetTransition {
 export class DfgBuilder {
     private readonly activities: Activities = new Activities().addPlayAndStop();
     private readonly arcs: Arcs = new Arcs();
+    private eventlog: EventLog = new EventLog();
 
     addPlayToStopArc(): void {
         this.arcs.addArc(
@@ -89,7 +90,12 @@ export class DfgBuilder {
         return this;
     }
 
-    build(eventLog: EventLog): Dfg {
-        return new Dfg('', this.activities, this.arcs, eventLog);
+    addEventLog(inputEventLog: EventLog): DfgBuilder {
+        this.eventlog = inputEventLog;
+        return this;
+    }
+
+    build(): Dfg {
+        return new Dfg('', this.activities, this.arcs, this.eventlog);
     }
 }

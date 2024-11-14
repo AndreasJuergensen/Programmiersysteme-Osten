@@ -14,7 +14,7 @@ describe('A Dfg', () => {
             .addFromPlayArc('B')
             .addToStopArc('A')
             .addToStopArc('B')
-            .build(inputEventLog);
+            .build();
         const a1: Activities = new Activities();
         const a2: Activities = new Activities()
             .createActivity('A')
@@ -34,7 +34,7 @@ describe('A Dfg', () => {
             .addFromPlayArc('B')
             .addToStopArc('A')
             .addToStopArc('B')
-            .build(inputEventLog);
+            .build();
         const a1: Activities = new Activities()
             .createActivity('A')
             .createActivity('B');
@@ -51,7 +51,7 @@ describe('A Dfg', () => {
             .createActivity('A')
             .createActivity('B')
             .createActivity('C')
-            .build(inputEventLog);
+            .build();
         const a1: Activities = new Activities().createActivity('A');
         const a2: Activities = new Activities().createActivity('B');
 
@@ -65,7 +65,7 @@ describe('A Dfg', () => {
         const sut: Dfg = new DfgBuilder()
             .createActivity('A')
             .createActivity('B')
-            .build(inputEventLog);
+            .build();
         const a1: Activities = new Activities().createActivity('A');
         const a2: Activities = new Activities()
             .createActivity('B')
@@ -81,7 +81,7 @@ describe('A Dfg', () => {
         const sut: Dfg = new DfgBuilder()
             .createActivity('A')
             .createActivity('B')
-            .build(inputEventLog);
+            .build();
         const a1: Activities = new Activities().createActivity('A');
         const a2: Activities = new Activities()
             .createActivity('A')
@@ -109,7 +109,7 @@ describe('A Dfg', () => {
                 .addArc('B', 'stop')
                 .addArc('play', 'C')
                 .addArc('C', 'stop')
-                .build(inputEventLog);
+                .build();
             const a1: Activities = new Activities()
                 .createActivity('A')
                 .createActivity('B');
@@ -143,7 +143,7 @@ describe('A Dfg', () => {
                 .addArc('D', 'C')
                 .addArc('C', 'stop')
                 .addArc('D', 'stop')
-                .build(inputEventLog);
+                .build();
             const a1: Activities = new Activities()
                 .createActivity('A')
                 .createActivity('B');
@@ -187,7 +187,7 @@ describe('A Dfg', () => {
                 .addArc('C', 'D')
                 .addArc('B', 'stop')
                 .addArc('D', 'stop')
-                .build(inputEventLog);
+                .build();
             const a1: Activities = new Activities()
                 .createActivity('A')
                 .createActivity('B');
