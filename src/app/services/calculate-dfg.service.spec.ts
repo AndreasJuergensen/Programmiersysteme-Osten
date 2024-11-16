@@ -140,21 +140,11 @@ describe('CalculateDfgService', () => {
         expect(result).toEqual(expectedDfg);
     });
 
-    it('output event log with one trace containing one activity previously safed in DFG', () => {
+    it('output event log with one trace containing one activity previously safed in DFG to test getEventLog-method', () => {
         const eventLog = new EventLog([new Trace([new Activity('A')])]);
 
         const dfg: Dfg = sut.calculate(eventLog);
         const result: EventLog = dfg.getEventLog();
         expect(result).toEqual(eventLog);
     });
-
-    // it('update EventLog safed in DFG and output updated Event Log', () => {
-    //     const eventLog = new EventLog([new Trace([new Activity('A')])]);
-    //     const newEventLog = new EventLog([new Trace([new Activity('B')])]);
-
-    //     const dfg: Dfg = sut.calculate(eventLog);
-    //     dfg.updateEventLog(newEventLog);
-    //     const result: EventLog = dfg.getEventLog();
-    //     expect(result).toEqual(newEventLog);
-    // });
 });
