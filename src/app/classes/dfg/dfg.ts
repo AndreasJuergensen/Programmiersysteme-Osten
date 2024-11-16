@@ -32,10 +32,6 @@ export class Dfg implements PetriNetTransition {
         };
     }
 
-    // updateEventLog(newEventLog: EventLog): void {
-    //     this.eventLog = newEventLog;
-    // }
-
     getEventLog(): EventLog {
         return this.eventLog;
     }
