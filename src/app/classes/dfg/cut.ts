@@ -1,4 +1,4 @@
-import { Activities } from './activities';
+import { Activities, Activity } from './activities';
 import { Arcs } from './arcs';
 
 class Cut {
@@ -11,21 +11,20 @@ class Cut {
         return (
             this.a1.isNotEmpty() &&
             this.a2.isNotEmpty() &&
-            this.everyNonPlayOrStopActivityIsContainedByA1OrA2(activities) &&
+            this.everyActivityIsContainedByA1OrA2OrIsPlayOrStop(activities) &&
             this.a1AndA2DoNotContainAdditionalActivities(activities) &&
             this.theIntersectionOfA1AndA2IsEmpty()
         );
     }
 
-    private everyNonPlayOrStopActivityIsContainedByA1OrA2(
+    private everyActivityIsContainedByA1OrA2OrIsPlayOrStop(
         activities: Activities,
     ): boolean {
-        return activities.isTrueForEveryActivity(
-            (activity) =>
-                !activity.isNeitherPlayNorStop() ||
-                this.a1.containsActivity(activity) ||
-                this.a2.containsActivity(activity),
-        );
+        const union: Activities = new Activities()
+            .addPlayAndStop()
+            .addAll(this.a1)
+            .addAll(this.a2);
+        return union.containsAllActivities(activities);
     }
 
     private a1AndA2DoNotContainAdditionalActivities(
@@ -57,85 +56,183 @@ class Cut {
     }
 
     everyActivityInA1HasAnArcToEveryActivityInA2(arcs: Arcs): boolean {
-        return this.a1.isTrueForEveryActivity((activity) =>
-            arcs
-                .calculateReachableActivities(
-                    new Activities().addActivity(activity),
-                )
-                .containsAllActivities(this.a2),
-        );
+        for (const activities of this.a1.split()) {
+            const hasAnArcToEveryActivityInA2: boolean = arcs
+                .calculateReachableActivities(activities)
+                .containsAllActivities(this.a2);
+            if (!hasAnArcToEveryActivityInA2) {
+                return false;
+            }
+        }
+        return true;
     }
 
     everyActivityInA2HasAnArcToEveryActivityInA1(arcs: Arcs): boolean {
-        return this.a2.isTrueForEveryActivity((activity) =>
-            arcs
-                .calculateReachableActivities(
-                    new Activities().addActivity(activity),
-                )
-                .containsAllActivities(this.a1),
-        );
+        for (const activities of this.a2.split()) {
+            const hasAnArcToEveryActivityInA1: boolean = arcs
+                .calculateReachableActivities(activities)
+                .containsAllActivities(this.a1);
+            if (!hasAnArcToEveryActivityInA1) {
+                return false;
+            }
+        }
+        return true;
     }
 
     everyActivityInA1CanReachEveryActivityInA2(arcs: Arcs): boolean {
-        return this.a1.isTrueForEveryActivity((activity) =>
-            arcs
-                .calculateTransitivelyReachableActivities(
-                    activity,
-                )
-                .containsAllActivities(this.a2),
-        );
+        for (const activites of this.a1.split()) {
+            const canReachEveryActivityInA2: boolean = arcs
+                .calculateTransitivelyReachableActivities(activites)
+                .containsAllActivities(this.a2);
+            if (!canReachEveryActivityInA2) {
+                return false;
+            }
+        }
+        return true;
     }
 
     everyActivityInA2CanReachEveryActivityInA1(arcs: Arcs): boolean {
-        return this.a2.isTrueForEveryActivity((activity) =>
-            arcs
-                .calculateTransitivelyReachableActivities(
-                    activity,
-                )
-                .containsAllActivities(this.a1),
-        );
+        for (const activites of this.a2.split()) {
+            const canReachEveryActivityInA1: boolean = arcs
+                .calculateTransitivelyReachableActivities(activites)
+                .containsAllActivities(this.a1);
+            if (!canReachEveryActivityInA1) {
+                return false;
+            }
+        }
+        return true;
     }
 
     everyActivityInA1CanBePassedThroughOnlyUsingActivitiesInA1(
-        activities: Activities,
+        playActivity: Activity,
+        stopActivity: Activity,
         arcs: Arcs,
     ): boolean {
         return this.everyActivityInXCanBePassedThroughOnlyUsingActivitiesInX(
-            activities,
+            playActivity,
+            stopActivity,
             arcs,
             new Activities().addPlayAndStop().addAll(this.a1),
         );
     }
 
     everyActivityInA2CanBePassedThroughOnlyUsingActivitiesInA2(
-        activities: Activities,
+        playActivity: Activity,
+        stopActivity: Activity,
         arcs: Arcs,
     ): boolean {
         return this.everyActivityInXCanBePassedThroughOnlyUsingActivitiesInX(
-            activities,
+            playActivity,
+            stopActivity,
             arcs,
             new Activities().addPlayAndStop().addAll(this.a2),
         );
     }
 
     private everyActivityInXCanBePassedThroughOnlyUsingActivitiesInX(
-        activities: Activities,
+        playActivity: Activity,
+        stopActivity: Activity,
         arcs: Arcs,
         x: Activities,
     ): boolean {
-        const arcsInX: Arcs = arcs.filter(
-            (arc) => arc.startIsIncludedIn(x) && arc.endIsIncludedIn(x),
-        );
+        const arcsInX: Arcs = arcs.filterArcsCompletelyIn(x);
         const everyActivityCanBeReachedFromStart: boolean = arcsInX
-            .calculateTransitivelyReachableActivities(activities.playActivity)
+            .calculateTransitivelyReachableActivities(
+                new Activities([playActivity]),
+            )
             .containsAllActivities(x);
         const stopCanBeReachedFromEveryActivity: boolean = arcsInX
-            .calculateTransitivelyReachingActivities(activities.stopActivity)
+            .calculateTransitivelyReachingActivities(stopActivity)
             .containsAllActivities(x);
         return (
             everyActivityCanBeReachedFromStart &&
             stopCanBeReachedFromEveryActivity
         );
+    }
+
+    everyActivityReachableFromPlayIsInA1(
+        playActivity: Activity,
+        arcs: Arcs,
+    ): boolean {
+        return this.a1.containsAllActivities(
+            arcs.calculateReachableActivitiesFromSingleActivity(playActivity),
+        );
+    }
+
+    everyActivityReachingStopIsInA1(
+        stopActivity: Activity,
+        arcs: Arcs,
+    ): boolean {
+        return this.a1.containsAllActivities(
+            arcs.calculateReachingActivitiesFromSingleActivity(stopActivity),
+        );
+    }
+
+    everyActivityInA1PlayIsReachableFromPlay(
+        playActivity: Activity,
+        arcs: Arcs,
+    ): boolean {
+        return arcs
+            .calculateReachableActivitiesFromSingleActivity(playActivity)
+            .containsAllActivities(
+                arcs.calculateFromOutsideReachableActivities(this.a1),
+            );
+    }
+
+    everyActivityInA2StopReachesEveryActivityInA1Play(arcs: Arcs): boolean {
+        const a2Stop: Activities = arcs.calculateOutsideReachingActivities(
+            this.a2,
+        );
+        const a1Play: Activities = arcs.calculateFromOutsideReachableActivities(
+            this.a1,
+        );
+        for (const activities of a2Stop.split()) {
+            const canReachEveryActivityInA1Play: boolean = arcs
+                .calculateReachableActivities(activities)
+                .containsAllActivities(a1Play);
+            if (!canReachEveryActivityInA1Play) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    everyActivityInA1StopReachesEveryActivityInA2Play(arcs: Arcs): boolean {
+        const a1Stop: Activities = arcs.calculateOutsideReachingActivities(
+            this.a1,
+        );
+        const a2Play: Activities = arcs.calculateFromOutsideReachableActivities(
+            this.a2,
+        );
+        for(const activities of a1Stop.split()) {
+            const canReachEveryActivityInA2Play: boolean = arcs
+                .calculateReachableActivities(activities)
+                .containsAllActivities(
+                    a2Play,
+                );
+            if(!canReachEveryActivityInA2Play) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    everyActivityInA1StopReachesStop(
+        stopActivity: Activity,
+        arcs: Arcs,
+    ): boolean {
+        const a1Stop: Activities = arcs.calculateOutsideReachingActivities(
+            this.a1,
+        );
+        for(const activities of a1Stop.split()) {
+            const canReachStop: boolean = arcs
+                .calculateReachableActivities(activities)
+                .containsActivity(stopActivity);
+            if(!canReachStop) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 
@@ -193,13 +290,50 @@ export class ParallelCut {
             this.cut.everyActivityInA1HasAnArcToEveryActivityInA2(arcs) &&
             this.cut.everyActivityInA2HasAnArcToEveryActivityInA1(arcs) &&
             this.cut.everyActivityInA1CanBePassedThroughOnlyUsingActivitiesInA1(
-                activities,
+                activities.playActivity,
+                activities.stopActivity,
                 arcs,
             ) &&
             this.cut.everyActivityInA2CanBePassedThroughOnlyUsingActivitiesInA2(
-                activities,
+                activities.playActivity,
+                activities.stopActivity,
                 arcs,
             )
+        );
+    }
+}
+
+export class LoopCut {
+    private readonly cut: Cut;
+
+    constructor(
+        private readonly a1: Activities,
+        private readonly a2: Activities,
+    ) {
+        this.cut = new Cut(a1, a2);
+    }
+
+    isPossible(activities: Activities, arcs: Arcs): boolean {
+        return (
+            this.cut.basicRequirementsHaveBeenMet(activities) &&
+            this.cut.everyActivityReachableFromPlayIsInA1(
+                activities.playActivity,
+                arcs,
+            ) &&
+            this.cut.everyActivityReachingStopIsInA1(
+                activities.stopActivity,
+                arcs,
+            ) &&
+            this.cut.everyActivityInA1PlayIsReachableFromPlay(
+                activities.playActivity,
+                arcs,
+            ) &&
+            this.cut.everyActivityInA2StopReachesEveryActivityInA1Play(arcs) &&
+            this.cut.everyActivityInA1StopReachesStop(
+                activities.stopActivity,
+                arcs,
+            ) &&
+            this.cut.everyActivityInA1StopReachesEveryActivityInA2Play(arcs)
         );
     }
 }

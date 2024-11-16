@@ -2,7 +2,7 @@ import { EventLog } from '../event-log';
 import { PetriNetTransition } from '../petri-net';
 import { Activities, Activity } from './activities';
 import { ArcJson, Arcs, DfgArc } from './arcs';
-import { ExclusiveCut, ParallelCut, SequenceCut } from './cut';
+import { ExclusiveCut, LoopCut, ParallelCut, SequenceCut } from './cut';
 
 export interface DfgJson {
     activities: string[];
@@ -20,7 +20,8 @@ export class Dfg implements PetriNetTransition {
         return (
             new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs) ||
             new SequenceCut(a1, a2).isPossible(this.activities, this.arcs) ||
-            new ParallelCut(a1, a2).isPossible(this.activities, this.arcs)
+            new ParallelCut(a1, a2).isPossible(this.activities, this.arcs) ||
+            new LoopCut(a1, a2).isPossible(this.activities, this.arcs)
         );
     }
 

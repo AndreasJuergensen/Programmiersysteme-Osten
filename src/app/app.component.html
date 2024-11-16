@@ -11,10 +11,7 @@
     </h2>
 
     <!--    Main content    -->
-    <app-display
-        class="padding full-size"
-        (fileContent)="processSourceChange($event)"
-    ></app-display>
+    <app-drawing-area></app-drawing-area>
 
     <div class="flexRowAlignSpaceEvenlyStart">
         <button mat-flat-button (click)="openDialog()">Input Event Log</button>

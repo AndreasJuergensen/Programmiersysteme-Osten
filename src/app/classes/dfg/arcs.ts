@@ -1,44 +1,60 @@
+import { from } from 'rxjs';
 import { Activities, Activity } from './activities';
 
 export class Arcs {
-    private readonly arcs: Array<DfgArc> = new Array();
+    constructor(private readonly arcs: Array<DfgArc> = new Array()) {}
 
-    filter(predicate: (arc: DfgArc) => boolean): Arcs {
-        const copy: Arcs = new Arcs();
-        Array.from(this.arcs)
-            .filter(predicate)
-            .forEach((arc) => copy.addArc(arc));
-        return copy;
+    filterArcsCompletelyIn(activities: Activities): Arcs {
+        const completelyIn: Arcs = new Arcs();
+        for (const arc of this.arcs) {
+            if (
+                arc.startIsIncludedIn(activities) &&
+                arc.endIsIncludedIn(activities)
+            ) {
+                completelyIn.addArc(arc);
+            }
+        }
+        return completelyIn;
+    }
+
+    calculateReachableActivitiesFromSingleActivity(
+        startActivity: Activity,
+    ): Activities {
+        return this.calculateReachableActivities(
+            new Activities([startActivity]),
+        );
     }
 
     calculateReachableActivities(startActivities: Activities): Activities {
-        return Array.from(this.arcs.values())
-            .filter((arc) => arc.startIsIncludedIn(startActivities))
-            .map((arc) => arc.getEnd())
-            .map((endActivity) => new Activities().addActivity(endActivity))
-            .reduce(
-                (prev, curr) => new Activities().addAll(prev).addAll(curr),
-                new Activities(),
-            );
+        const reachableActivities: Activities = new Activities();
+        for (const arc of this.arcs) {
+            if (arc.startIsIncludedIn(startActivities)) {
+                reachableActivities.addActivity(arc.getEnd());
+            }
+        }
+        return reachableActivities;
+    }
+
+    calculateReachingActivitiesFromSingleActivity(
+        endActivity: Activity,
+    ): Activities {
+        return this.calculateReachingActivities(new Activities([endActivity]));
     }
 
     calculateReachingActivities(endActivities: Activities): Activities {
-        return Array.from(this.arcs.values())
-            .filter((arc) => arc.endIsIncludedIn(endActivities))
-            .map((arc) => arc.getStart())
-            .map((endActivity) => new Activities().addActivity(endActivity))
-            .reduce(
-                (prev, curr) => new Activities().addAll(prev).addAll(curr),
-                new Activities(),
-            );
+        const reachingActivities: Activities = new Activities();
+        for (const arc of this.arcs) {
+            if (arc.endIsIncludedIn(endActivities)) {
+                reachingActivities.addActivity(arc.getStart());
+            }
+        }
+        return reachingActivities;
     }
 
     calculateTransitivelyReachableActivities(
-        startActivity: Activity,
+        startActivities: Activities,
     ): Activities {
-        const reachableActivities: Activities = new Activities().addActivity(
-            startActivity,
-        );
+        const reachableActivities: Activities = new Activities().addAll(startActivities);
         let prevReachableActivities: Activities;
         do {
             prevReachableActivities = new Activities().addAll(
@@ -71,6 +87,31 @@ export class Arcs {
         return reachingActivities;
     }
 
+    calculateFromOutsideReachableActivities(
+        activities: Activities,
+    ): Activities {
+        const fromOutsideReachableActivities: Activities = new Activities();
+        for (const arc of this.arcs) {
+            if (
+                arc.endIsIncludedIn(activities) &&
+                !arc.startIsIncludedIn(activities)
+            ) {
+                fromOutsideReachableActivities.addActivity(arc.getEnd());
+            }
+        }
+        return fromOutsideReachableActivities;
+    }
+
+    calculateOutsideReachingActivities(activities: Activities): Activities {
+        const outsideReachingActivites: Activities = new Activities();
+        for(const arc of this.arcs) {
+            if(arc.startIsIncludedIn(activities) && !arc.endIsIncludedIn(activities)) {
+                outsideReachingActivites.addActivity(arc.getStart())
+            }
+        }
+        return outsideReachingActivites;
+    }
+
     addArc(arc: DfgArc): Arcs {
         if (!this.containsArc(arc)) {
             this.arcs.push(arc);
@@ -88,7 +129,7 @@ export class Arcs {
     }
 
     asJson(): ArcJson[] {
-        return Array.from(this.arcs.values()).map((arc) => arc.asJson());
+        return this.arcs.map((arc) => arc.asJson());
     }
 }
 
@@ -135,4 +176,4 @@ export class DfgArc {
             end: this.end.asJson(),
         };
     }
- }
+}

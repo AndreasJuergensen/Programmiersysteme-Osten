@@ -2,9 +2,7 @@ export class Activities {
     readonly playActivity: Activity = new Activity('play');
     readonly stopActivity: Activity = new Activity('stop');
 
-    private activities: Array<Activity> = [];
-
-    constructor() {}
+    constructor(private readonly activities: Array<Activity> = new Array()) {}
 
     addPlayAndStop(): Activities {
         this.activities.push(this.playActivity);
@@ -12,12 +10,12 @@ export class Activities {
         return this;
     }
 
-    isTrueForEveryActivity(
-        predicate: (activity: Activity) => boolean,
-    ): boolean {
-        return this.activities
-            .map((activity) => predicate(activity))
-            .reduce((prev, curr) => prev && curr, true);
+    split(): Activities[] {
+        const splitted: Activities[] = [];
+        for(const activity of this.activities) {
+            splitted.push(new Activities([activity]))
+        }
+        return splitted;
     }
 
     /**
@@ -34,7 +32,9 @@ export class Activities {
      * Postcondition: getActivityByName(activity.name) returns the the activity for every activity included in the given activities
      */
     addAll(activities: Activities): Activities {
-        activities.activities.forEach((activity) => this.addActivity(activity));
+        for (const activity of activities.activities) {
+            this.addActivity(activity);
+        }
         return this;
     }
 
@@ -51,23 +51,30 @@ export class Activities {
     }
 
     containsAllActivities(activities: Activities): boolean {
-        return activities.isTrueForEveryActivity((activity) =>
-            this.containsActivity(activity),
-        );
+        for (const activity of activities.activities) {
+            if (!this.containsActivity(activity)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     containsActivity(activity: Activity): boolean {
-        return this.activities.find((a) => a.equals(activity)) !== undefined;
+        for(const a of this.activities) {
+            if(a.equals(activity)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     containsAnyActivityOf(activities: Activities): boolean {
-        return (
-            activities.activities
-                .filter((activity) => activity.isNeitherPlayNorStop())
-                .find((activity) => {
-                    return this.containsActivity(activity);
-                }) !== undefined
-        );
+        for(const activity of activities.activities) {
+            if(activity.isNeitherPlayNorStop() && this.containsActivity(activity)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -81,15 +88,16 @@ export class Activities {
     }
 
     isNotEmpty(): boolean {
-        return (
-            this.activities.filter((activity) =>
-                activity.isNeitherPlayNorStop(),
-            ).length > 0
-        );
+        for(const activity of this.activities) {
+            if(activity.isNeitherPlayNorStop()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     asJson(): string[] {
-        return Array.from(this.activities.values()).map((a) => a.asJson());
+        return this.activities.map((a) => a.asJson());
     }
 }
 
