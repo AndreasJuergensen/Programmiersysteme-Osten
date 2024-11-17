@@ -10,10 +10,16 @@ export class Activities {
         return this;
     }
 
+    removePlayAndStop(): Activities {
+        return new Activities(
+            this.activities.filter((activity) => activity.isNeitherPlayNorStop),
+        );
+    }
+
     split(): Activities[] {
         const splitted: Activities[] = [];
-        for(const activity of this.activities) {
-            splitted.push(new Activities([activity]))
+        for (const activity of this.activities) {
+            splitted.push(new Activities([activity]));
         }
         return splitted;
     }
@@ -60,8 +66,8 @@ export class Activities {
     }
 
     containsActivity(activity: Activity): boolean {
-        for(const a of this.activities) {
-            if(a.equals(activity)) {
+        for (const a of this.activities) {
+            if (a.equals(activity)) {
                 return true;
             }
         }
@@ -69,8 +75,11 @@ export class Activities {
     }
 
     containsAnyActivityOf(activities: Activities): boolean {
-        for(const activity of activities.activities) {
-            if(activity.isNeitherPlayNorStop() && this.containsActivity(activity)) {
+        for (const activity of activities.activities) {
+            if (
+                activity.isNeitherPlayNorStop() &&
+                this.containsActivity(activity)
+            ) {
                 return true;
             }
         }
@@ -88,12 +97,25 @@ export class Activities {
     }
 
     isNotEmpty(): boolean {
-        for(const activity of this.activities) {
-            if(activity.isNeitherPlayNorStop()) {
+        for (const activity of this.activities) {
+            if (activity.isNeitherPlayNorStop()) {
                 return true;
             }
         }
         return false;
+    }
+
+    /* 
+    return partition containing all activities from this activities,
+    that are not contained in method-parameter otherPartition, 
+    play- and stop-activity are not part of the return partition
+     */
+    calculateActivityPartitionBy(otherPartition: Activities): Activities {
+        return new Activities(
+            this.activities.filter(
+                (activity) => !otherPartition.containsActivity(activity),
+            ),
+        ).removePlayAndStop();
     }
 
     asJson(): string[] {

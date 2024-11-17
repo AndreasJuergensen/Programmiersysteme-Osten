@@ -23,6 +23,20 @@ export class Dfg implements PetriNetTransition {
         );
     }
 
+    /* 
+    cutArcs are the arcs that are choosen by user for cut,
+    the return partitions contain all activities from this DFG,
+    divided into two partitions, each one without play and stop
+    */
+    calculatePartitions(cutArcs: Arcs): Activities[] {
+        const a1: Activities = this.arcs.calculateActivityPartitionBy(
+            cutArcs,
+            this.activities.playActivity,
+        );
+        const a2: Activities = this.activities.calculateActivityPartitionBy(a1);
+        return [a1, a2];
+    }
+
     asJson(): DfgJson {
         return {
             activities: this.activities.asJson(),

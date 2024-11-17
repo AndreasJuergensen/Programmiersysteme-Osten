@@ -54,7 +54,9 @@ export class Arcs {
     calculateTransitivelyReachableActivities(
         startActivities: Activities,
     ): Activities {
-        const reachableActivities: Activities = new Activities().addAll(startActivities);
+        const reachableActivities: Activities = new Activities().addAll(
+            startActivities,
+        );
         let prevReachableActivities: Activities;
         do {
             prevReachableActivities = new Activities().addAll(
@@ -104,12 +106,32 @@ export class Arcs {
 
     calculateOutsideReachingActivities(activities: Activities): Activities {
         const outsideReachingActivites: Activities = new Activities();
-        for(const arc of this.arcs) {
-            if(arc.startIsIncludedIn(activities) && !arc.endIsIncludedIn(activities)) {
-                outsideReachingActivites.addActivity(arc.getStart())
+        for (const arc of this.arcs) {
+            if (
+                arc.startIsIncludedIn(activities) &&
+                !arc.endIsIncludedIn(activities)
+            ) {
+                outsideReachingActivites.addActivity(arc.getStart());
             }
         }
         return outsideReachingActivites;
+    }
+
+    /* 
+    return partition containing all activities that are reachable from 
+    play and not connected to any arc from cutArcs
+     */
+    calculateActivityPartitionBy(cutArcs: Arcs, play: Activity): Activities {
+        return this.removeArcsBy(cutArcs)
+            .calculateTransitivelyReachableActivities(new Activities([play]))
+            .removePlayAndStop();
+    }
+
+    /* 
+    return all arcs from this Arcs, except that ones contained in cutArcs
+     */
+    private removeArcsBy(cutArcs: Arcs): Arcs {
+        return new Arcs(this.arcs.filter((arc) => !cutArcs.containsArc(arc)));
     }
 
     addArc(arc: DfgArc): Arcs {
