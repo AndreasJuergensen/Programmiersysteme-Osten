@@ -29,11 +29,22 @@ export class Dfg implements PetriNetTransition {
     divided into two partitions, each one without play and stop
     */
     calculatePartitions(cutArcs: Arcs): Activities[] {
-        const a1: Activities = this.arcs.calculateActivityPartitionBy(
-            cutArcs,
-            this.activities.playActivity,
-        );
-        const a2: Activities = this.activities.calculateActivityPartitionBy(a1);
+        const cuttedArcs: Arcs = this.arcs.removeArcsBy(cutArcs);
+        const a1: Activities =
+            cuttedArcs.calculateActivityPartitionByActivitiesReachableFromPlay(
+                this.activities.playActivity,
+            );
+        const remainingActivities: Activities =
+            this.activities.getActivitiesNotContainedIn(a1);
+        a1.removePlayAndStop();
+        if (!remainingActivities.isNotEmpty) {
+            return [a1, new Activities()];
+        }
+        const a2: Activities = this.arcs
+            .calculateActivityPartitionByActivitiesConnectedTo(
+                remainingActivities.getFirstActivity(),
+            )
+            .removePlayAndStop();
         return [a1, a2];
     }
 

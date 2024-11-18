@@ -105,17 +105,16 @@ export class Activities {
         return false;
     }
 
-    /* 
-    return partition containing all activities from this activities,
-    that are not contained in method-parameter otherPartition, 
-    play- and stop-activity are not part of the return partition
-     */
-    calculateActivityPartitionBy(otherPartition: Activities): Activities {
+    getActivitiesNotContainedIn(partition: Activities): Activities {
         return new Activities(
             this.activities.filter(
-                (activity) => !otherPartition.containsActivity(activity),
+                (activity) => !partition.containsActivity(activity),
             ),
-        ).removePlayAndStop();
+        );
+    }
+
+    getFirstActivity(): Activity {
+        return this.activities[0];
     }
 
     asJson(): string[] {

@@ -117,20 +117,29 @@ export class Arcs {
         return outsideReachingActivites;
     }
 
+    calculateActivityPartitionByActivitiesReachableFromPlay(
+        play: Activity,
+    ): Activities {
+        return this.calculateTransitivelyReachableActivities(
+            new Activities([play]),
+        );
+    }
+
     /* 
-    return partition containing all activities that are reachable from 
-    play and not connected to any arc from cutArcs
+    return partition containing all activities that are connected to given activity
      */
-    calculateActivityPartitionBy(cutArcs: Arcs, play: Activity): Activities {
-        return this.removeArcsBy(cutArcs)
-            .calculateTransitivelyReachableActivities(new Activities([play]))
-            .removePlayAndStop();
+    calculateActivityPartitionByActivitiesConnectedTo(activity: Activity) {
+        const reachingActivities =
+            this.calculateTransitivelyReachingActivities(activity);
+        return this.calculateTransitivelyReachableActivities(
+            reachingActivities,
+        );
     }
 
     /* 
     return all arcs from this Arcs, except that ones contained in cutArcs
      */
-    private removeArcsBy(cutArcs: Arcs): Arcs {
+    removeArcsBy(cutArcs: Arcs): Arcs {
         return new Arcs(this.arcs.filter((arc) => !cutArcs.containsArc(arc)));
     }
 
