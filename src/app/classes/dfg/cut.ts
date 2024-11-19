@@ -55,6 +55,17 @@ class Cut {
             .containsAnyActivityOf(this.a1);
     }
 
+    cutStartsAtPlayAndEndsAtStop(arcs: Arcs): boolean {
+        const a1ReachableByPlayAndReachingStop: boolean =
+            arcs.isPartitionReachableFromPlay(this.a1) &&
+            arcs.isPartitionReachingStop(this.a1);
+        const a2ReachableByPlayAndReachingStop: boolean =
+            arcs.isPartitionReachableFromPlay(this.a2) &&
+            arcs.isPartitionReachingStop(this.a2);
+
+        return a1ReachableByPlayAndReachingStop && a2ReachableByPlayAndReachingStop;
+    }
+
     everyActivityInA1HasAnArcToEveryActivityInA2(arcs: Arcs): boolean {
         for (const activities of this.a1.split()) {
             const hasAnArcToEveryActivityInA2: boolean = arcs
@@ -204,13 +215,11 @@ class Cut {
         const a2Play: Activities = arcs.calculateFromOutsideReachableActivities(
             this.a2,
         );
-        for(const activities of a1Stop.split()) {
+        for (const activities of a1Stop.split()) {
             const canReachEveryActivityInA2Play: boolean = arcs
                 .calculateReachableActivities(activities)
-                .containsAllActivities(
-                    a2Play,
-                );
-            if(!canReachEveryActivityInA2Play) {
+                .containsAllActivities(a2Play);
+            if (!canReachEveryActivityInA2Play) {
                 return false;
             }
         }
@@ -224,11 +233,11 @@ class Cut {
         const a1Stop: Activities = arcs.calculateOutsideReachingActivities(
             this.a1,
         );
-        for(const activities of a1Stop.split()) {
+        for (const activities of a1Stop.split()) {
             const canReachStop: boolean = arcs
                 .calculateReachableActivities(activities)
                 .containsActivity(stopActivity);
-            if(!canReachStop) {
+            if (!canReachStop) {
                 return false;
             }
         }
@@ -250,7 +259,8 @@ export class ExclusiveCut {
         return (
             this.cut.basicRequirementsHaveBeenMet(activities) &&
             this.cut.noArcFromA1ToA2Exists(arcs) &&
-            this.cut.noArcFromA2ToA1Exists(arcs)
+            this.cut.noArcFromA2ToA1Exists(arcs) &&
+            this.cut.cutStartsAtPlayAndEndsAtStop(arcs)
         );
     }
 }
@@ -287,6 +297,7 @@ export class ParallelCut {
     isPossible(activities: Activities, arcs: Arcs): boolean {
         return (
             this.cut.basicRequirementsHaveBeenMet(activities) &&
+            this.cut.cutStartsAtPlayAndEndsAtStop(arcs) &&
             this.cut.everyActivityInA1HasAnArcToEveryActivityInA2(arcs) &&
             this.cut.everyActivityInA2HasAnArcToEveryActivityInA1(arcs) &&
             this.cut.everyActivityInA1CanBePassedThroughOnlyUsingActivitiesInA1(

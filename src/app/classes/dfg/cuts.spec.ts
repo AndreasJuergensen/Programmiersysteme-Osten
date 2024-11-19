@@ -4,6 +4,190 @@ import { Arcs, DfgArc } from './arcs';
 import { ExclusiveCut, LoopCut, ParallelCut, SequenceCut } from './cut';
 import { Dfg, DfgBuilder } from './dfg';
 
+/**
+ * from this point testing Dfg calculatePartitions-method
+ */
+describe('Partitions from a Dfg by cuttedArcs', () => {
+    it('to be partitioned with a1 is empty', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .addFromPlayArc('A')
+            .addFromPlayArc('B')
+            .addToStopArc('A')
+            .addToStopArc('B')
+            .build();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('play', 'A'))
+            .addArc(sut.getArc('play', 'B'));
+
+        const result: Activities[] = sut.calculatePartitions(cuttedArcs);
+
+        const a1: Activities = new Activities();
+        const a2: Activities = new Activities()
+            .createActivity('A')
+            .createActivity('B');
+
+        expect(result).toEqual([a1, a2]);
+    });
+
+    it('to be partitioned with a2 is empty', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .addFromPlayArc('A')
+            .addFromPlayArc('B')
+            .addToStopArc('A')
+            .addToStopArc('B')
+            .build();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('A', 'stop'))
+            .addArc(sut.getArc('B', 'stop'));
+
+        const result: Activities[] = sut.calculatePartitions(cuttedArcs);
+
+        const a1: Activities = new Activities()
+            .createActivity('A')
+            .createActivity('B');
+        const a2: Activities = new Activities();
+
+        expect(result).toEqual([a1, a2]);
+    });
+
+    it('to be partitioned by cuttedArcs is empty', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .addFromPlayArc('A')
+            .addFromPlayArc('B')
+            .addToStopArc('A')
+            .addToStopArc('B')
+            .build();
+        const cuttedArcs: Arcs = new Arcs();
+
+        const result: Activities[] = sut.calculatePartitions(cuttedArcs);
+
+        const a1: Activities = new Activities()
+            .createActivity('A')
+            .createActivity('B');
+        const a2: Activities = new Activities();
+        const expectedPartitions: Activities[] = [a1, a2];
+
+        expect(result).toEqual(expectedPartitions);
+    });
+
+    it('to be partitioned by cuttedArcs and not all activities from Dfg included in partitions', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .createActivity('D')
+            .addFromPlayArc('A')
+            .addToStopArc('D')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addArc('C', 'D')
+            .build();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('A', 'B'))
+            .addArc(sut.getArc('C', 'D'));
+
+        const result: Activities[] = sut.calculatePartitions(cuttedArcs);
+
+        const expectedA1: Activities = new Activities().createActivity('A');
+        const expectedA2: Activities = new Activities().createActivity('D');
+
+        expect(result).toEqual([expectedA1, expectedA2]);
+    });
+
+    it('to be partitioned by cuttedArcs (exclusive cut like)', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .addFromPlayArc('A')
+            .addFromPlayArc('B')
+            .addToStopArc('A')
+            .addToStopArc('B')
+            .build();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('B', 'stop'))
+            .addArc(sut.getArc('play', 'A'));
+
+        const result: Activities[] = sut.calculatePartitions(cuttedArcs);
+
+        const expectedA1: Activities = new Activities().createActivity('B');
+        const expectedA2: Activities = new Activities().createActivity('A');
+
+        expect(result).toEqual([expectedA1, expectedA2]);
+    });
+
+    it('to be partitioned by cuttedArcs (sequence cut like)', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .addFromPlayArc('A')
+            .addFromPlayArc('C')
+            .addToStopArc('B')
+            .addToStopArc('C')
+            .addArc('A', 'B')
+            .addArc('A', 'C')
+            .addArc('C', 'A')
+            .addArc('C', 'B')
+            .addArc('B', 'C')
+            .build();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('A', 'B'))
+            .addArc(sut.getArc('C', 'stop'))
+            .addArc(sut.getArc('C', 'B'))
+            .addArc(sut.getArc('B', 'C'));
+
+        const result: Activities[] = sut.calculatePartitions(cuttedArcs);
+
+        const expectedA1: Activities = new Activities()
+            .createActivity('A')
+            .createActivity('C');
+        const expectedA2: Activities = new Activities().createActivity('B');
+
+        expect(result).toEqual([expectedA1, expectedA2]);
+    });
+
+    it('to be partitioned by cuttedArcs (parallel cut like)', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .addFromPlayArc('A')
+            .addFromPlayArc('C')
+            .addToStopArc('B')
+            .addToStopArc('C')
+            .addArc('A', 'B')
+            .addArc('A', 'C')
+            .addArc('C', 'A')
+            .addArc('C', 'B')
+            .addArc('B', 'C')
+            .build();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('A', 'C'))
+            .addArc(sut.getArc('C', 'A'))
+            .addArc(sut.getArc('C', 'B'))
+            .addArc(sut.getArc('B', 'C'));
+
+        const result: Activities[] = sut.calculatePartitions(cuttedArcs);
+
+        const expectedA1: Activities = new Activities()
+            .createActivity('A')
+            .createActivity('C')
+            .createActivity('B');
+        const expectedA2: Activities = new Activities();
+
+        expect(result).toEqual([expectedA1, expectedA2]);
+    });
+});
+
+/**
+ * from this point testing canBeCut-method, thus validity of cut
+ */
 describe('A Dfg', () => {
     it('can not be cut in a1 and a2 if a1 is empty', () => {
         const sut: Dfg = new DfgBuilder()
@@ -14,10 +198,13 @@ describe('A Dfg', () => {
             .addToStopArc('A')
             .addToStopArc('B')
             .build();
-        const a1: Activities = new Activities();
-        const a2: Activities = new Activities()
-            .createActivity('A')
-            .createActivity('B');
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('play', 'A'))
+            .addArc(sut.getArc('play', 'B'));
+
+        const partitions: Activities[] = sut.calculatePartitions(cuttedArcs);
+        const a1: Activities = partitions[0];
+        const a2: Activities = partitions[1];
 
         const result: boolean = sut.canBeCutIn(a1, a2);
 
@@ -33,10 +220,13 @@ describe('A Dfg', () => {
             .addToStopArc('A')
             .addToStopArc('B')
             .build();
-        const a1: Activities = new Activities()
-            .createActivity('A')
-            .createActivity('B');
-        const a2: Activities = new Activities();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('A', 'stop'))
+            .addArc(sut.getArc('B', 'stop'));
+
+        const partitions: Activities[] = sut.calculatePartitions(cuttedArcs);
+        const a1: Activities = partitions[0];
+        const a2: Activities = partitions[1];
 
         const result: boolean = sut.canBeCutIn(a1, a2);
 
@@ -48,9 +238,19 @@ describe('A Dfg', () => {
             .createActivity('A')
             .createActivity('B')
             .createActivity('C')
+            .addFromPlayArc('A')
+            .addToStopArc('B')
+            .addToStopArc('C')
+            .addArc('A', 'B')
+            .addArc('A', 'C')
             .build();
-        const a1: Activities = new Activities().createActivity('A');
-        const a2: Activities = new Activities().createActivity('B');
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('A', 'B'))
+            .addArc(sut.getArc('C', 'stop'));
+
+        const partitions: Activities[] = sut.calculatePartitions(cuttedArcs);
+        const a1: Activities = partitions[0];
+        const a2: Activities = partitions[1];
 
         const result: boolean = sut.canBeCutIn(a1, a2);
 
@@ -61,11 +261,16 @@ describe('A Dfg', () => {
         const sut: Dfg = new DfgBuilder()
             .createActivity('A')
             .createActivity('B')
+            .addFromPlayArc('A')
+            .addToStopArc('B')
+            .addArc('A', 'B')
             .build();
-        const a1: Activities = new Activities().createActivity('A');
-        const a2: Activities = new Activities()
-            .createActivity('B')
-            .createActivity('C');
+        const cuttedArcs: Arcs = new Arcs().addArc(sut.getArc('A', 'B'));
+
+        const partitions: Activities[] = sut.calculatePartitions(cuttedArcs);
+        const a1: Activities = partitions[0];
+        const a2: Activities = partitions[1];
+        a2.createActivity('C');
 
         const result: boolean = sut.canBeCutIn(a1, a2);
 
@@ -76,11 +281,16 @@ describe('A Dfg', () => {
         const sut: Dfg = new DfgBuilder()
             .createActivity('A')
             .createActivity('B')
+            .addFromPlayArc('A')
+            .addToStopArc('B')
+            .addArc('A', 'B')
+            .addArc('B', 'A')
             .build();
-        const a1: Activities = new Activities().createActivity('A');
-        const a2: Activities = new Activities()
-            .createActivity('A')
-            .createActivity('B');
+        const cuttedArcs: Arcs = new Arcs().addArc(sut.getArc('A', 'B'));
+
+        const partitions: Activities[] = sut.calculatePartitions(cuttedArcs);
+        const a1: Activities = partitions[0];
+        const a2: Activities = partitions[1];
 
         const result: boolean = sut.canBeCutIn(a1, a2);
 
@@ -91,6 +301,7 @@ describe('A Dfg', () => {
         'can be cut in a1 and a2 if a1 and a2 are not empty, ' +
             'the union of a1 and a2 is exactly T, ' +
             'the intersection of a1 and a2 is empty and ' +
+            'both partitions starts at play and ends at stop' +
             'no arc between a1 and a2 exists ' +
             '(ExclusiveCut)',
         () => {
@@ -98,16 +309,20 @@ describe('A Dfg', () => {
                 .createActivity('A')
                 .createActivity('B')
                 .createActivity('C')
-                .addArc('play', 'A')
+                .addFromPlayArc('A')
+                .addFromPlayArc('C')
+                .addToStopArc('B')
+                .addToStopArc('C')
                 .addArc('A', 'B')
-                .addArc('B', 'stop')
-                .addArc('play', 'C')
-                .addArc('C', 'stop')
                 .build();
-            const a1: Activities = new Activities()
-                .createActivity('A')
-                .createActivity('B');
-            const a2: Activities = new Activities().createActivity('C');
+            const cuttedArcs: Arcs = new Arcs()
+                .addArc(sut.getArc('play', 'C'))
+                .addArc(sut.getArc('C', 'stop'));
+
+            const partitions: Activities[] =
+                sut.calculatePartitions(cuttedArcs);
+            const a1: Activities = partitions[0];
+            const a2: Activities = partitions[1];
 
             const result: boolean = sut.canBeCutIn(a1, a2);
 
@@ -128,21 +343,23 @@ describe('A Dfg', () => {
                 .createActivity('B')
                 .createActivity('C')
                 .createActivity('D')
-                .addArc('play', 'A')
-                .addArc('play', 'B')
+                .addFromPlayArc('A')
+                .addFromPlayArc('B')
                 .addArc('A', 'C')
                 .addArc('B', 'D')
                 .addArc('C', 'D')
                 .addArc('D', 'C')
-                .addArc('C', 'stop')
-                .addArc('D', 'stop')
+                .addToStopArc('C')
+                .addToStopArc('D')
                 .build();
-            const a1: Activities = new Activities()
-                .createActivity('A')
-                .createActivity('B');
-            const a2: Activities = new Activities()
-                .createActivity('C')
-                .createActivity('D');
+            const cuttedArcs: Arcs = new Arcs()
+                .addArc(sut.getArc('A', 'C'))
+                .addArc(sut.getArc('B', 'D'));
+
+            const partitions: Activities[] =
+                sut.calculatePartitions(cuttedArcs);
+            const a1: Activities = partitions[0];
+            const a2: Activities = partitions[1];
 
             const result: boolean = sut.canBeCutIn(a1, a2);
 
@@ -154,6 +371,7 @@ describe('A Dfg', () => {
         'can be cut in a1 and a2 if a1 and a2 are not empty, ' +
             'the union of a1 and a2 is exactly T, ' +
             'the intersection of a1 and a2 is empty, ' +
+            'both partitions starts at play and ends at stop' +
             'every activity in a1 can reach every activity in a2, ' +
             'every activity in a2 can reach every activity in a1, ' +
             'every activity in a1 can be passed through on the way from play to stop only visiting activities in a1 and ' +
@@ -164,28 +382,28 @@ describe('A Dfg', () => {
                 .createActivity('A')
                 .createActivity('B')
                 .createActivity('C')
-                .createActivity('D')
-                .addArc('play', 'A')
-                .addArc('play', 'C')
+                .addFromPlayArc('A')
+                .addFromPlayArc('C')
+                .addToStopArc('B')
+                .addToStopArc('C')
                 .addArc('A', 'B')
                 .addArc('A', 'C')
-                .addArc('A', 'D')
-                .addArc('B', 'C')
-                .addArc('B', 'D')
                 .addArc('C', 'A')
                 .addArc('C', 'B')
-                .addArc('D', 'A')
-                .addArc('D', 'B')
-                .addArc('C', 'D')
-                .addArc('B', 'stop')
-                .addArc('D', 'stop')
+                .addArc('B', 'C')
                 .build();
-            const a1: Activities = new Activities()
-                .createActivity('A')
-                .createActivity('B');
-            const a2: Activities = new Activities()
-                .createActivity('C')
-                .createActivity('D');
+            const cuttedArcs: Arcs = new Arcs()
+                .addArc(sut.getArc('play', 'C'))
+                .addArc(sut.getArc('C', 'stop'))
+                .addArc(sut.getArc('A', 'C'))
+                .addArc(sut.getArc('C', 'A'))
+                .addArc(sut.getArc('C', 'B'))
+                .addArc(sut.getArc('B', 'C'));
+
+            const partitions: Activities[] =
+                sut.calculatePartitions(cuttedArcs);
+            const a1: Activities = partitions[0];
+            const a2: Activities = partitions[1];
 
             const result: boolean = sut.canBeCutIn(a1, a2);
 
@@ -209,17 +427,20 @@ describe('A Dfg', () => {
                 .createActivity('A')
                 .createActivity('B')
                 .createActivity('C')
-                .addArc('play', 'A')
+                .addFromPlayArc('A')
+                .addToStopArc('B')
                 .addArc('A', 'B')
-                .addArc('B', 'stop')
                 .addArc('B', 'C')
                 .addArc('C', 'A')
                 .build();
-            const a1: Activities = new Activities()
-                .createActivity('A')
-                .createActivity('B');
-            const a2: Activities = new Activities()
-                .createActivity('C')
+            const cuttedArcs: Arcs = new Arcs()
+                .addArc(sut.getArc('C', 'A'))
+                .addArc(sut.getArc('B', 'C'));
+
+            const partitions: Activities[] =
+                sut.calculatePartitions(cuttedArcs);
+            const a1: Activities = partitions[0];
+            const a2: Activities = partitions[1];
 
             const result: boolean = sut.canBeCutIn(a1, a2);
 
@@ -228,6 +449,9 @@ describe('A Dfg', () => {
     );
 });
 
+/**
+ * from thispoint testing invalid different Cuts types
+ */
 describe('An ExclusiveCut', () => {
     it('is not possible if an arc from a1 to a2 exists', () => {
         const activities: Activities = new Activities()
@@ -266,6 +490,35 @@ describe('An ExclusiveCut', () => {
 
         expect(result).toBeFalse();
     });
+
+    it(
+        'is not possible if any of the partitions do not start at play' +
+            'or do not end at stop',
+        () => {
+            const sut: Dfg = new DfgBuilder()
+                .createActivity('A')
+                .createActivity('B')
+                .createActivity('C')
+                .addFromPlayArc('A')
+                .addToStopArc('B')
+                .addArc('A', 'B')
+                .addArc('A', 'C')
+                .addArc('C', 'B')
+                .build();
+            const cuttedArcs: Arcs = new Arcs()
+                .addArc(sut.getArc('A', 'C'))
+                .addArc(sut.getArc('C', 'B'));
+
+            const partitions: Activities[] =
+                sut.calculatePartitions(cuttedArcs);
+            const a1: Activities = partitions[0];
+            const a2: Activities = partitions[1];
+
+            const result: boolean = sut.canBeCutIn(a1, a2);
+
+            expect(result).toBeFalse();
+        },
+    );
 });
 
 describe('A SequenceCut', () => {
@@ -589,21 +842,50 @@ describe('A ParallelCut', () => {
 
         expect(result).toBeFalse();
     });
+
+    it(
+        'is not possible if any of the partitions do not start at play' +
+            'or do not end at stop (invalid parallel cut)',
+        () => {
+            const sut: Dfg = new DfgBuilder()
+                .createActivity('A')
+                .createActivity('B')
+                .createActivity('C')
+                .addFromPlayArc('A')
+                .addToStopArc('B')
+                .addArc('A', 'B')
+                .addArc('A', 'C')
+                .addArc('C', 'B')
+                .build();
+            const cuttedArcs: Arcs = new Arcs()
+                .addArc(sut.getArc('A', 'C'))
+                .addArc(sut.getArc('C', 'B'));
+
+            const partitions: Activities[] =
+                sut.calculatePartitions(cuttedArcs);
+            const a1: Activities = partitions[0];
+            const a2: Activities = partitions[1];
+
+            const result: boolean = sut.canBeCutIn(a1, a2);
+
+            expect(result).toBeFalse();
+        },
+    );
 });
 
-describe("A LoopCut", () => {
-    it("is not possible if play has at least one arc to a2", () => {
+describe('A LoopCut', () => {
+    it('is not possible if play has at least one arc to a2', () => {
         const activities: Activities = new Activities()
             .createActivity('A')
             .createActivity('B')
             .createActivity('C');
         const arcs: Arcs = new Arcs()
-        .addArc(
-            new DfgArc(
-                activities.playActivity,
-                activities.getActivityByName("C")
+            .addArc(
+                new DfgArc(
+                    activities.playActivity,
+                    activities.getActivityByName('C'),
+                ),
             )
-        )
             .addArc(
                 new DfgArc(
                     activities.playActivity,
@@ -633,7 +915,7 @@ describe("A LoopCut", () => {
                     activities.getActivityByName('C'),
                     activities.getActivityByName('A'),
                 ),
-            )
+            );
         const a1: Activities = new Activities()
             .createActivity('A')
             .createActivity('B');
@@ -643,7 +925,7 @@ describe("A LoopCut", () => {
         const result: boolean = sut.isPossible(activities, arcs);
 
         expect(result).toBeFalse();
-    })
+    });
 
     it('is not possible if stop has at least one arcs from a2', () => {
         const activities: Activities = new Activities()
@@ -897,4 +1179,4 @@ describe("A LoopCut", () => {
 
         expect(result).toBeFalse();
     });
-})
+});
