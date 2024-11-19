@@ -24,28 +24,37 @@ export class Dfg implements PetriNetTransition {
     }
 
     /* 
-    cutArcs are the arcs that are choosen by user for cut,
-    the return partitions contain all activities from this DFG,
-    divided into two partitions, each one without play and stop
+    cuttedArcs are the arcs that are choosen by user for cut, the return
+    partitions contain activities from this DFG divided into two partitions,
+    each one without play and stop and without any assurance for completeness
     */
-    calculatePartitions(cutArcs: Arcs): Activities[] {
-        const cuttedArcs: Arcs = this.arcs.removeArcsBy(cutArcs);
+    calculatePartitions(cuttedArcs: Arcs): Activities[] {
         const a1: Activities =
-            cuttedArcs.calculateActivityPartitionByActivitiesReachableFromPlay(
+            this.arcs.calculateActivityPartitionByActivitiesReachableFromPlay(
+                cuttedArcs,
                 this.activities.playActivity,
             );
         const remainingActivities: Activities =
             this.activities.getActivitiesNotContainedIn(a1);
         a1.removePlayAndStop();
-        if (!remainingActivities.isNotEmpty) {
+        if (remainingActivities.isEmpty()) {
             return [a1, new Activities()];
         }
         const a2: Activities = this.arcs
             .calculateActivityPartitionByActivitiesConnectedTo(
-                remainingActivities.getFirstActivity(),
+                cuttedArcs,
+                remainingActivities.getRandomActivity(),
             )
             .removePlayAndStop();
         return [a1, a2];
+    }
+
+    /* 
+    return the DfgArc by start and end name with same obj-ref as in this Dfg,
+    thus same behavior as the arc is clicked in petrinet
+     */
+    getArc(start: string, end: string): DfgArc {
+        return this.arcs.getArcByStartNameAndEndName(start, end);
     }
 
     asJson(): DfgJson {

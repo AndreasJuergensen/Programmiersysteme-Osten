@@ -11,9 +11,12 @@ export class Activities {
     }
 
     removePlayAndStop(): Activities {
-        return new Activities(
-            this.activities.filter((activity) => activity.isNeitherPlayNorStop),
-        );
+        for (const activity of this.activities) {
+            if (activity.isPlayOrStop()) {
+                this.activities.splice(this.activities.indexOf(activity), 1);
+            }
+        }
+        return this;
     }
 
     split(): Activities[] {
@@ -96,6 +99,22 @@ export class Activities {
         return this.activities.find((a) => a.equals(new Activity(name)))!;
     }
 
+    /* 
+    return all activities from this activities, that are not contained
+    within the given partition
+    */
+    getActivitiesNotContainedIn(partition: Activities): Activities {
+        return new Activities(
+            this.activities.filter(
+                (activity) => !partition.containsActivity(activity),
+            ),
+        );
+    }
+
+    getRandomActivity(): Activity {
+        return this.activities[0];
+    }
+
     isNotEmpty(): boolean {
         for (const activity of this.activities) {
             if (activity.isNeitherPlayNorStop()) {
@@ -105,16 +124,13 @@ export class Activities {
         return false;
     }
 
-    getActivitiesNotContainedIn(partition: Activities): Activities {
-        return new Activities(
-            this.activities.filter(
-                (activity) => !partition.containsActivity(activity),
-            ),
-        );
-    }
-
-    getFirstActivity(): Activity {
-        return this.activities[0];
+    isEmpty(): boolean {
+        for (const activity of this.activities) {
+            if (activity.isNeitherPlayNorStop()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     asJson(): string[] {
@@ -137,8 +153,16 @@ export class Activity {
         return this.name === 'play';
     }
 
+    isStop(): boolean {
+        return this.name === 'stop';
+    }
+
     isNeitherPlayNorStop(): boolean {
-        return !this.isPlay() && this.name !== 'stop';
+        return !this.isPlay() && !this.isStop();
+    }
+
+    isPlayOrStop(): boolean {
+        return this.isPlay() || this.isStop();
     }
 
     asJson(): string {

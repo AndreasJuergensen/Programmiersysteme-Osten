@@ -1,4 +1,3 @@
-import { from } from 'rxjs';
 import { Activities, Activity } from './activities';
 
 export class Arcs {
@@ -117,30 +116,73 @@ export class Arcs {
         return outsideReachingActivites;
     }
 
+    /* 
+    return partition containing all activities that are reachable from play-activity
+     */
     calculateActivityPartitionByActivitiesReachableFromPlay(
+        cuttedArcs: Arcs,
         play: Activity,
     ): Activities {
-        return this.calculateTransitivelyReachableActivities(
-            new Activities([play]),
-        );
+        return this.removeArcsBy(
+            cuttedArcs,
+        ).calculateTransitivelyReachableActivities(new Activities([play]));
     }
 
     /* 
     return partition containing all activities that are connected to given activity
      */
-    calculateActivityPartitionByActivitiesConnectedTo(activity: Activity) {
-        const reachingActivities =
-            this.calculateTransitivelyReachingActivities(activity);
-        return this.calculateTransitivelyReachableActivities(
+    calculateActivityPartitionByActivitiesConnectedTo(
+        cuttedArcs: Arcs,
+        activity: Activity,
+    ): Activities {
+        const notCuttedArcs: Arcs = this.removeArcsBy(cuttedArcs);
+        const reachingActivities: Activities =
+            notCuttedArcs.calculateTransitivelyReachingActivities(activity);
+        return notCuttedArcs.calculateTransitivelyReachableActivities(
             reachingActivities,
+        );
+    }
+    /* 
+    return all arcs from this Arcs, except that ones contained in cuttedArcs
+     */
+    private removeArcsBy(cuttedArcs: Arcs): Arcs {
+        return new Arcs(
+            this.arcs.filter((arc) => !cuttedArcs.containsArc(arc)),
         );
     }
 
     /* 
-    return all arcs from this Arcs, except that ones contained in cutArcs
+    check if this arcs contain any arc with start at play and end at any
+    activity within the given partition
      */
-    removeArcsBy(cutArcs: Arcs): Arcs {
-        return new Arcs(this.arcs.filter((arc) => !cutArcs.containsArc(arc)));
+    isPartitionReachableFromPlay(partition: Activities): boolean {
+        for (const arc of this.arcs) {
+            if (
+                arc.endIsIncludedIn(partition) &&
+                !arc.startIsIncludedIn(partition) &&
+                arc.getStart().isPlay()
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /* 
+    check if this arcs contain any arc with end at stop and start at any 
+    acitivity within the given partition
+     */
+    isPartitionReachingStop(partition: Activities): boolean {
+        for (const arc of this.arcs) {
+            if (
+                arc.startIsIncludedIn(partition) &&
+                !arc.endIsIncludedIn(partition) &&
+                arc.getEnd().isStop()
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     addArc(arc: DfgArc): Arcs {
@@ -157,6 +199,18 @@ export class Arcs {
             }
         }
         return false;
+    }
+
+    getArcByStartNameAndEndName(start: string, end: string): DfgArc {
+        for (const arc of this.arcs) {
+            if (
+                arc.getStart().asJson() === start &&
+                arc.getEnd().asJson() === end
+            ) {
+                return arc;
+            }
+        }
+        throw new Error('Arc not found');
     }
 
     asJson(): ArcJson[] {
