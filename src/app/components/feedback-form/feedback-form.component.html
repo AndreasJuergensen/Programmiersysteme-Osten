@@ -1,0 +1,16 @@
+<h2>Input</h2>
+<div>
+    <input
+        [(ngModel)]="userInput"
+        name="userInput"
+        placeholder="Enter something"
+        style="padding: 8px; margin-right: 10px"
+    />
+    <button (click)="handleInput()" style="padding: 8px 15px">Submit</button>
+    <button
+        (click)="closeDialog()"
+        style="padding: 8px 15px; margin-left: 10px"
+    >
+        Cancel
+    </button>
+</div>

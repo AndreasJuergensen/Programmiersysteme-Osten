@@ -3,6 +3,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { EventLogDialogComponent } from './components/event-log-dialog/event-log-dialog.component';
 import { EventLog } from './classes/event-log';
 import { Subscription } from 'rxjs';
+import { FeedbackFormComponent } from './components/feedback-form/feedback-form.component';
 
 @Component({
     selector: 'app-root',
@@ -10,11 +11,7 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-
-    constructor(
-        private _matDialog: MatDialog,
-    ) {
-    }
+    constructor(private _matDialog: MatDialog) {}
 
     public openDialog(): void {
         const config: MatDialogConfig = { width: '800px' };
@@ -25,6 +22,19 @@ export class AppComponent {
         >(EventLogDialogComponent, config);
 
         const sub: Subscription = dialogRef.afterClosed().subscribe({
+            next: (result) => console.log(result),
+            complete: () => sub.unsubscribe(),
+        });
+    }
+
+    public popUpDialog(): void {
+        const config: MatDialogConfig = { width: '400px' };
+        const popupRef = this._matDialog.open<
+            FeedbackFormComponent,
+            MatDialogConfig
+        >(FeedbackFormComponent, config);
+
+        const sub: Subscription = popupRef.afterClosed().subscribe({
             next: (result) => console.log(result),
             complete: () => sub.unsubscribe(),
         });

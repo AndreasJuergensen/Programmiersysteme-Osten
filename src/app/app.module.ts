@@ -5,6 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FooterComponent } from './components/footer/footer.component';
@@ -14,6 +15,9 @@ import {
     withInterceptorsFromDi,
 } from '@angular/common/http';
 import { DrawingAreaModule } from './components/drawing-area/drawing-area.module';
+import { FormsModule } from '@angular/forms';
+import { FeedbackFormComponent } from './components/feedback-form/feedback-form.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
     declarations: [AppComponent, FooterComponent],
@@ -27,6 +31,10 @@ import { DrawingAreaModule } from './components/drawing-area/drawing-area.module
         MatIconModule,
         ReactiveFormsModule,
         DrawingAreaModule,
+        MatSnackBarModule,
+        FormsModule,
+        FeedbackFormComponent,
+        MatDialogModule,
     ],
     providers: [
         {

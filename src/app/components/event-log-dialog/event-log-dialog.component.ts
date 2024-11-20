@@ -22,16 +22,17 @@ import { EventLogParserService } from 'src/app/services/event-log-parser.service
     styleUrl: './event-log-dialog.component.css',
 })
 export class EventLogDialogComponent {
-
     constructor(
         private dialogRef: MatDialogRef<EventLogDialogComponent, EventLog>,
-        private eventLogParserService: EventLogParserService
+        private eventLogParserService: EventLogParserService,
     ) {}
 
     public eventLogInput: string = '';
 
     public onOkClick(): void {
-        const eventLog: EventLog = this.eventLogParserService.parse(this.eventLogInput);
+        const eventLog: EventLog = this.eventLogParserService.parse(
+            this.eventLogInput,
+        );
         this.dialogRef.close(eventLog);
     }
 }
