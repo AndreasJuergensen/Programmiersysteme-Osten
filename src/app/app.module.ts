@@ -14,6 +14,7 @@ import {
     withInterceptorsFromDi,
 } from '@angular/common/http';
 import { DrawingAreaModule } from './components/drawing-area/drawing-area.module';
+//import { PopupComponent } from './components/popup/popup.component';
 
 @NgModule({
     declarations: [AppComponent, FooterComponent],
@@ -27,6 +28,7 @@ import { DrawingAreaModule } from './components/drawing-area/drawing-area.module
         MatIconModule,
         ReactiveFormsModule,
         DrawingAreaModule,
+        //        PopupComponent,
     ],
     providers: [
         {
