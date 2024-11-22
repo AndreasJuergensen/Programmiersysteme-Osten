@@ -43,7 +43,7 @@ export class Dfg implements PetriNetTransition {
         const a2: Activities = this.arcs
             .calculateActivityPartitionByActivitiesConnectedTo(
                 cuttedArcs,
-                remainingActivities.getRandomActivity(),
+                remainingActivities.getFirstActivity(),
             )
             .removePlayAndStop();
         return [a1, a2];

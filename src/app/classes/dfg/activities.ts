@@ -104,14 +104,15 @@ export class Activities {
     within the given partition
     */
     getActivitiesNotContainedIn(partition: Activities): Activities {
-        return new Activities(
-            this.activities.filter(
-                (activity) => !partition.containsActivity(activity),
-            ),
-        );
+        const remainingActivities: Activities = new Activities();
+        for (const acitivity of this.activities) {
+            if (!partition.containsActivity(acitivity))
+                remainingActivities.addActivity(acitivity);
+        }
+        return remainingActivities;
     }
 
-    getRandomActivity(): Activity {
+    getFirstActivity(): Activity {
         return this.activities[0];
     }
 

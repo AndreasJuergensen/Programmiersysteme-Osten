@@ -151,40 +151,6 @@ export class Arcs {
         );
     }
 
-    /* 
-    check if this arcs contain any arc with start at play and end at any
-    activity within the given partition
-     */
-    isPartitionReachableFromPlay(partition: Activities): boolean {
-        for (const arc of this.arcs) {
-            if (
-                arc.endIsIncludedIn(partition) &&
-                !arc.startIsIncludedIn(partition) &&
-                arc.getStart().isPlay()
-            ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /* 
-    check if this arcs contain any arc with end at stop and start at any 
-    acitivity within the given partition
-     */
-    isPartitionReachingStop(partition: Activities): boolean {
-        for (const arc of this.arcs) {
-            if (
-                arc.startIsIncludedIn(partition) &&
-                !arc.endIsIncludedIn(partition) &&
-                arc.getEnd().isStop()
-            ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     addArc(arc: DfgArc): Arcs {
         if (!this.containsArc(arc)) {
             this.arcs.push(arc);
