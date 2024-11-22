@@ -95,7 +95,7 @@ describe('Partition a Dfg by cutted arcs', () => {
         expect(result).toEqual([expectedA1, expectedA2]);
     });
 
-    it('with cutted arcs like invalid exclusive cut', () => {
+    it('with cutted arcs like invalid exclusive cut (with two partitions)', () => {
         const sut: Dfg = new DfgBuilder()
             .createActivity('A')
             .createActivity('B')
@@ -112,6 +112,29 @@ describe('Partition a Dfg by cutted arcs', () => {
 
         const expectedA1: Activities = new Activities().createActivity('B');
         const expectedA2: Activities = new Activities().createActivity('A');
+
+        expect(result).toEqual([expectedA1, expectedA2]);
+    });
+
+    it('with cutted arcs like invalid exclusive cut (with one partition)', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .addFromPlayArc('A')
+            .addArc('A', 'B')
+            .addToStopArc('B')
+            .addFromPlayArc('C')
+            .addArc('C', 'B')
+            .build();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('B', 'stop'))
+            .addArc(sut.getArc('play', 'A'));
+
+        const result: Activities[] = sut.calculatePartitions(cuttedArcs);
+
+        const expectedA1: Activities = new Activities().createActivity('C').createActivity('B').createActivity('A');
+        const expectedA2: Activities = new Activities();
 
         expect(result).toEqual([expectedA1, expectedA2]);
     });

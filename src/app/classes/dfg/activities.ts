@@ -1,3 +1,5 @@
+import { Arcs } from './arcs';
+
 export class Activities {
     readonly playActivity: Activity = new Activity('play');
     readonly stopActivity: Activity = new Activity('stop');
@@ -99,10 +101,10 @@ export class Activities {
         return this.activities.find((a) => a.equals(new Activity(name)))!;
     }
 
-    /* 
-    return all activities from this activities, that are not contained
-    within the given partition
-    */
+    /**
+     * return all activities from this activities, that are not contained
+     * within the given partition
+     */
     getActivitiesNotContainedIn(partition: Activities): Activities {
         const remainingActivities: Activities = new Activities();
         for (const acitivity of this.activities) {
@@ -110,6 +112,19 @@ export class Activities {
                 remainingActivities.addActivity(acitivity);
         }
         return remainingActivities;
+    }
+
+    /**
+     * return all reaching activities from every activity
+     */
+    getReachingActivities(arcs: Arcs): Activities {
+        const reachingActivities: Activities = new Activities();
+        for (const activity of this.activities) {
+            reachingActivities.addAll(
+                arcs.calculateTransitivelyReachingActivities(activity),
+            );
+        }
+        return reachingActivities;
     }
 
     getFirstActivity(): Activity {
