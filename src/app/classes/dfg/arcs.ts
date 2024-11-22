@@ -161,6 +161,10 @@ export class Arcs {
         return this;
     }
 
+    isEmpty(): boolean {
+        return this.arcs.length === 0;
+    }
+
     private containsArc(arc: DfgArc): boolean {
         for (const a of this.arcs) {
             if (a.equals(arc)) {
