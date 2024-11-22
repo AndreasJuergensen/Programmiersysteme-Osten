@@ -133,7 +133,10 @@ describe('Partition a Dfg by cutted arcs', () => {
 
         const result: Activities[] = sut.calculatePartitions(cuttedArcs);
 
-        const expectedA1: Activities = new Activities().createActivity('C').createActivity('B').createActivity('A');
+        const expectedA1: Activities = new Activities()
+            .createActivity('C')
+            .createActivity('B')
+            .createActivity('A');
         const expectedA2: Activities = new Activities();
 
         expect(result).toEqual([expectedA1, expectedA2]);
