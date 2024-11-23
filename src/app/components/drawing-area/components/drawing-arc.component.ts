@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Arc } from './elements';
+import { Edge } from '../models';
 
 @Component({
     selector: 'svg:g[app-drawing-arc]',
@@ -7,20 +7,22 @@ import { Arc } from './elements';
         <svg:defs>
             <svg:marker
                 id="arrowhead"
+                viewBox="0 0 10 10"
                 markerWidth="10"
                 markerHeight="10"
-                refY="4"
-                orient="auto"
+                refX="5"
+                refY="5"
+                orient="auto-start-reverse"
             >
-                <svg:path d="M0,0 V8 L10,4 Z"></svg:path>
+                <svg:path d="M 1,1 L 9,5 L 1,9 Z"></svg:path>
             </svg:marker>
         </svg:defs>
 
         <svg:line
-            [attr.x1]="arc.start.coordinates.x"
-            [attr.y1]="arc.start.coordinates.y"
-            [attr.x2]="arc.end.coordinates.x - 20"
-            [attr.y2]="arc.end.coordinates.y"
+            [attr.x1]="arc.x1"
+            [attr.y1]="arc.y1"
+            [attr.x2]="arc.x2"
+            [attr.y2]="arc.y2"
             marker-end="url(#arrowhead)"
         />
     `,
@@ -31,10 +33,11 @@ import { Arc } from './elements';
         }
         path {
             stroke: black;
+            stroke-width: 1;
             fill: black;
         }
     `,
 })
 export class DrawingArcComponent {
-    @Input({ required: true }) arc!: Arc;
+    @Input({ required: true }) arc!: Edge;
 }

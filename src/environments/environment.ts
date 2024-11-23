@@ -4,6 +4,19 @@
 
 export const environment = {
     production: false,
+    drawingElements: {
+        activities: {
+            height: 40,
+            width: 40,
+        },
+        transitions: {
+            height: 40,
+            width: 40,
+        },
+        places: {
+            radius: 20,
+        },
+    },
 };
 
 /*
