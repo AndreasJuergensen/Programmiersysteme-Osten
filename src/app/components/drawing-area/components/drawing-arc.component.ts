@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Edge } from '../models';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'svg:g[app-drawing-arc]',
@@ -14,7 +15,12 @@ import { Edge } from '../models';
                 refY="5"
                 orient="auto-start-reverse"
             >
-                <svg:path d="M 1,1 L 9,5 L 1,9 Z"></svg:path>
+                <svg:path
+                    d="M 1,1 L 9,5 L 1,9 Z"
+                    [attr.fill]="color"
+                    [attr.stroke]="color"
+                    [attr.stroke-width]="width"
+                ></svg:path>
             </svg:marker>
         </svg:defs>
 
@@ -23,21 +29,16 @@ import { Edge } from '../models';
             [attr.y1]="arc.y1"
             [attr.x2]="arc.x2"
             [attr.y2]="arc.y2"
+            [attr.stroke]="color"
+            [attr.stroke-width]="width"
             marker-end="url(#arrowhead)"
         />
     `,
-    styles: `
-        line {
-            stroke: black;
-            stroke-width: 1;
-        }
-        path {
-            stroke: black;
-            stroke-width: 1;
-            fill: black;
-        }
-    `,
+    styles: ``,
 })
 export class DrawingArcComponent {
     @Input({ required: true }) arc!: Edge;
+
+    readonly color: string = environment.drawingElements.arcs.color;
+    readonly width: number = environment.drawingElements.arcs.width;
 }

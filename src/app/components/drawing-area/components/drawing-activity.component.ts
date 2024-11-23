@@ -6,14 +6,19 @@ import { environment } from 'src/environments/environment';
     selector: 'svg:g[app-drawing-activity]',
     template: `
         <svg:rect
-            [attr.x]="activity.coordinates.x - width / 2"
-            [attr.y]="activity.coordinates.y - height / 2"
+            [attr.x]="activity.x - width / 2"
+            [attr.y]="activity.y - height / 2"
             [attr.height]="height"
             [attr.width]="width"
+            [attr.fill]="bgColor"
+            [attr.fill-opacity]="bgOpacity"
+            [attr.stroke]="strokeColor"
+            [attr.stroke-opacity]="strokeOpacity"
+            [attr.stroke-width]="strokeWidth"
         />
         <svg:text
-            [attr.x]="activity.coordinates.x"
-            [attr.y]="activity.coordinates.y + height"
+            [attr.x]="activity.x"
+            [attr.y]="activity.y + (height + strokeWidth) / 2 + 20"
         >
             {{ activity.id }}
         </svg:text>
@@ -23,6 +28,17 @@ import { environment } from 'src/environments/environment';
 export class DrawingActivityComponent {
     @Input({ required: true }) activity!: Activity;
 
-    readonly height: number = environment.drawingElements.activities.height;
     readonly width: number = environment.drawingElements.activities.height;
+    readonly height: number = environment.drawingElements.activities.height;
+
+    readonly bgColor: string = environment.drawingElements.activities.bgColor;
+    readonly bgOpacity: string =
+        environment.drawingElements.activities.bgOpacity;
+
+    readonly strokeColor: string =
+        environment.drawingElements.activities.strokeColor;
+    readonly strokeOpacity: string =
+        environment.drawingElements.activities.strokeOpacity;
+    readonly strokeWidth: number =
+        environment.drawingElements.activities.strokeWidth;
 }
