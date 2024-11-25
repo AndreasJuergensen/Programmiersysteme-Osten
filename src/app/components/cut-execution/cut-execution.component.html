@@ -1,0 +1,10 @@
+<form [formGroup]="radioForm">
+    <mat-radio-group formControlName="selectedCut">
+        <mat-radio-button *ngFor="let option of radioOptions" [value]="option">
+            {{ option }}
+        </mat-radio-button>
+    </mat-radio-group>
+</form>
+<button mat-raised-button="primary" (click)="onCutClick()">
+    Cut durchfuehren
+</button>
