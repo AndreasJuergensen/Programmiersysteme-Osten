@@ -1,3 +1,4 @@
+<h3>Welcher Cut soll durchgeführt werden?</h3>
 <form [formGroup]="radioForm">
     <mat-radio-group formControlName="selectedCut">
         <mat-radio-button *ngFor="let option of radioOptions" [value]="option">
@@ -8,3 +9,5 @@
 <button mat-raised-button="primary" (click)="onCutClick()">
     Cut durchfuehren
 </button>
+<!-- Abstand einfuegen? Wie? -->
+<button mat-stroked-button (click)="onCancelClick()">Cancel</button>

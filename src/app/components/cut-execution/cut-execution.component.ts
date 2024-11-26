@@ -42,12 +42,22 @@ export class CutExecutionComponent implements OnInit {
         });
     }
 
-    public onCutClick(): void {
+    onCutClick(): void {
         const selectedValue = this.radioForm.get('selectedCut')?.value;
         if (selectedValue) {
             this.executeCutService.cut(selectedValue);
+            this.resetRadioSelection();
         } else {
-            console.warn('No option selected!');
+            console.warn('No option selected!'); // hier Feedback ausgeben, falls kein Cut ausgewaehlt wurde
         }
+    }
+
+    onCancelClick(): void {
+        this.resetRadioSelection();
+        console.log('Selection canceled'); // hier Feedback ausgeben, dass Auswahl abgebrochen wurde
+    }
+
+    resetRadioSelection(): void {
+        this.radioForm.get('selectedCut')?.setValue(null);
     }
 }
