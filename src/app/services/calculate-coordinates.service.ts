@@ -158,15 +158,42 @@ export class CalculateCoordinatesService {
                 edge.source.id === element.id ||
                 edge.target.id === element.id
             ) {
-                break;
+                continue;
             }
 
-            let lambda = this.lambdaBerechnen(element, edge);
-            let lotpunkt = this.lotpunktBerechnen(lambda, edge);
-            let abstand = this.abstandZwischenZweiPunktenBerechnen(
-                lotpunkt,
-                element,
-            );
+            if (edge.source.y === element.y && edge.target.y === element.y) {
+                if (element.x < edge.target.x && element.x > edge.source.x) {
+                    console.log(
+                        `(Arc: [${edge.source.x}, ${edge.source.y}] - [${edge.target.x}, ${edge.target.y}])`,
+                    );
+                    console.log(`Node: [${element.x},${element.y}]`);
+                    console.log(
+                        'Wir verschieben, da Abstand 0 und Knoten innerhalb von Arc',
+                    );
+                    return true;
+                } else {
+                    console.log(
+                        `(Arc: [${edge.source.x}, ${edge.source.y}] - [${edge.target.x}, ${edge.target.y}])`,
+                    );
+                    console.log(`Node: [${element.x},${element.y}]`);
+                    console.log(
+                        'Wir brechen ab, da Abstand 0 und Knoten außerhalb von Arc',
+                    );
+                    continue;
+                }
+                //console.log('Hier brechen wir ab, da y gleich sind');
+
+                //return true;
+            }
+
+            // let lambda = this.lambdaBerechnen(element, edge);
+            // let lotpunkt = this.lotpunktBerechnen(lambda, edge);
+            // let abstand = this.abstandZwischenZweiPunktenBerechnen(
+            //     lotpunkt,
+            //     element,
+            // );
+
+            let abstand = this.abstandBerechnen(edge, element);
             console.log(
                 'Vergleich mit Edge ' +
                     edge.source.id +
@@ -177,7 +204,11 @@ export class CalculateCoordinatesService {
             console.log(`Node: (${element.x},${element.y})`);
             console.log('Abstand: ' + abstand);
 
-            if (abstand < 15) {
+            // if (abstand < 15) {
+            if (abstand < 15 && abstand > 0) {
+                console.log(
+                    'Abstand ist kleiner als 70, wir müssen verschieben.',
+                );
                 return true;
             }
         }
@@ -209,5 +240,31 @@ export class CalculateCoordinatesService {
             Math.pow(node.x - lotpunkt[0], 2) +
                 Math.pow(node.y - lotpunkt[1], 2),
         );
+    }
+
+    private abstandBerechnen(edge: Edge, node: Node): number {
+        let koeffizienten = this.berechneNormalform(edge);
+
+        let a = koeffizienten[0];
+        let b = koeffizienten[1];
+        let c = koeffizienten[2];
+
+        return (
+            Math.abs(a * node.x + b * node.y + c) /
+            Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2))
+        );
+    }
+
+    //Die Normalform einer Geraden lautet ax + by + c = 0
+    //Die Methode gibt hierbei die Werte für a, b und c in der Form [a,b,c] zurück
+    private berechneNormalform(edge: Edge): [number, number, number] {
+        //a
+        let steigung =
+            (edge.target.y - edge.source.y) / (edge.target.x - edge.source.x);
+
+        //c
+        let schnittpunktMitYAchse = edge.source.y - steigung * edge.source.x;
+
+        return [steigung, -1, schnittpunktMitYAchse];
     }
 }
