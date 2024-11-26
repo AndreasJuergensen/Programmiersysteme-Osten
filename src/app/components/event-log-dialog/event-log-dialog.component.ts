@@ -40,10 +40,6 @@ export class EventLogDialogComponent {
             this.eventLogInput,
         );
         const dfg: Dfg = this.calculateDfgService.calculate(eventLog);
-        // const graph: Map<
-        //     String,
-        //     Array<Activity>
-        // > = this.calculateCoordinatesService.calculateCoordinates(dfg);
         const graph =
             this.calculateCoordinatesService.calculateCoordinates(dfg);
         console.log(graph);

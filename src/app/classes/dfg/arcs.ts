@@ -26,35 +26,13 @@ export class Arcs {
     }
 
     calculateNextActivities(startActivity: Activity): Activities {
-        //const activities2 = new Activities();
-        const arrayAct = Array.from(this._arcs.values())
+        return Array.from(this._arcs.values())
             .filter((arc) => arc.getStart().name == startActivity.name)
             .reduce(
                 (prev, curr) => prev.addActivity(curr.getEnd()),
                 new Activities(),
             );
-
-        // const test = Array.from(this.arcs.values()).filter(
-        //     (arc) => arc.getStart().name == startActivity.name,
-        // );
-        // console.log('ArrayAct: ' + startActivity.name + ' - Filter-Aufruf:');
-        // console.log(test);
-        // console.log(arrayAct);
-        // console.log('---------');
-        return arrayAct;
     }
-
-    // calculateNextActivities(startActivity: Activity): Array<DfgArc> {
-    //     const arrayAct = Array.from(this.arcs.values()).filter(
-    //         (arc) => arc.getStart().name == startActivity.name,
-    //     );
-    //     // console.log('Start Arcs');
-    //     // this.arcs.forEach((arc) => {
-    //     //     console.log(arc.getStart().name);
-    //     // });
-    //     // console.log('Ende Arcs');
-    //     return arrayAct;
-    // }
 
     calculateReachableActivities(startActivities: Activities): Activities {
         const reachableActivities: Activities = new Activities();
