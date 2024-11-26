@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Edge } from '../models';
+import { Arc } from '../models';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -37,7 +37,7 @@ import { environment } from 'src/environments/environment';
     styles: ``,
 })
 export class DrawingArcComponent {
-    @Input({ required: true }) arc!: Edge;
+    @Input({ required: true }) arc!: Arc;
 
     readonly color: string = environment.drawingElements.arcs.color;
     readonly width: number = environment.drawingElements.arcs.width;

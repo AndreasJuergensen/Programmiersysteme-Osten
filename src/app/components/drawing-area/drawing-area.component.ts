@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Activity, DfgArc, Edge, Place, Transition } from './models';
+import { Activity, DfgArc, Arc, Place, Transition } from './models';
 import { CalculateCoordinatesService } from 'src/app/services/calculate-coordinates.service';
 
 @Component({
@@ -11,7 +11,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     private _activities: Array<Activity> = new Array<Activity>();
     private _transitions: Array<Transition> = new Array<Transition>();
     private _places: Array<Place> = new Array<Place>();
-    private _arcs: Array<Edge> = new Array<Edge>();
+    private _arcs: Array<Arc> = new Array<Arc>();
 
     constructor(
         private calculateCoordiantesService: CalculateCoordinatesService,
@@ -29,7 +29,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         return this._places;
     }
 
-    get arcs(): Array<Edge> {
+    get arcs(): Array<Arc> {
         return this._arcs;
     }
 
@@ -40,7 +40,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 return new Activity(node.id, node.x, node.y);
             });
 
-            const arcs: Array<Edge> = [];
+            const arcs: Array<Arc> = [];
             graph.edges.forEach((edge) => {
                 const startNode: Activity = nodes.find(
                     (node) => edge.source.id === node.id,
