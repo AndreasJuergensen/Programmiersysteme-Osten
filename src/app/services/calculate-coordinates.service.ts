@@ -93,6 +93,121 @@ export class CalculateCoordinatesService {
             edges.push({ source: startNode, target: endNode });
         });
 
+        this.nacharbeitKoordinaten(nodes, edges);
+
         this._graph$.next({ nodes: nodes, edges: edges });
+    }
+
+    public nacharbeitKoordinaten(nodes: Array<Node>, edges: Array<Edge>) {
+        let runAgain: boolean;
+        let index: number = 1;
+
+        do {
+            runAgain = false;
+            nodes.forEach((element) => {
+                console.log('########## start #############');
+                console.log('Node: ' + element.id);
+                // console.log('############ anfang #############');
+                // console.log(
+                //     this.pruefeUeberschneidungNodeAufNode(element, nodes),
+                // );
+                // console.log(
+                //     this.pruefeUeberschneidungNodeAufEdge(element, edges),
+                // );
+                // console.log('########### ende ##############');
+
+                if (
+                    this.pruefeUeberschneidungNodeAufNode(element, nodes) ||
+                    this.pruefeUeberschneidungNodeAufEdge(element, edges)
+                ) {
+                    //neue Koordinaten setzen
+                    element.y += 100;
+                    runAgain = true;
+                }
+                console.log('########## ende #############');
+            });
+
+            // console.log('Run again: ' + runAgain);
+            // console.log(index + '. Durchlauf');
+            // index += 1;
+        } while (runAgain);
+    }
+
+    private pruefeUeberschneidungNodeAufNode(
+        element: Node,
+        nodes: Array<Node>,
+    ): boolean {
+        let ueberschneidendesElement: Node | undefined = nodes.find((node) => {
+            node.x === element.x &&
+                node.y === element.y &&
+                node.id !== element.id;
+        });
+
+        // console.log('ueberschneidendesElement');
+        // console.log(ueberschneidendesElement);
+
+        return ueberschneidendesElement !== undefined;
+    }
+
+    private pruefeUeberschneidungNodeAufEdge(
+        element: Node,
+        edges: Array<Edge>,
+    ): boolean {
+        for (const edge of edges) {
+            if (
+                edge.source.id === element.id ||
+                edge.target.id === element.id
+            ) {
+                break;
+            }
+
+            let lambda = this.lambdaBerechnen(element, edge);
+            let lotpunkt = this.lotpunktBerechnen(lambda, edge);
+            let abstand = this.abstandZwischenZweiPunktenBerechnen(
+                lotpunkt,
+                element,
+            );
+            console.log(
+                'Vergleich mit Edge ' +
+                    edge.source.id +
+                    '<->' +
+                    edge.target.id +
+                    `([${edge.source.x}, ${edge.source.y}] - [${edge.target.x}, ${edge.target.y}])`,
+            );
+            console.log(`Node: (${element.x},${element.y})`);
+            console.log('Abstand: ' + abstand);
+
+            if (abstand < 15) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private lambdaBerechnen(node: Node, edge: Edge): number {
+        return (
+            (-1 *
+                (edge.target.x * (edge.source.x - node.x) +
+                    edge.target.y * (edge.source.y - node.y))) /
+            (Math.pow(edge.target.x, 2) + Math.pow(edge.target.y, 2))
+        );
+    }
+
+    private lotpunktBerechnen(lambda: number, edge: Edge): [number, number] {
+        return [
+            edge.source.x + lambda * edge.target.x,
+            edge.source.y + lambda * edge.target.y,
+        ];
+    }
+
+    private abstandZwischenZweiPunktenBerechnen(
+        lotpunkt: [number, number],
+        node: Node,
+    ): number {
+        return Math.sqrt(
+            Math.pow(node.x - lotpunkt[0], 2) +
+                Math.pow(node.y - lotpunkt[1], 2),
+        );
     }
 }
