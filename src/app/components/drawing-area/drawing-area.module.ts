@@ -6,7 +6,7 @@ import {
     DrawingArcComponent,
     DrawingPlaceComponent,
     DrawingTransitionsComponent,
-} from './elements';
+} from './components';
 
 @NgModule({
     declarations: [
