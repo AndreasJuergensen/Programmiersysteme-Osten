@@ -1,3 +1,4 @@
+import { EventLog } from '../event-log';
 import { PetriNetTransition } from '../petri-net';
 import { Activities, Activity } from './activities';
 import { ArcJson, Arcs, DfgArc } from './arcs';
@@ -12,6 +13,7 @@ export class Dfg implements PetriNetTransition {
         public id: string,
         private readonly activities: Activities,
         private readonly arcs: Arcs,
+        private eventLog: EventLog,
     ) {}
 
     canBeCutIn(a1: Activities, a2: Activities): boolean {
@@ -29,11 +31,16 @@ export class Dfg implements PetriNetTransition {
             arcs: this.arcs.asJson(),
         };
     }
+
+    getEventLog(): EventLog {
+        return this.eventLog;
+    }
 }
 
 export class DfgBuilder {
     private readonly activities: Activities = new Activities().addPlayAndStop();
     private readonly arcs: Arcs = new Arcs();
+    private eventlog: EventLog = new EventLog();
 
     addPlayToStopArc(): void {
         this.arcs.addArc(
@@ -79,7 +86,12 @@ export class DfgBuilder {
         return this;
     }
 
+    addEventLog(inputEventLog: EventLog): DfgBuilder {
+        this.eventlog = inputEventLog;
+        return this;
+    }
+
     build(): Dfg {
-        return new Dfg('', this.activities, this.arcs);
+        return new Dfg('', this.activities, this.arcs, this.eventlog);
     }
 }
