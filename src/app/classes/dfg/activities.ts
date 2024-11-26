@@ -5,8 +5,8 @@ export class Activities {
     constructor(private readonly activities: Array<Activity> = new Array()) {}
 
     addPlayAndStop(): Activities {
-        this.activities.push(this.playActivity);
-        this.activities.push(this.stopActivity);
+        this._activities.push(this.playActivity);
+        this._activities.push(this.stopActivity);
         return this;
     }
 
@@ -23,7 +23,7 @@ export class Activities {
      */
     addActivity(activity: Activity): Activities {
         if (!this.containsActivity(activity)) {
-            this.activities.push(activity);
+            this._activities.push(activity);
         }
         return this;
     }
@@ -84,7 +84,7 @@ export class Activities {
         if (!this.containsActivityWithName(name)) {
             throw new Error('Activity not found');
         }
-        return this.activities.find((a) => a.equals(new Activity(name)))!;
+        return this._activities.find((a) => a.equals(new Activity(name)))!;
     }
 
     isNotEmpty(): boolean {
@@ -102,25 +102,29 @@ export class Activities {
 }
 
 export class Activity {
-    private readonly name: string;
+    private readonly _name: string;
 
     constructor(name: string) {
-        this.name = name;
+        this._name = name;
+    }
+
+    get name(): string {
+        return this._name;
     }
 
     equals(other: Activity): boolean {
-        return this.name === other.name;
+        return this._name === other._name;
     }
 
     isPlay(): boolean {
-        return this.name === 'play';
+        return this._name === 'play';
     }
 
     isNeitherPlayNorStop(): boolean {
-        return !this.isPlay() && this.name !== 'stop';
+        return !this.isPlay() && this._name !== 'stop';
     }
 
     asJson(): string {
-        return this.name;
+        return this._name;
     }
 }

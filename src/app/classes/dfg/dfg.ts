@@ -16,6 +16,14 @@ export class Dfg implements PetriNetTransition {
         private eventLog: EventLog,
     ) {}
 
+    get activities(): Activities {
+        return this._activities;
+    }
+
+    get arcs(): Arcs {
+        return this._arcs;
+    }
+
     canBeCutIn(a1: Activities, a2: Activities): boolean {
         return (
             new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs) ||
@@ -27,8 +35,8 @@ export class Dfg implements PetriNetTransition {
 
     asJson(): DfgJson {
         return {
-            activities: this.activities.asJson(),
-            arcs: this.arcs.asJson(),
+            activities: this._activities.asJson(),
+            arcs: this._arcs.asJson(),
         };
     }
 

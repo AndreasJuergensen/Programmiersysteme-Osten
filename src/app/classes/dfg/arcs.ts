@@ -25,6 +25,37 @@ export class Arcs {
         );
     }
 
+    calculateNextActivities(startActivity: Activity): Activities {
+        //const activities2 = new Activities();
+        const arrayAct = Array.from(this._arcs.values())
+            .filter((arc) => arc.getStart().name == startActivity.name)
+            .reduce(
+                (prev, curr) => prev.addActivity(curr.getEnd()),
+                new Activities(),
+            );
+
+        // const test = Array.from(this.arcs.values()).filter(
+        //     (arc) => arc.getStart().name == startActivity.name,
+        // );
+        // console.log('ArrayAct: ' + startActivity.name + ' - Filter-Aufruf:');
+        // console.log(test);
+        // console.log(arrayAct);
+        // console.log('---------');
+        return arrayAct;
+    }
+
+    // calculateNextActivities(startActivity: Activity): Array<DfgArc> {
+    //     const arrayAct = Array.from(this.arcs.values()).filter(
+    //         (arc) => arc.getStart().name == startActivity.name,
+    //     );
+    //     // console.log('Start Arcs');
+    //     // this.arcs.forEach((arc) => {
+    //     //     console.log(arc.getStart().name);
+    //     // });
+    //     // console.log('Ende Arcs');
+    //     return arrayAct;
+    // }
+
     calculateReachableActivities(startActivities: Activities): Activities {
         const reachableActivities: Activities = new Activities();
         for (const arc of this.arcs) {
@@ -114,13 +145,13 @@ export class Arcs {
 
     addArc(arc: DfgArc): Arcs {
         if (!this.containsArc(arc)) {
-            this.arcs.push(arc);
+            this._arcs.push(arc);
         }
         return this;
     }
 
     private containsArc(arc: DfgArc): boolean {
-        for (const a of this.arcs) {
+        for (const a of this._arcs) {
             if (a.equals(arc)) {
                 return true;
             }
