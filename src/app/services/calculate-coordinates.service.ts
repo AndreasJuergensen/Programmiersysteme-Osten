@@ -100,22 +100,10 @@ export class CalculateCoordinatesService {
 
     public nacharbeitKoordinaten(nodes: Array<Node>, edges: Array<Edge>) {
         let runAgain: boolean;
-        let index: number = 1;
 
         do {
             runAgain = false;
             nodes.forEach((element) => {
-                console.log('########## start #############');
-                console.log('Node: ' + element.id);
-                // console.log('############ anfang #############');
-                // console.log(
-                //     this.pruefeUeberschneidungNodeAufNode(element, nodes),
-                // );
-                // console.log(
-                //     this.pruefeUeberschneidungNodeAufEdge(element, edges),
-                // );
-                // console.log('########### ende ##############');
-
                 if (
                     this.pruefeUeberschneidungNodeAufNode(element, nodes) ||
                     this.pruefeUeberschneidungNodeAufEdge(element, edges)
@@ -124,12 +112,7 @@ export class CalculateCoordinatesService {
                     element.y += 100;
                     runAgain = true;
                 }
-                console.log('########## ende #############');
             });
-
-            // console.log('Run again: ' + runAgain);
-            // console.log(index + '. Durchlauf');
-            // index += 1;
         } while (runAgain);
     }
 
@@ -143,9 +126,6 @@ export class CalculateCoordinatesService {
                 node.id !== element.id;
         });
 
-        // console.log('ueberschneidendesElement');
-        // console.log(ueberschneidendesElement);
-
         return ueberschneidendesElement !== undefined;
     }
 
@@ -154,6 +134,7 @@ export class CalculateCoordinatesService {
         edges: Array<Edge>,
     ): boolean {
         for (const edge of edges) {
+            //Überprüfung, ob Node die Start- oder Ziel-Node des Arc ist
             if (
                 edge.source.id === element.id ||
                 edge.target.id === element.id
@@ -161,85 +142,28 @@ export class CalculateCoordinatesService {
                 continue;
             }
 
+            //Überprüfung, ob die Node auf der Geraden liegt, die durch die Arc gebildet wird, soz. Überprüfung auf Abstand 0
             if (edge.source.y === element.y && edge.target.y === element.y) {
+                //Überprüfung, ob die Node zwischen dem Start- und End-Punkt der Arc liegt und somit, ob die Node auf der Arc liegt
                 if (element.x < edge.target.x && element.x > edge.source.x) {
-                    console.log(
-                        `(Arc: [${edge.source.x}, ${edge.source.y}] - [${edge.target.x}, ${edge.target.y}])`,
-                    );
-                    console.log(`Node: [${element.x},${element.y}]`);
-                    console.log(
-                        'Wir verschieben, da Abstand 0 und Knoten innerhalb von Arc',
-                    );
+                    //es muss verschoben werden, da die Node auf dem Arc liegt
                     return true;
                 } else {
-                    console.log(
-                        `(Arc: [${edge.source.x}, ${edge.source.y}] - [${edge.target.x}, ${edge.target.y}])`,
-                    );
-                    console.log(`Node: [${element.x},${element.y}]`);
-                    console.log(
-                        'Wir brechen ab, da Abstand 0 und Knoten außerhalb von Arc',
-                    );
+                    //es muss nicht verschoben werden, da Node nicht auf Arc liegt
                     continue;
                 }
-                //console.log('Hier brechen wir ab, da y gleich sind');
-
-                //return true;
             }
 
-            // let lambda = this.lambdaBerechnen(element, edge);
-            // let lotpunkt = this.lotpunktBerechnen(lambda, edge);
-            // let abstand = this.abstandZwischenZweiPunktenBerechnen(
-            //     lotpunkt,
-            //     element,
-            // );
-
             let abstand = this.abstandBerechnen(edge, element);
-            console.log(
-                'Vergleich mit Edge ' +
-                    edge.source.id +
-                    '<->' +
-                    edge.target.id +
-                    `([${edge.source.x}, ${edge.source.y}] - [${edge.target.x}, ${edge.target.y}])`,
-            );
-            console.log(`Node: (${element.x},${element.y})`);
-            console.log('Abstand: ' + abstand);
 
             // if (abstand < 15) {
             if (abstand < 15 && abstand > 0) {
-                console.log(
-                    'Abstand ist kleiner als 70, wir müssen verschieben.',
-                );
+                //der Abstand ist zu klein, deshalb müssen wir verschieben
                 return true;
             }
         }
 
         return false;
-    }
-
-    private lambdaBerechnen(node: Node, edge: Edge): number {
-        return (
-            (-1 *
-                (edge.target.x * (edge.source.x - node.x) +
-                    edge.target.y * (edge.source.y - node.y))) /
-            (Math.pow(edge.target.x, 2) + Math.pow(edge.target.y, 2))
-        );
-    }
-
-    private lotpunktBerechnen(lambda: number, edge: Edge): [number, number] {
-        return [
-            edge.source.x + lambda * edge.target.x,
-            edge.source.y + lambda * edge.target.y,
-        ];
-    }
-
-    private abstandZwischenZweiPunktenBerechnen(
-        lotpunkt: [number, number],
-        node: Node,
-    ): number {
-        return Math.sqrt(
-            Math.pow(node.x - lotpunkt[0], 2) +
-                Math.pow(node.y - lotpunkt[1], 2),
-        );
     }
 
     private abstandBerechnen(edge: Edge, node: Node): number {
