@@ -5,8 +5,8 @@ export class Activities {
     constructor(private readonly activities: Array<Activity> = new Array()) {}
 
     addPlayAndStop(): Activities {
-        this._activities.push(this.playActivity);
-        this._activities.push(this.stopActivity);
+        this.activities.push(this.playActivity);
+        this.activities.push(this.stopActivity);
         return this;
     }
 
@@ -23,7 +23,7 @@ export class Activities {
      */
     addActivity(activity: Activity): Activities {
         if (!this.containsActivity(activity)) {
-            this._activities.push(activity);
+            this.activities.push(activity);
         }
         return this;
     }
@@ -84,7 +84,11 @@ export class Activities {
         if (!this.containsActivityWithName(name)) {
             throw new Error('Activity not found');
         }
-        return this._activities.find((a) => a.equals(new Activity(name)))!;
+        return this.activities.find((a) => a.equals(new Activity(name)))!;
+    }
+
+    getAllActivites(): Array<Activity> {
+        return this.activities;
     }
 
     isNotEmpty(): boolean {

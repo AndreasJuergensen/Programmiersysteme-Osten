@@ -39,11 +39,11 @@ export class CalculateCoordinatesService {
         Die Koordinaten des DFG werden mittels Tiefensuche von Graphen (DFS) die Koordinaten berechnet.
         Der Stack enthält dabei die Elemente des Graphen, die schon gefunden wurden, deren Koordinanten aber noch berechnet werden müssen.
         */
-        const stack: Array<StackElement> = neighbours.activities.map(
-            (neighbour) => {
+        const stack: Array<StackElement> = neighbours
+            .getAllActivites()
+            .map((neighbour) => {
                 return { activity: neighbour, source_x: 100, source_y: 100 };
-            },
-        );
+            });
 
         while (stack.length > 0) {
             const stackElement: StackElement = stack.pop()!;
@@ -70,7 +70,7 @@ export class CalculateCoordinatesService {
                 );
 
                 stack.push(
-                    ...neighbours.activities.map((neighbour) => {
+                    ...neighbours.getAllActivites().map((neighbour) => {
                         return {
                             activity: neighbour,
                             source_x: activityAsNode.x,
@@ -82,7 +82,7 @@ export class CalculateCoordinatesService {
             }
         }
 
-        dfg.arcs.arcs.forEach((arc) => {
+        dfg.arcs.getArcs().forEach((arc) => {
             const startNode: Node = nodes.find(
                 (node) => arc.getStart().name === node.id,
             )!;

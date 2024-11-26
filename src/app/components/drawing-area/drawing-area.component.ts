@@ -1,9 +1,5 @@
-import {
-    Component,
-    OnDestroy,
-    OnInit,
-} from '@angular/core';
-import { Activity, Edge, Place, Transition } from './models';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Activity, DfgArc, Edge, Place, Transition } from './models';
 import { CalculateCoordinatesService } from 'src/app/services/calculate-coordinates.service';
 
 @Component({
@@ -15,7 +11,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     private _activities: Array<Activity> = new Array<Activity>();
     private _transitions: Array<Transition> = new Array<Transition>();
     private _places: Array<Place> = new Array<Place>();
-    private _arcs: Array<Arc> = new Array<Arc>();
+    private _arcs: Array<Edge> = new Array<Edge>();
 
     constructor(
         private calculateCoordiantesService: CalculateCoordinatesService,
@@ -34,17 +30,17 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     }
 
     get arcs(): Array<Edge> {
-        return this._edges;
+        return this._arcs;
     }
 
     ngOnInit(): void {
         // Subcribe to Observable from service which calculates coordinates...
         this.calculateCoordiantesService.graph$.subscribe((graph) => {
             const nodes: Array<Activity> = graph.nodes.map((node) => {
-                return { id: node.id, coordinates: { x: node.x, y: node.y } };
+                return new Activity(node.id, node.x, node.y);
             });
 
-            const arcs: Array<Arc> = [];
+            const arcs: Array<Edge> = [];
             graph.edges.forEach((edge) => {
                 const startNode: Activity = nodes.find(
                     (node) => edge.source.id === node.id,
@@ -53,7 +49,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                     (node) => edge.target.id === node.id,
                 )!;
 
-                arcs.push({ start: startNode, end: endNode });
+                arcs.push(new DfgArc(startNode, endNode));
             });
 
             this._activities = nodes;

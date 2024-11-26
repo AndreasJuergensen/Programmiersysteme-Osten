@@ -1,4 +1,3 @@
-import { from } from 'rxjs';
 import { Activities, Activity } from './activities';
 
 export class Arcs {
@@ -26,7 +25,7 @@ export class Arcs {
     }
 
     calculateNextActivities(startActivity: Activity): Activities {
-        return Array.from(this._arcs.values())
+        return Array.from(this.arcs.values())
             .filter((arc) => arc.getStart().name == startActivity.name)
             .reduce(
                 (prev, curr) => prev.addActivity(curr.getEnd()),
@@ -123,13 +122,17 @@ export class Arcs {
 
     addArc(arc: DfgArc): Arcs {
         if (!this.containsArc(arc)) {
-            this._arcs.push(arc);
+            this.arcs.push(arc);
         }
         return this;
     }
 
+    getArcs(): Array<DfgArc> {
+        return this.arcs;
+    }
+
     private containsArc(arc: DfgArc): boolean {
-        for (const a of this._arcs) {
+        for (const a of this.arcs) {
             if (a.equals(arc)) {
                 return true;
             }
