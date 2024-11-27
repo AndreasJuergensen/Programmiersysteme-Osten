@@ -4,6 +4,7 @@ import { Activities, Activity } from '../classes/dfg/activities';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Graph, Node, Edge, StackElement } from '../classes/graph';
 import { DfgArc } from '../classes/dfg/arcs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
@@ -39,6 +40,9 @@ export class CalculateCoordinatesService {
     private generateNodes(dfg: Dfg): Array<Node> {
         const nodes: Array<Node> = new Array<Node>();
 
+        const gapX = environment.drawingGrid.gapX;
+        const gapY = environment.drawingGrid.gapY;
+
         let yCoordinate: number = 100;
         let xOfLastModeledNode: number = 100;
 
@@ -58,7 +62,7 @@ export class CalculateCoordinatesService {
         while (stack.length > 0) {
             const stackElement: StackElement = stack.pop()!;
             if (this.InsertNewLevel(nodes, stackElement, xOfLastModeledNode)) {
-                yCoordinate = this.biggestYCoodinateOfNodes(nodes) + 100;
+                yCoordinate = this.biggestYCoodinateOfNodes(nodes) + gapY;
             }
 
             if (this.IsNodeAlreadyModeled(nodes, stackElement)) {
@@ -67,7 +71,7 @@ export class CalculateCoordinatesService {
 
             const activityAsNode = {
                 id: stackElement.activity.name,
-                x: stackElement.source_x + 100,
+                x: stackElement.source_x + gapX,
                 y: yCoordinate,
             };
             nodes.push(activityAsNode);
@@ -168,6 +172,8 @@ export class CalculateCoordinatesService {
         nodes: Array<Node>,
         edges: Array<Edge>,
     ) {
+        const gapY = environment.drawingGrid.gapY;
+
         let nodeWasMoved: boolean;
 
         do {
@@ -177,7 +183,7 @@ export class CalculateCoordinatesService {
                     this.checkNodeOverlap(node, nodes) ||
                     this.checkEdgeOverlap(node, edges)
                 ) {
-                    node.y += 100;
+                    node.y += gapY;
                     nodeWasMoved = true;
                 }
             });
@@ -221,7 +227,12 @@ export class CalculateCoordinatesService {
             }
 
             let distance = this.calculateDistanceBetweenNodeAndEdge(edge, node);
-            if (0 < distance && distance < 15) {
+            const width = environment.drawingElements.activities.width;
+            const height = environment.drawingElements.activities.height;
+            const lengthDiagonal = Math.sqrt(
+                Math.pow(width / 2, 2) + Math.pow(height / 2, 2),
+            );
+            if (0 < distance && distance < Math.ceil(lengthDiagonal)) {
                 return true;
             }
         }
