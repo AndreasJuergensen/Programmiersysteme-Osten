@@ -29,16 +29,16 @@ export class FeedbackFormComponent {
         if (isValid) {
             this.feedbackService.showMessage(
                 `valid Input: ${this.userInput}`,
-                true,
+                false,
             );
             this.dialogRef.close({ isValid, input: this.userInput });
         } else {
-            this.feedbackService.showMessage('invalid Input', false);
+            this.feedbackService.showMessage('invalid Input', true);
         }
     }
 
     closeDialog(): void {
-        this.feedbackService.showMessage('Dialog closed without input.', false);
+        this.feedbackService.showMessage('Dialog closed without input.', true);
         this.dialogRef.close();
     }
 }
