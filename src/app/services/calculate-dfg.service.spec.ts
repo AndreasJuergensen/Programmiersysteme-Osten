@@ -1,5 +1,6 @@
-import { DfgJson } from '../classes/dfg/dfg';
-import { EventLog } from '../classes/event-log';
+import { Activity } from '../classes/dfg/activities';
+import { Dfg, DfgJson } from '../classes/dfg/dfg';
+import { EventLog, Trace } from '../classes/event-log';
 import { CalculateDfgService } from './calculate-dfg.service';
 
 describe('CalculateDfgService', () => {
@@ -10,7 +11,7 @@ describe('CalculateDfgService', () => {
     });
 
     it('empty event log -> empty dfg', () => {
-        const eventLog: EventLog = { traces: [] };
+        const eventLog: EventLog = new EventLog([]);
 
         const result: DfgJson = sut.calculate(eventLog).asJson();
 
@@ -22,9 +23,7 @@ describe('CalculateDfgService', () => {
     });
 
     it('event log with one trace containing one activity', () => {
-        const eventLog: EventLog = {
-            traces: [{ activities: [{ name: 'A' }] }],
-        };
+        const eventLog = new EventLog([new Trace([new Activity('A')])]);
 
         const result: DfgJson = sut.calculate(eventLog).asJson();
 
@@ -39,9 +38,9 @@ describe('CalculateDfgService', () => {
     });
 
     it('event log with one trace containing two activities', () => {
-        const eventLog: EventLog = {
-            traces: [{ activities: [{ name: 'A' }, { name: 'B' }] }],
-        };
+        const eventLog = new EventLog([
+            new Trace([new Activity('A'), new Activity('B')]),
+        ]);
 
         const result: DfgJson = sut.calculate(eventLog).asJson();
 
@@ -57,11 +56,13 @@ describe('CalculateDfgService', () => {
     });
 
     it('event log with one trace containing double activities', () => {
-        const eventLog: EventLog = {
-            traces: [
-                { activities: [{ name: 'A' }, { name: 'B' }, { name: 'A' }] },
-            ],
-        };
+        const eventLog = new EventLog([
+            new Trace([
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('A'),
+            ]),
+        ]);
 
         const result: DfgJson = sut.calculate(eventLog).asJson();
 
@@ -78,12 +79,18 @@ describe('CalculateDfgService', () => {
     });
 
     it('event log with two traces containing double activities', () => {
-        const eventLog: EventLog = {
-            traces: [
-                { activities: [{ name: 'A' }, { name: 'B' }, { name: 'A' }] },
-                { activities: [{ name: 'B' }, { name: 'C' }, { name: 'A' }] },
-            ],
-        };
+        const eventLog = new EventLog([
+            new Trace([
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('A'),
+            ]),
+            new Trace([
+                new Activity('B'),
+                new Activity('C'),
+                new Activity('A'),
+            ]),
+        ]);
 
         const result: DfgJson = sut.calculate(eventLog).asJson();
 
@@ -103,16 +110,18 @@ describe('CalculateDfgService', () => {
     });
 
     it('event log with two traces containing double activities', () => {
-        const eventLog: EventLog = {
-            traces: [
-                {
-                    activities: [{ name: 'A' }, { name: 'B' }, { name: 'A' }],
-                },
-                {
-                    activities: [{ name: 'B' }, { name: 'A' }, { name: 'C' }],
-                },
-            ],
-        };
+        const eventLog = new EventLog([
+            new Trace([
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('A'),
+            ]),
+            new Trace([
+                new Activity('B'),
+                new Activity('A'),
+                new Activity('C'),
+            ]),
+        ]);
 
         const result: DfgJson = sut.calculate(eventLog).asJson();
 
@@ -129,5 +138,13 @@ describe('CalculateDfgService', () => {
             ],
         };
         expect(result).toEqual(expectedDfg);
+    });
+
+    it('output event log with one trace containing one activity previously safed in DFG to test getEventLog-method', () => {
+        const eventLog = new EventLog([new Trace([new Activity('A')])]);
+
+        const dfg: Dfg = sut.calculate(eventLog);
+        const result: EventLog = dfg.getEventLog();
+        expect(result).toEqual(eventLog);
     });
 });
