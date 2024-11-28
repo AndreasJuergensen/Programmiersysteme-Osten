@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Activity, Arc, Place, Transition } from './elements';
+import { Activity, Edge, Place, Transition } from './models';
 
 @Component({
     selector: 'app-drawing-area',
@@ -10,7 +10,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     private _activities: Array<Activity> = new Array<Activity>();
     private _transitions: Array<Transition> = new Array<Transition>();
     private _places: Array<Place> = new Array<Place>();
-    private _arcs: Array<Arc> = new Array<Arc>();
+    private _edges: Array<Edge> = new Array<Edge>();
 
     get activities(): Array<Activity> {
         return this._activities;
@@ -24,8 +24,8 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         return this._places;
     }
 
-    get arcs(): Array<Arc> {
-        return this._arcs;
+    get arcs(): Array<Edge> {
+        return this._edges;
     }
 
     ngOnInit(): void {

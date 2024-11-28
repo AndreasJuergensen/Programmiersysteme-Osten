@@ -11,26 +11,32 @@ export class CalculateDfgService {
     public calculate(eventLog: EventLog): Dfg {
         const dfgBuilder: DfgBuilder = new DfgBuilder();
 
-        if (eventLog.traces.length === 0) {
+        dfgBuilder.addEventLog(eventLog);
+
+        if (eventLog.getAllTraces().length === 0) {
             dfgBuilder.addPlayToStopArc();
+
             return dfgBuilder.build();
         }
 
-        eventLog.traces
-            .flatMap((trace) => trace.activities)
-            .map((activity) => activity.name)
+        eventLog
+            .getAllTraces()
+            .flatMap((trace) => trace.getAllActivities())
+            .map((activity) => activity.asJson())
             .forEach((name) => dfgBuilder.createActivity(name));
 
-        eventLog.traces.forEach((trace) => {
-            trace.activities.forEach((activity, i, activities) => {
+        eventLog.getAllTraces().forEach((trace) => {
+            trace.getAllActivities().forEach((activity, i, activities) => {
+                const activityName = activity.asJson();
+
                 if (i === 0) {
-                    dfgBuilder.addFromPlayArc(activity.name);
+                    dfgBuilder.addFromPlayArc(activityName);
                 } else {
-                    dfgBuilder.addArc(activities[i - 1].name, activity.name);
+                    dfgBuilder.addArc(activities[i - 1].asJson(), activityName);
                 }
 
                 if (i === activities.length - 1) {
-                    dfgBuilder.addToStopArc(activity.name);
+                    dfgBuilder.addToStopArc(activityName);
                 }
             });
         });
