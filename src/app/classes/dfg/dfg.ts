@@ -16,13 +16,31 @@ export class Dfg implements PetriNetTransition {
         private eventLog: EventLog,
     ) {}
 
-    canBeCutIn(a1: Activities, a2: Activities): boolean {
-        return (
-            new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs) ||
-            new SequenceCut(a1, a2).isPossible(this.activities, this.arcs) ||
-            new ParallelCut(a1, a2).isPossible(this.activities, this.arcs) ||
-            new LoopCut(a1, a2).isPossible(this.activities, this.arcs)
-        );
+    canBeCutIn(
+        a1: Activities,
+        a2: Activities,
+    ): { result: boolean; matchingcut: string | null } {
+        if (new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs)) {
+            return { result: true, matchingcut: 'ExclusiveCut' };
+        }
+        if (new SequenceCut(a1, a2).isPossible(this.activities, this.arcs)) {
+            return { result: true, matchingcut: 'SequenceCut' };
+        }
+        if (new ParallelCut(a1, a2).isPossible(this.activities, this.arcs)) {
+            return { result: true, matchingcut: 'ParallelCut' };
+        }
+        if (new LoopCut(a1, a2).isPossible(this.activities, this.arcs)) {
+            return { result: true, matchingcut: 'LoopCut' };
+        }
+
+        return { result: false, matchingcut: null };
+
+        // return (
+        //     new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs) ||
+        //     new SequenceCut(a1, a2).isPossible(this.activities, this.arcs) ||
+        //     new ParallelCut(a1, a2).isPossible(this.activities, this.arcs) ||
+        //     new LoopCut(a1, a2).isPossible(this.activities, this.arcs)
+        // );
     }
 
     /* 
