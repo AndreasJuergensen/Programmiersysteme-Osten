@@ -9,7 +9,9 @@ export class EventLog {
     }
 
     addTrace(trace: Trace): void {
-        this.traces.push(trace);
+        if (!trace.isEmpty()) {
+            this.traces.push(trace);
+        }
     }
 
     getAllTraces(): Trace[] {
@@ -41,7 +43,7 @@ export class EventLog {
                     e2.addTrace(
                         new Trace(trace.getAllActivities().slice(index)),
                     );
-                    continue;
+                    break;
                 }
                 firstSequence.addActivity(activity);
             }
@@ -95,12 +97,8 @@ export class EventLog {
                     }
                 }
             }
-            if (!loopTrace1.isEmpty()) {
-                e1.addTrace(loopTrace1);
-            }
-            if (!loopTrace2.isEmpty()) {
-                e2.addTrace(loopTrace2);
-            }
+            e1.addTrace(loopTrace1);
+            e2.addTrace(loopTrace2);
         }
         return [e1, e2];
     }
