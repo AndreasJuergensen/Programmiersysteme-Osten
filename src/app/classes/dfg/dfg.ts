@@ -34,14 +34,16 @@ export class Dfg implements PetriNetTransition {
         }
 
         return { result: false, matchingcut: null };
-
-        // return (
-        //     new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs) ||
-        //     new SequenceCut(a1, a2).isPossible(this.activities, this.arcs) ||
-        //     new ParallelCut(a1, a2).isPossible(this.activities, this.arcs) ||
-        //     new LoopCut(a1, a2).isPossible(this.activities, this.arcs)
-        // );
     }
+
+    // canBeCutIn(a1: Activities, a2: Activities): boolean {
+    //     return (
+    //         new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs) ||
+    //         new SequenceCut(a1, a2).isPossible(this.activities, this.arcs) ||
+    //         new ParallelCut(a1, a2).isPossible(this.activities, this.arcs) ||
+    //         new LoopCut(a1, a2).isPossible(this.activities, this.arcs)
+    //     );
+    // }
 
     /* 
     cuttedArcs are the arcs that are choosen by user for cut, the return

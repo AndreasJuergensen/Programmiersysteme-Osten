@@ -33,19 +33,18 @@ export class ExecuteCutService {
         selectedArcs: Arcs,
         selectedCut: string,
     ): boolean {
-        const calculatedDfg: Dfg = dfg;
-        const arcsSelectedByUser: Arcs = selectedArcs;
-        const cutSelectedByUserViaRadioButton: string = selectedCut;
+        // const calculatedDfg: Dfg = dfg;
+        // const arcsSelectedByUser: Arcs = selectedArcs;
+        // const cutSelectedByUserViaRadioButton: string = selectedCut;
 
-        const a1: Activities = dfg.calculatePartitions(arcsSelectedByUser)[0];
-        const a2: Activities = dfg.calculatePartitions(arcsSelectedByUser)[1];
+        const a1: Activities = dfg.calculatePartitions(selectedArcs)[0];
+        const a2: Activities = dfg.calculatePartitions(selectedArcs)[1];
 
         let result: boolean = false;
 
         if (
-            calculatedDfg.canBeCutIn(a1, a2).result &&
-            calculatedDfg.canBeCutIn(a1, a2).matchingcut ===
-                cutSelectedByUserViaRadioButton
+            dfg.canBeCutIn(a1, a2).result &&
+            dfg.canBeCutIn(a1, a2).matchingcut === selectedCut
         ) {
             result = true;
         }
