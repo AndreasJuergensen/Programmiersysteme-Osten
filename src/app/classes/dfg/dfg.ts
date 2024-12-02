@@ -11,17 +11,25 @@ export interface DfgJson {
 export class Dfg implements PetriNetTransition {
     constructor(
         public id: string,
-        private readonly activities: Activities,
-        private readonly arcs: Arcs,
+        private readonly _activities: Activities,
+        private readonly _arcs: Arcs,
         private eventLog: EventLog,
     ) {}
 
+    get activities(): Activities {
+        return this._activities;
+    }
+
+    get arcs(): Arcs {
+        return this._arcs;
+    }
+
     canBeCutIn(a1: Activities, a2: Activities): boolean {
         return (
-            new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs) ||
-            new SequenceCut(a1, a2).isPossible(this.activities, this.arcs) ||
-            new ParallelCut(a1, a2).isPossible(this.activities, this.arcs) ||
-            new LoopCut(a1, a2).isPossible(this.activities, this.arcs)
+            new ExclusiveCut(a1, a2).isPossible(this._activities, this._arcs) ||
+            new SequenceCut(a1, a2).isPossible(this._activities, this._arcs) ||
+            new ParallelCut(a1, a2).isPossible(this._activities, this._arcs) ||
+            new LoopCut(a1, a2).isPossible(this._activities, this._arcs)
         );
     }
 
@@ -61,8 +69,8 @@ export class Dfg implements PetriNetTransition {
 
     asJson(): DfgJson {
         return {
-            activities: this.activities.asJson(),
-            arcs: this.arcs.asJson(),
+            activities: this._activities.asJson(),
+            arcs: this._arcs.asJson(),
         };
     }
 
