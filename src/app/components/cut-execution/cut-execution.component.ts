@@ -45,7 +45,7 @@ export class CutExecutionComponent implements OnInit {
     onCutClick(): void {
         const selectedValue = this.radioForm.get('selectedCut')?.value;
         if (selectedValue) {
-            this.executeCutService.cut(selectedValue);
+            // this.executeCutService.execute(selectedValue);
             this.resetRadioSelection();
         } else {
             console.warn('No option selected!'); // hier Feedback ausgeben, falls kein Cut ausgewaehlt wurde
