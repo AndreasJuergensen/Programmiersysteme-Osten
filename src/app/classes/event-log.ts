@@ -18,7 +18,7 @@ export class EventLog {
         return this.traces;
     }
 
-    splitByExclusiveCut(a1: Activities): EventLog[] {
+    splitByExclusiveCut(a1: Activities): [EventLog, EventLog] {
         const e1: EventLog = new EventLog();
         const e2: EventLog = new EventLog();
         for (const trace of this.traces) {
@@ -31,7 +31,7 @@ export class EventLog {
         return [e1, e2];
     }
 
-    splitBySequenceCut(a2: Activities): EventLog[] {
+    splitBySequenceCut(a2: Activities): [EventLog, EventLog] {
         const e1: EventLog = new EventLog();
         const e2: EventLog = new EventLog();
         for (const trace of this.traces) {
@@ -52,7 +52,7 @@ export class EventLog {
         return [e1, e2];
     }
 
-    splitByParallelCut(a1: Activities): EventLog[] {
+    splitByParallelCut(a1: Activities): [EventLog, EventLog] {
         const e1: EventLog = new EventLog();
         const e2: EventLog = new EventLog();
         for (const trace of this.traces) {
@@ -71,7 +71,7 @@ export class EventLog {
         return [e1, e2];
     }
 
-    splitByLoopCut(a1: Activities, a2: Activities): EventLog[] {
+    splitByLoopCut(a1: Activities, a2: Activities): [EventLog, EventLog] {
         const e1: EventLog = new EventLog();
         const e2: EventLog = new EventLog();
         for (const trace of this.traces) {
