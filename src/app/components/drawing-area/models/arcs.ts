@@ -1,7 +1,7 @@
 import { environment } from 'src/environments/environment';
 import { Activity, Place, Transition } from './nodes';
 
-export abstract class Edge {
+export abstract class Arc {
     readonly length: number;
     readonly alphaRad: number;
     readonly alphaDeg: number;
@@ -31,7 +31,7 @@ export abstract class Edge {
     abstract calculateCoordinates(): void;
 }
 
-export class DfgArc extends Edge {
+export class DfgArc extends Arc {
     constructor(start: Activity, end: Activity) {
         super(start, end);
         this.calculateCoordinates();
@@ -90,7 +90,7 @@ export class DfgArc extends Edge {
     }
 }
 
-export class PlaceToTransitionArc extends Edge {
+export class PlaceToTransitionArc extends Arc {
     constructor(start: Place, end: Transition) {
         super(start, end);
         this.calculateCoordinates();
@@ -149,7 +149,7 @@ export class PlaceToTransitionArc extends Edge {
     }
 }
 
-export class TransitionToPlaceArc extends Edge {
+export class TransitionToPlaceArc extends Arc {
     constructor(start: Transition, end: Place) {
         super(start, end);
         this.calculateCoordinates();

@@ -1,5 +1,9 @@
 export const environment = {
     production: false,
+    drawingGrid: {
+        gapX: 125,
+        gapY: 125,
+    },
     drawingElements: {
         activities: {
             width: 40,

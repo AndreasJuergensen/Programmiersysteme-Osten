@@ -101,6 +101,11 @@ export class Activities {
         return this.activities.find((a) => a.equals(new Activity(name)))!;
     }
 
+
+    getAllActivites(): Array<Activity> {
+        return this.activities;
+    }
+
     /**
      * return all activities from this activities, that are not contained
      * within the given partition
@@ -129,6 +134,7 @@ export class Activities {
 
     getFirstActivity(): Activity {
         return this.activities[0];
+
     }
 
     isNotEmpty(): boolean {
@@ -155,18 +161,22 @@ export class Activities {
 }
 
 export class Activity {
-    private readonly name: string;
+    private readonly _name: string;
 
     constructor(name: string) {
-        this.name = name;
+        this._name = name;
+    }
+
+    get name(): string {
+        return this._name;
     }
 
     equals(other: Activity): boolean {
-        return this.name === other.name;
+        return this._name === other._name;
     }
 
     isPlay(): boolean {
-        return this.name === 'play';
+        return this._name === 'play';
     }
 
     isStop(): boolean {
@@ -182,6 +192,6 @@ export class Activity {
     }
 
     asJson(): string {
-        return this.name;
+        return this._name;
     }
 }

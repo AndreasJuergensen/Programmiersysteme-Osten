@@ -24,6 +24,15 @@ export class Arcs {
         );
     }
 
+    calculateNextActivities(startActivity: Activity): Activities {
+        return Array.from(this.arcs.values())
+            .filter((arc) => arc.getStart().name == startActivity.name)
+            .reduce(
+                (prev, curr) => prev.addActivity(curr.getEnd()),
+                new Activities(),
+            );
+    }
+
     calculateReachableActivities(startActivities: Activities): Activities {
         const reachableActivities: Activities = new Activities();
         for (const arc of this.arcs) {
@@ -159,6 +168,11 @@ export class Arcs {
             this.arcs.push(arc);
         }
         return this;
+    }
+
+
+    getArcs(): Array<DfgArc> {
+        return this.arcs;
     }
 
     isEmpty(): boolean {
