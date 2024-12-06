@@ -101,7 +101,6 @@ export class Activities {
         return this.activities.find((a) => a.equals(new Activity(name)))!;
     }
 
-
     getAllActivites(): Array<Activity> {
         return this.activities;
     }
@@ -134,7 +133,10 @@ export class Activities {
 
     getFirstActivity(): Activity {
         return this.activities[0];
+    }
 
+    getLength(): number {
+        return this.activities.length;
     }
 
     isNotEmpty(): boolean {

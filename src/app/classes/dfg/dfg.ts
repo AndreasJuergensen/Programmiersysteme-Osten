@@ -1,5 +1,5 @@
 import { EventLog } from '../event-log';
-import { PetriNetTransition } from '../petri-net';
+import { PetriNetTransition } from '../petrinet/transitions';
 import { Activities, Activity } from './activities';
 import { ArcJson, Arcs, DfgArc } from './arcs';
 import { ExclusiveCut, LoopCut, ParallelCut, SequenceCut } from './cut';
@@ -9,12 +9,26 @@ export interface DfgJson {
     arcs: ArcJson[];
 }
 export class Dfg implements PetriNetTransition {
+    private static count: number = 0;
+    public id: string;
     constructor(
-        public id: string,
         private readonly _activities: Activities,
         private readonly _arcs: Arcs,
         private eventLog: EventLog,
-    ) {}
+    ) {
+        this.id = 'dfg' + ++Dfg.count;
+    }
+
+    isBaseCase(): boolean {
+        if (this.activities.removePlayAndStop().getLength() === 1) {
+            return true;
+        }
+        return false;
+    }
+
+    getBaseActivityName(): string {
+        return this.activities.removePlayAndStop().getFirstActivity().asJson();
+    }
 
     get activities(): Activities {
         return this._activities;
@@ -134,6 +148,6 @@ export class DfgBuilder {
     }
 
     build(): Dfg {
-        return new Dfg('', this.activities, this.arcs, this.eventlog);
+        return new Dfg(this.activities, this.arcs, this.eventlog);
     }
 }
