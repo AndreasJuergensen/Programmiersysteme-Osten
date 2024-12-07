@@ -1,12 +1,10 @@
 import { Place } from './places';
-import { PetriNetTransition } from './transitions';
+import { PetriNetTransition } from './petri-net-transitions';
 
 export class PetriNetArcs {
-    constructor(
-        private readonly arcs: Array<
-            PlaceToTransitionArc | TransitionToPlaceArc
-        > = new Array(),
-    ) {}
+    private readonly arcs: Array<PlaceToTransitionArc | TransitionToPlaceArc> =
+        new Array();
+    constructor() {}
 
     redirectArcStart(
         currentStart: PetriNetTransition,
