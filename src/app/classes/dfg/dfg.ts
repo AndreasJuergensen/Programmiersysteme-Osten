@@ -1,5 +1,5 @@
 import { EventLog } from '../event-log';
-import { PetriNetTransition } from '../petrinet/transitions';
+import { PetriNetTransition } from '../petrinet/petri-net-transitions';
 import { Activities, Activity } from './activities';
 import { ArcJson, Arcs, DfgArc } from './arcs';
 import { ExclusiveCut, LoopCut, ParallelCut, SequenceCut } from './cut';
@@ -17,17 +17,6 @@ export class Dfg implements PetriNetTransition {
         private eventLog: EventLog,
     ) {
         this.id = 'dfg' + ++Dfg.count;
-    }
-
-    isBaseCase(): boolean {
-        if (this.activities.removePlayAndStop().getLength() === 1) {
-            return true;
-        }
-        return false;
-    }
-
-    getBaseActivityName(): string {
-        return this.activities.removePlayAndStop().getFirstActivity().asJson();
     }
 
     get activities(): Activities {
@@ -73,12 +62,27 @@ export class Dfg implements PetriNetTransition {
         return [a1, a2];
     }
 
+    isBaseCase(): boolean {
+        if (this.activities.getLength() === 3) {
+            return true;
+        }
+        return false;
+    }
+
+    getBaseActivityName(): string {
+        return this.activities.getBaseActivity().asJson();
+    }
+
     /* 
     return the DfgArc by start and end name with same obj-ref as in this Dfg,
     thus same behavior as the arc is clicked in petrinet
-     */
+    */
     getArc(start: string, end: string): DfgArc {
         return this.arcs.getArcByStartNameAndEndName(start, end);
+    }
+
+    getEventLog(): EventLog {
+        return this.eventLog;
     }
 
     asJson(): DfgJson {
@@ -86,10 +90,6 @@ export class Dfg implements PetriNetTransition {
             activities: this._activities.asJson(),
             arcs: this._arcs.asJson(),
         };
-    }
-
-    getEventLog(): EventLog {
-        return this.eventLog;
     }
 }
 

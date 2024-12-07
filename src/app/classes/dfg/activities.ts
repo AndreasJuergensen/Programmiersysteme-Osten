@@ -135,6 +135,10 @@ export class Activities {
         return this.activities[0];
     }
 
+    getBaseActivity(): Activity {
+        return this.activities[this.activities.length - 1];
+    }
+
     getLength(): number {
         return this.activities.length;
     }
