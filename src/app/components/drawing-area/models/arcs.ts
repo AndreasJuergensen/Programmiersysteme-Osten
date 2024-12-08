@@ -1,5 +1,5 @@
 import { environment } from 'src/environments/environment';
-import { Activity, Place, Transition } from './nodes';
+import { Activity, Box, Place, Transition } from './nodes';
 
 export abstract class Arc {
     readonly length: number;
@@ -64,6 +64,65 @@ export class DfgArc extends Arc {
     }
 
     private calculateLengthToActivityBorder(
+        widthHalf: number,
+        heightHalf: number,
+        strokeHalf: number,
+    ): number {
+        const alphaDegAbs = Math.abs(this.alphaDeg);
+        switch (alphaDegAbs) {
+            case 0:
+                return widthHalf + strokeHalf;
+            case 45:
+                return Math.sqrt(
+                    Math.pow(widthHalf + strokeHalf, 2) +
+                        Math.pow(heightHalf + strokeHalf, 2),
+                );
+            case 90:
+                return heightHalf + strokeHalf;
+
+            default:
+                break;
+        }
+
+        return alphaDegAbs < 45
+            ? (widthHalf + strokeHalf) / Math.cos(Math.abs(this.alphaRad))
+            : (heightHalf + strokeHalf) / Math.sin(Math.abs(this.alphaRad));
+    }
+}
+
+export class PlaceToBoxArc extends Arc {
+    constructor(start: Place, end: Box) {
+        super(start, end);
+        this.calculateCoordinates();
+    }
+
+    override calculateCoordinates(): void {
+        const x1 = this.start.x;
+        const y1 = this.start.y;
+
+        const offsetArrow = 5;
+        const widthHalf = (this.end as Box).width / 2;
+        const heightHalf = (this.end as Box).height / 2;
+        const strokeHalf =
+            environment.drawingElements.boxes.strokeWidth / 2;
+
+        let lengthToBorder = this.calculateLengthToBoxBorder(
+            widthHalf,
+            heightHalf,
+            strokeHalf,
+        );
+
+        const realLength = this.length - lengthToBorder - offsetArrow;
+        const deltaX = realLength * Math.cos(Math.abs(this.alphaRad));
+        const deltaY = realLength * Math.sin(Math.abs(this.alphaRad));
+
+        this.x1 = x1;
+        this.x2 = x1 + this.sgnX * deltaX;
+        this.y1 = y1;
+        this.y2 = y1 + this.sgnY * deltaY;
+    }
+
+    private calculateLengthToBoxBorder(
         widthHalf: number,
         heightHalf: number,
         strokeHalf: number,
