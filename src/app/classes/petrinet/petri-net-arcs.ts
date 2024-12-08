@@ -65,6 +65,19 @@ export class PetriNetArcs {
         throw new Error('This place is not reaching a transition');
     }
 
+    getNextTransitions(place: Place): Array<PetriNetTransition> {
+        const petriNetTransitions: Array<PetriNetTransition> =
+            new Array<PetriNetTransition>();
+
+        for (const arc of this.arcs) {
+            if (arc.start === place) {
+                petriNetTransitions.push(arc.end);
+            }
+        }
+
+        return petriNetTransitions;
+    }
+
     getPrevTransition(place: Place): PetriNetTransition {
         for (const arc of this._arcs) {
             if (arc.end === place) {
@@ -81,6 +94,18 @@ export class PetriNetArcs {
             }
         }
         throw new Error('This transition is not reaching a place');
+    }
+
+    getNextPlaces(transition: PetriNetTransition): Array<Place> {
+        const places: Array<Place> = new Array<Place>();
+
+        for (const arc of this.arcs) {
+            if (arc.start === transition) {
+                places.push(arc.end);
+            }
+        }
+
+        return places;
     }
 
     getPrevPlace(transition: PetriNetTransition): Place {

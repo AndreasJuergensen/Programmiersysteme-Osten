@@ -1,6 +1,6 @@
 import { Activity } from './dfg/activities';
-import { PetriNetTransition, Place } from './petri-net';
-
+import { PetriNetTransition } from './petrinet/petri-net-transitions';
+import { Place } from './petrinet/places';
 export interface GraphJson {
     nodes: NodeJson[];
     edges: EdgeJson[];
@@ -68,6 +68,10 @@ export abstract class Node {
         return this._id !== node.id && this._x === node.x && this._y === node.y;
     }
 
+    getXOffset(): number {
+        return this._x
+    }
+
     asJson(): NodeJson {
         return {
             id: this._id,
@@ -92,6 +96,18 @@ export class BoxNode extends Node {
         private _height: number,
     ) {
         super(_id, _x, _y);
+    }
+
+    get width(): number {
+        return this._width;
+    }
+
+    get height(): number {
+        return this._height;
+    }
+
+    override getXOffset(): number {
+        return super.x + this._width / 2;
     }
 }
 
@@ -154,8 +170,14 @@ export class Edge {
     }
 }
 
-export interface StackElement {
+export interface DfgStackElement {
     activity: Activity;
+    source_x: number;
+    source_y: number;
+}
+
+export interface PetriNetStackElement {
+    node: Place | PetriNetTransition;
     source_x: number;
     source_y: number;
 }
