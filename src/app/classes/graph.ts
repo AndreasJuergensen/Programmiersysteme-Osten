@@ -1,9 +1,11 @@
 import { Activity } from './dfg/activities';
+import { PetriNetTransition, Place } from './petri-net';
 
 export interface GraphJson {
     nodes: NodeJson[];
     edges: EdgeJson[];
 }
+
 export class Graph {
     constructor(
         readonly nodes: Node[],
@@ -16,6 +18,13 @@ export class Graph {
             edges: this.edges.map((e) => e.asJson()),
         };
     }
+
+    getSize(): [number, number] {
+        return [
+            Math.max(...this.nodes.map((node) => node.x)),
+            Math.max(...this.nodes.map((node) => node.y)),
+        ];
+    }
 }
 
 export interface NodeJson {
@@ -24,7 +33,7 @@ export interface NodeJson {
     y: number;
 }
 
-export class Node {
+export abstract class Node {
     constructor(
         private _id: string,
         private _x: number,
@@ -65,6 +74,24 @@ export class Node {
             x: this._x,
             y: this._y,
         };
+    }
+}
+
+export class ActivityNode extends Node {}
+
+export class PlaceNode extends Node {}
+
+export class TransitionNode extends Node {}
+
+export class BoxNode extends Node {
+    constructor(
+        _id: string,
+        _x: number,
+        _y: number,
+        private _width: number,
+        private _height: number,
+    ) {
+        super(_id, _x, _y);
     }
 }
 

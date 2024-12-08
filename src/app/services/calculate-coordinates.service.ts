@@ -2,15 +2,40 @@ import { Injectable } from '@angular/core';
 import { Dfg } from '../classes/dfg/dfg';
 import { Activities, Activity } from '../classes/dfg/activities';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Graph, Node, Edge, StackElement } from '../classes/graph';
+import {
+    Graph,
+    Node,
+    Edge,
+    StackElement,
+    ActivityNode,
+} from '../classes/graph';
 import { DfgArc } from '../classes/dfg/arcs';
 import { environment } from 'src/environments/environment';
+import {
+    PetriNet,
+    PetriNetTransition,
+    Place,
+    PlaceToTransitionArc,
+    TransitionToPlaceArc,
+} from '../classes/petri-net';
 
 @Injectable({
     providedIn: 'root',
 })
 export class CalculateCoordinatesService {
     constructor() {}
+
+    private readonly petriNet: PetriNet = new PetriNet(
+        new Set<Place>(),
+        new Map<string, PetriNetTransition | Dfg>(),
+        new Set<PlaceToTransitionArc | TransitionToPlaceArc>(),
+    );
+
+    //     {
+    //     places: new Set<Place>(),
+    //     transitions: new Map<string, PetriNetTransition | Dfg>(),
+    //     arcs: new Set<PlaceToTransitionArc | TransitionToPlaceArc>(),
+    // };
 
     private readonly _graph$: BehaviorSubject<Graph> =
         new BehaviorSubject<Graph>(new Graph([], []));
@@ -23,7 +48,7 @@ export class CalculateCoordinatesService {
         dfg: Dfg,
         initialXCoordinate: number = 100,
         initialYCoordinate: number = 100,
-    ): void {
+    ): Graph {
         // Stage 1
         const nodes: Array<Node> = this.generateNodes(
             dfg,
@@ -37,7 +62,9 @@ export class CalculateCoordinatesService {
         this.recalculateCoordinatesForOverlaps(nodes, edges);
 
         // Publish calculated graph
-        this._graph$.next(new Graph(nodes, edges));
+        //this._graph$.next(new Graph(nodes, edges));
+
+        return new Graph(nodes, edges);
     }
 
     /**
@@ -60,7 +87,11 @@ export class CalculateCoordinatesService {
 
         const playActivity: Activity = dfg.activities.getActivityByName('play');
         nodes.push(
-            new Node(playActivity.name, initialXCoordinate, initialYCoordinate),
+            new ActivityNode(
+                playActivity.name,
+                initialXCoordinate,
+                initialYCoordinate,
+            ),
         );
         const neighbours: Activities =
             dfg.arcs.calculateNextActivities(playActivity);
@@ -87,7 +118,7 @@ export class CalculateCoordinatesService {
                 continue;
             }
 
-            const activityAsNode = new Node(
+            const activityAsNode = new ActivityNode(
                 stackElement.activity.name,
                 stackElement.source_x + gapX,
                 yCoordinate,
