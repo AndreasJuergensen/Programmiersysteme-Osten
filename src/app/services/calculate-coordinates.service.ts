@@ -13,7 +13,7 @@ export class CalculateCoordinatesService {
     constructor() {}
 
     private readonly _graph$: BehaviorSubject<Graph> =
-        new BehaviorSubject<Graph>({ nodes: [], edges: [] });
+        new BehaviorSubject<Graph>(new Graph([], []));
 
     get graph$(): Observable<Graph> {
         return this._graph$.asObservable();
@@ -37,7 +37,7 @@ export class CalculateCoordinatesService {
         this.recalculateCoordinatesForOverlaps(nodes, edges);
 
         // Publish calculated graph
-        this._graph$.next({ nodes: nodes, edges: edges });
+        this._graph$.next(new Graph(nodes, edges));
     }
 
     /**
@@ -59,11 +59,9 @@ export class CalculateCoordinatesService {
         let xOfLastModeledNode: number = initialXCoordinate;
 
         const playActivity: Activity = dfg.activities.getActivityByName('play');
-        nodes.push({
-            id: playActivity.name,
-            x: initialXCoordinate,
-            y: initialYCoordinate,
-        });
+        nodes.push(
+            new Node(playActivity.name, initialXCoordinate, initialYCoordinate),
+        );
         const neighbours: Activities =
             dfg.arcs.calculateNextActivities(playActivity);
 
@@ -89,11 +87,11 @@ export class CalculateCoordinatesService {
                 continue;
             }
 
-            const activityAsNode = {
-                id: stackElement.activity.name,
-                x: stackElement.source_x + gapX,
-                y: yCoordinate,
-            };
+            const activityAsNode = new Node(
+                stackElement.activity.name,
+                stackElement.source_x + gapX,
+                yCoordinate,
+            );
             nodes.push(activityAsNode);
 
             const neighbours: Activities = dfg.arcs.calculateNextActivities(
@@ -177,7 +175,7 @@ export class CalculateCoordinatesService {
                 (node) => arc.getEnd().name === node.id,
             )!;
 
-            edges.push({ source: startNode, target: endNode });
+            edges.push(new Edge(startNode, endNode));
         });
 
         return edges;
@@ -203,7 +201,7 @@ export class CalculateCoordinatesService {
                     this.checkNodeOverlap(node, nodes) ||
                     this.checkEdgeOverlap(node, edges)
                 ) {
-                    node.y += gapY;
+                    node.addYOffset(gapY);
                     nodeWasMoved = true;
                 }
             });
@@ -218,7 +216,7 @@ export class CalculateCoordinatesService {
      */
     private checkNodeOverlap(node: Node, nodes: Array<Node>): boolean {
         for (const n of nodes) {
-            if (n.x === node.x && n.y === node.y && n.id !== node.id) {
+            if (node.isNodeOverlapped(n)) {
                 return true;
             }
         }
@@ -234,19 +232,19 @@ export class CalculateCoordinatesService {
      */
     private checkEdgeOverlap(node: Node, edges: Array<Edge>): boolean {
         for (const edge of edges) {
-            if (this.NodeBelongsToEdge(edge, node)) {
+            if (edge.isNodeStartOrEndNode(node)) {
                 continue;
             }
 
-            if (this.IsEdgeAndNodeOnSameHorizontalLevel(edge, node)) {
-                if (this.IsNodeOnEdgeOnSameHorizontalLevel(edge, node)) {
+            if (edge.isNodeOnSameHorizontalLevel(node)) {
+                if (edge.isNodeOnEdgeAndOnSameHorizontalLevel(node)) {
                     return true;
                 } else {
                     continue;
                 }
             }
 
-            let distance = this.calculateDistanceBetweenNodeAndEdge(edge, node);
+            let distance = edge.distanceToNode(node);
             const width = environment.drawingElements.activities.width;
             const height = environment.drawingElements.activities.height;
             const lengthDiagonal = Math.sqrt(
@@ -258,77 +256,5 @@ export class CalculateCoordinatesService {
         }
 
         return false;
-    }
-
-    /**
-     *
-     * @param {Edge} edge - The edge for which the check is performed
-     * @param {Node} node - The node which is tested
-     * @returns {boolean} True if node is start or target
-     */
-    private NodeBelongsToEdge(edge: Edge, node: Node): boolean {
-        return edge.source.id === node.id || edge.target.id === node.id;
-    }
-
-    /**
-     *
-     * @param {Edge} edge - The edge for which the check is performed
-     * @param {Node} node - The node which is tested
-     * @returns {boolean} True if on same horizontal level
-     */
-    private IsEdgeAndNodeOnSameHorizontalLevel(
-        edge: Edge,
-        node: Node,
-    ): boolean {
-        return edge.source.y === node.y && edge.target.y === node.y;
-    }
-
-    /**
-     *
-     * @param {Edge} edge - The edge for which the check is performed
-     * @param {Node} node - The node which is tested
-     * @returns {boolean} True if node is on edge
-     */
-    private IsNodeOnEdgeOnSameHorizontalLevel(edge: Edge, node: Node): boolean {
-        return node.x < edge.target.x && node.x > edge.source.x;
-    }
-
-    /**
-     *
-     * @param {Edge} edge - The edge for which the distance is calculated
-     * @param {Node} node - The node for which the distance is calculated
-     * @returns {number} The distance between the given edge and node
-     */
-    private calculateDistanceBetweenNodeAndEdge(
-        edge: Edge,
-        node: Node,
-    ): number {
-        let coefficients =
-            this.calculateCanoncialLinearEquationCoefficients(edge);
-
-        let a = coefficients[0];
-        let b = coefficients[1];
-        let c = coefficients[2];
-
-        return (
-            Math.abs(a * node.x + b * node.y + c) /
-            Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2))
-        );
-    }
-
-    /**
-     * Calculates the coefficients of the canonical linear equation ax + by + c = 0.
-     * @param {Edge} edge - The edge to calculate the coefficients for
-     * @returns {[number, number, number]} Tuple of coefficients
-     */
-    private calculateCanoncialLinearEquationCoefficients(
-        edge: Edge,
-    ): [number, number, number] {
-        let gradient =
-            (edge.target.y - edge.source.y) / (edge.target.x - edge.source.x);
-
-        let yAxisPoint = edge.source.y - gradient * edge.source.x;
-
-        return [gradient, -1, yAxisPoint];
     }
 }

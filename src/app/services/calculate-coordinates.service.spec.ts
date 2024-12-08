@@ -1,18 +1,10 @@
-import { TestBed } from '@angular/core/testing';
-
 import { CalculateCoordinatesService } from './calculate-coordinates.service';
 import { Dfg, DfgBuilder } from '../classes/dfg/dfg';
-import { EventLog } from '../classes/event-log';
-import { EventLogParserService } from './event-log-parser.service';
-import { Activities, Activity } from '../classes/dfg/activities';
-import { Node } from '../components/drawing-area';
-import { Graph } from '../classes/graph';
-import { endWith } from 'rxjs';
+import { Graph, Node, Edge } from '../classes/graph';
 import { environment } from 'src/environments/environment';
 
 describe('CalculateCoordinatesService', () => {
     let sut: CalculateCoordinatesService;
-    let eventlogParserService: EventLogParserService;
 
     beforeEach(() => {
         sut = new CalculateCoordinatesService();
@@ -29,26 +21,24 @@ describe('CalculateCoordinatesService', () => {
             .addFromPlayArc('stop')
             .build();
 
-        const playNode = {
-            id: 'play',
-            x: startXCoordinate,
-            y: startYCoordinate,
-        };
-        const stopNode = {
-            id: 'stop',
-            x: startXCoordinate + environment.drawingGrid.gapX,
-            y: startYCoordinate,
-        };
+        const playNode = new Node('play', startXCoordinate, startYCoordinate);
+        const stopNode = new Node(
+            'stop',
+            startXCoordinate + environment.drawingGrid.gapX,
+            startYCoordinate,
+        );
 
-        const expectedGraph: Graph = {
-            nodes: [playNode, stopNode],
-            edges: [{ source: playNode, target: stopNode }],
-        };
+        const expectedGraph: Graph = new Graph(
+            [playNode, stopNode],
+            [new Edge(playNode, stopNode)],
+        );
 
         sut.calculateCoordinates(dfg);
 
         sut.graph$.subscribe((graph) => {
-            expect(graph).toEqual(expectedGraph);
+            console.log(graph);
+            console.log(expectedGraph);
+            expect(graph.asJson()).toEqual(expectedGraph.asJson());
         });
     });
 
@@ -70,46 +60,42 @@ describe('CalculateCoordinatesService', () => {
             .addToStopArc('C')
             .build();
 
-        const playNode = {
-            id: 'play',
-            x: startXCoordinate,
-            y: startYCoordinate,
-        };
-        const ANode = {
-            id: 'A',
-            x: startXCoordinate + environment.drawingGrid.gapX,
-            y: startYCoordinate,
-        };
-        const BNode = {
-            id: 'B',
-            x: startXCoordinate + environment.drawingGrid.gapX * 2,
-            y: startYCoordinate,
-        };
-        const CNode = {
-            id: 'C',
-            x: startXCoordinate + environment.drawingGrid.gapX * 3,
-            y: startYCoordinate,
-        };
-        const stopNode = {
-            id: 'stop',
-            x: startXCoordinate + environment.drawingGrid.gapX * 4,
-            y: startYCoordinate,
-        };
+        const playNode = new Node('play', startXCoordinate, startYCoordinate);
+        const ANode = new Node(
+            'A',
+            startXCoordinate + environment.drawingGrid.gapX,
+            startYCoordinate,
+        );
+        const BNode = new Node(
+            'B',
+            startXCoordinate + environment.drawingGrid.gapX * 2,
+            startYCoordinate,
+        );
+        const CNode = new Node(
+            'C',
+            startXCoordinate + environment.drawingGrid.gapX * 3,
+            startYCoordinate,
+        );
+        const stopNode = new Node(
+            'stop',
+            startXCoordinate + environment.drawingGrid.gapX * 4,
+            startYCoordinate,
+        );
 
-        const expectedGraph: Graph = {
-            nodes: [playNode, ANode, BNode, CNode, stopNode],
-            edges: [
-                { source: playNode, target: ANode },
-                { source: ANode, target: BNode },
-                { source: BNode, target: CNode },
-                { source: CNode, target: stopNode },
+        const expectedGraph: Graph = new Graph(
+            [playNode, ANode, BNode, CNode, stopNode],
+            [
+                new Edge(playNode, ANode),
+                new Edge(ANode, BNode),
+                new Edge(BNode, CNode),
+                new Edge(CNode, stopNode),
             ],
-        };
+        );
 
         sut.calculateCoordinates(dfg);
 
         sut.graph$.subscribe((graph) => {
-            expect(graph).toEqual(expectedGraph);
+            expect(graph.asJson()).toEqual(expectedGraph.asJson());
         });
     });
 
@@ -134,53 +120,49 @@ describe('CalculateCoordinatesService', () => {
             .addToStopArc('Y')
             .build();
 
-        const playNode = {
-            id: 'play',
-            x: startXCoordinate,
-            y: startYCoordinate,
-        };
-        const ANode = {
-            id: 'A',
-            x: startXCoordinate + environment.drawingGrid.gapX,
-            y: startYCoordinate + environment.drawingGrid.gapY,
-        };
-        const BNode = {
-            id: 'B',
-            x: startXCoordinate + environment.drawingGrid.gapX * 2,
-            y: startYCoordinate + environment.drawingGrid.gapY,
-        };
-        const XNode = {
-            id: 'X',
-            x: startXCoordinate + environment.drawingGrid.gapX,
-            y: startYCoordinate,
-        };
-        const YNode = {
-            id: 'Y',
-            x: startXCoordinate + environment.drawingGrid.gapX * 2,
-            y: startYCoordinate,
-        };
-        const stopNode = {
-            id: 'stop',
-            x: startXCoordinate + environment.drawingGrid.gapX * 3,
-            y: startYCoordinate,
-        };
+        const playNode = new Node('play', startXCoordinate, startYCoordinate);
+        const ANode = new Node(
+            'A',
+            startXCoordinate + environment.drawingGrid.gapX,
+            startYCoordinate + environment.drawingGrid.gapY,
+        );
+        const BNode = new Node(
+            'B',
+            startXCoordinate + environment.drawingGrid.gapX * 2,
+            startYCoordinate + environment.drawingGrid.gapY,
+        );
+        const XNode = new Node(
+            'X',
+            startXCoordinate + environment.drawingGrid.gapX,
+            startYCoordinate,
+        );
+        const YNode = new Node(
+            'Y',
+            startXCoordinate + environment.drawingGrid.gapX * 2,
+            startYCoordinate,
+        );
+        const stopNode = new Node(
+            'stop',
+            startXCoordinate + environment.drawingGrid.gapX * 3,
+            startYCoordinate,
+        );
 
-        const expectedGraph: Graph = {
-            nodes: [playNode, XNode, YNode, stopNode, ANode, BNode],
-            edges: [
-                { source: playNode, target: ANode },
-                { source: ANode, target: BNode },
-                { source: BNode, target: stopNode },
-                { source: playNode, target: XNode },
-                { source: XNode, target: YNode },
-                { source: YNode, target: stopNode },
+        const expectedGraph: Graph = new Graph(
+            [playNode, XNode, YNode, stopNode, ANode, BNode],
+            [
+                new Edge(playNode, ANode),
+                new Edge(ANode, BNode),
+                new Edge(BNode, stopNode),
+                new Edge(playNode, XNode),
+                new Edge(XNode, YNode),
+                new Edge(YNode, stopNode),
             ],
-        };
+        );
 
         sut.calculateCoordinates(dfg);
 
         sut.graph$.subscribe((graph) => {
-            expect(graph).toEqual(expectedGraph);
+            expect(graph.asJson()).toEqual(expectedGraph.asJson());
         });
     });
 
@@ -207,59 +189,55 @@ describe('CalculateCoordinatesService', () => {
             .addToStopArc('D')
             .build();
 
-        const playNode = {
-            id: 'play',
-            x: startXCoordinate,
-            y: startYCoordinate,
-        };
-        const ANode = {
-            id: 'A',
-            x: startXCoordinate + environment.drawingGrid.gapX,
-            y: startYCoordinate,
-        };
-        const BNode = {
-            id: 'B',
-            x: startXCoordinate + environment.drawingGrid.gapX * 3,
-            y: startYCoordinate,
-        };
-        const CNode = {
-            id: 'C',
-            x: startXCoordinate + environment.drawingGrid.gapX * 2,
-            y: startYCoordinate + environment.drawingGrid.gapY,
-        };
-        const DNode = {
-            id: 'D',
-            x: startXCoordinate + environment.drawingGrid.gapX * 4,
-            y: startYCoordinate,
-        };
-        const stopNode = {
-            id: 'stop',
-            x: startXCoordinate + environment.drawingGrid.gapX * 5,
-            y: startYCoordinate,
-        };
+        const playNode = new Node('play', startXCoordinate, startYCoordinate);
+        const ANode = new Node(
+            'A',
+            startXCoordinate + environment.drawingGrid.gapX,
+            startYCoordinate,
+        );
+        const BNode = new Node(
+            'B',
+            startXCoordinate + environment.drawingGrid.gapX * 3,
+            startYCoordinate,
+        );
+        const CNode = new Node(
+            'C',
+            startXCoordinate + environment.drawingGrid.gapX * 2,
+            startYCoordinate + environment.drawingGrid.gapY,
+        );
+        const DNode = new Node(
+            'D',
+            startXCoordinate + environment.drawingGrid.gapX * 4,
+            startYCoordinate,
+        );
+        const stopNode = new Node(
+            'stop',
+            startXCoordinate + environment.drawingGrid.gapX * 5,
+            startYCoordinate,
+        );
 
-        const expectedGraph: Graph = {
-            nodes: [playNode, ANode, CNode, BNode, DNode, stopNode],
-            edges: [
-                { source: playNode, target: ANode },
-                { source: ANode, target: BNode },
-                { source: BNode, target: CNode },
-                { source: CNode, target: DNode },
-                { source: ANode, target: CNode },
-                { source: CNode, target: BNode },
-                { source: BNode, target: DNode },
-                { source: DNode, target: stopNode },
+        const expectedGraph: Graph = new Graph(
+            [playNode, ANode, CNode, BNode, DNode, stopNode],
+            [
+                new Edge(playNode, ANode),
+                new Edge(ANode, BNode),
+                new Edge(BNode, CNode),
+                new Edge(CNode, DNode),
+                new Edge(ANode, CNode),
+                new Edge(CNode, BNode),
+                new Edge(BNode, DNode),
+                new Edge(DNode, stopNode),
             ],
-        };
+        );
 
         sut.calculateCoordinates(dfg);
 
         sut.graph$.subscribe((graph) => {
-            expect(graph).toEqual(expectedGraph);
+            expect(graph.asJson()).toEqual(expectedGraph.asJson());
         });
     });
 
-    it('DFG with four Traces, same Activities but different ordner', () => {
+    it('DFG with four Traces, same Activities but different order', () => {
         //A B X D + A X B D + A C X D + A X C D
         let result: Graph;
         const startXCoordinate = 100;
@@ -287,66 +265,61 @@ describe('CalculateCoordinatesService', () => {
             .addToStopArc('D')
             .build();
 
-        const playNode = {
-            id: 'play',
-            x: startXCoordinate,
-            y: startYCoordinate,
-        };
-        const ANode = {
-            id: 'A',
-            x: startXCoordinate + environment.drawingGrid.gapX,
-            y: startYCoordinate,
-        };
-        const BNode = {
-            id: 'B',
-            x: startXCoordinate + environment.drawingGrid.gapX * 4,
-            y: startYCoordinate + environment.drawingGrid.gapY,
-        };
-        const CNode = {
-            id: 'C',
-            x: startXCoordinate + environment.drawingGrid.gapX * 2,
-            y: startYCoordinate,
-        };
-        const DNode = {
-            id: 'D',
-            x: startXCoordinate + environment.drawingGrid.gapX * 3,
-            y: startYCoordinate,
-        };
-        const XNode = {
-            id: 'X',
-            x: startXCoordinate + environment.drawingGrid.gapX * 3,
-            y: startYCoordinate + environment.drawingGrid.gapY,
-        };
-        const stopNode = {
-            id: 'stop',
-            x: startXCoordinate + environment.drawingGrid.gapX * 4,
-            y: startYCoordinate,
-        };
+        const playNode = new Node('play', startXCoordinate, startYCoordinate);
+        const ANode = new Node(
+            'A',
+            startXCoordinate + environment.drawingGrid.gapX,
+            startYCoordinate,
+        );
+        const BNode = new Node(
+            'B',
+            startXCoordinate + environment.drawingGrid.gapX * 4,
+            startYCoordinate + environment.drawingGrid.gapY,
+        );
+        const CNode = new Node(
+            'C',
+            startXCoordinate + environment.drawingGrid.gapX * 2,
+            startYCoordinate,
+        );
+        const DNode = new Node(
+            'D',
+            startXCoordinate + environment.drawingGrid.gapX * 3,
+            startYCoordinate,
+        );
+        const XNode = new Node(
+            'X',
+            startXCoordinate + environment.drawingGrid.gapX * 3,
+            startYCoordinate + environment.drawingGrid.gapY,
+        );
+        const stopNode = new Node(
+            'stop',
+            startXCoordinate + environment.drawingGrid.gapX * 4,
+            startYCoordinate,
+        );
 
-        const expectedGraph: Graph = {
-            nodes: [playNode, ANode, CNode, DNode, stopNode, XNode, BNode],
-            edges: [
-                { source: playNode, target: ANode },
-                { source: ANode, target: BNode },
-                { source: BNode, target: XNode },
-                { source: XNode, target: DNode },
-                { source: ANode, target: XNode },
-                { source: XNode, target: BNode },
-                { source: BNode, target: DNode },
-                { source: ANode, target: CNode },
-                { source: CNode, target: XNode },
-                { source: XNode, target: CNode },
-                { source: CNode, target: DNode },
-                { source: DNode, target: stopNode },
+        const expectedGraph: Graph = new Graph(
+            [playNode, ANode, CNode, DNode, stopNode, XNode, BNode],
+            [
+                new Edge(playNode, ANode),
+                new Edge(ANode, BNode),
+                new Edge(BNode, XNode),
+                new Edge(XNode, DNode),
+                new Edge(ANode, XNode),
+                new Edge(XNode, BNode),
+                new Edge(BNode, DNode),
+                new Edge(ANode, CNode),
+                new Edge(CNode, XNode),
+                new Edge(XNode, CNode),
+                new Edge(CNode, DNode),
+                new Edge(DNode, stopNode),
             ],
-        };
+        );
         console.log(expectedGraph);
 
         sut.calculateCoordinates(dfg);
 
         sut.graph$.subscribe((graph) => {
-            console.log(graph);
-            expect(graph).toEqual(expectedGraph);
+            expect(graph.asJson()).toEqual(expectedGraph.asJson());
         });
     });
 });
