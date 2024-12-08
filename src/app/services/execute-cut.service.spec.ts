@@ -2,18 +2,21 @@ import { ExecuteCutService } from './execute-cut.service';
 import { Dfg, DfgBuilder } from '../classes/dfg/dfg';
 import { Arcs } from '../classes/dfg/arcs';
 import { CalculateDfgService } from './calculate-dfg.service';
+import { EventLog, Trace } from '../classes/event-log';
+import { Activity } from '../classes/dfg/activities';
 
 describe('ExecuteCutService', () => {
     let sut: ExecuteCutService;
     let calculateDfgService: CalculateDfgService;
 
     beforeEach(() => {
-        sut = new ExecuteCutService(calculateDfgService);
+        sut = new ExecuteCutService();
+        calculateDfgService = new CalculateDfgService();
     });
 
-    it('test', () => {});
+    // it('test', () => {});
 
-    // it('no valid exclusive cut on a simple dfg', () => {
+    // it('execute invalid exclusive cut on a simple dfg', () => {
     //     const dfg: Dfg = new DfgBuilder()
     //         .createActivity('A')
     //         .createActivity('B')
@@ -30,39 +33,56 @@ describe('ExecuteCutService', () => {
 
     //     const selectedCutViaRadioButton: string = 'ExclusiveCut';
 
-    //     const result: boolean = sut.validateCut(
+    //     const result: { dfg1: Dfg; dfg2: Dfg } | void = sut.execute(
     //         dfg,
     //         cuttedArcs,
     //         selectedCutViaRadioButton,
     //     );
 
-    //     expect(result).toBeFalse();
+    //     expect(result).toEqual();
     // });
 
     // it('valid exclusive cut on a simple dfg', () => {
-    //     const dfg: Dfg = new DfgBuilder()
-    //         .createActivity('A')
-    //         .createActivity('B')
-    //         .createActivity('C')
-    //         .addFromPlayArc('A')
-    //         .addFromPlayArc('C')
-    //         .addToStopArc('B')
-    //         .addToStopArc('C')
-    //         .addArc('A', 'B')
-    //         .build();
+    //     const eventLog: EventLog = new EventLog([
+    //         new Trace([new Activity('A'), new Activity('B')]),
+    //         new Trace([new Activity('C')]),
+    //     ]);
+
+    //     const dfg: Dfg = calculateDfgService.calculate(eventLog);
+    //     // console.log('test');
+    //     // console.log(dfg);
+
+    //     // console.log(dfg.getEventLog());
+
     //     const cuttedArcs: Arcs = new Arcs()
     //         .addArc(dfg.getArc('play', 'C'))
     //         .addArc(dfg.getArc('C', 'stop'));
 
     //     const selectedCutViaRadioButton: string = 'ExclusiveCut';
 
-    //     const result: boolean = sut.validateCut(
+    //     const dfg1: Dfg = new DfgBuilder()
+    //         .createActivity('A')
+    //         .createActivity('B')
+    //         .addFromPlayArc('A')
+    //         .addToStopArc('B')
+    //         .addArc('A', 'B')
+    //         .build();
+    //     const dfg2: Dfg = new DfgBuilder()
+    //         .createActivity('C')
+    //         .addFromPlayArc('C')
+    //         .addToStopArc('C')
+    //         .build();
+
+    //     const result: { dfg1: Dfg; dfg2: Dfg } | void = sut.execute(
     //         dfg,
     //         cuttedArcs,
     //         selectedCutViaRadioButton,
     //     );
+    //     console.log(dfg1);
+    //     console.log(dfg2);
+    //     console.log(result);
 
-    //     expect(result).toBeTrue();
+    //     expect(result).toEqual({ dfg1, dfg2 });
     // });
 
     // it('valid paralllel cut', () => {

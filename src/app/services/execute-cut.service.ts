@@ -9,8 +9,12 @@ import { EventLog } from '../classes/event-log';
     providedIn: 'root',
 })
 export class ExecuteCutService {
-    constructor(private calculateDfgService: CalculateDfgService) {} // private selectedArcs: Arcs, // private dfg: Dfg,
+    // Event Log --> DFG --> Cut --> Partitionen --> CanBeCutIn --> True / False
 
+    constructor() {} // private selectedArcs: Arcs, // private dfg: Dfg,
+
+    private calculateDfgService: CalculateDfgService =
+        new CalculateDfgService();
     public execute(
         dfg: Dfg,
         selectedArcs: Arcs,
@@ -21,9 +25,13 @@ export class ExecuteCutService {
         const a2: Activities = partitions[1];
 
         if (!this.validateCut(dfg, a1, a2, selectedCut)) {
-            console.log('kein valider Cut! Bitte nochmal probieren!'); // hier spaeter Aufruf des Feedback-Service
+            console.log('3: kein valider Cut! Bitte nochmal probieren!'); // hier spaeter Aufruf des Feedback-Service
         } else {
+            console.log('3: else - Teil');
+            // console.log(dfg.getEventLog());
+
             return {
+                // Petri Netz zurückgeben mit Übergabe des Original-DFG und der Teil-DFGs
                 dfg1: this.cut(selectedCut, dfg.getEventLog(), a1, a2).dfg1,
                 dfg2: this.cut(selectedCut, dfg.getEventLog(), a1, a2).dfg2,
             };
@@ -36,17 +44,15 @@ export class ExecuteCutService {
         a1: Activities,
         a2: Activities,
     ): { dfg1: Dfg; dfg2: Dfg } {
-        console.log('cut durchgefuehrt!' + ' selected Cut: ' + selectedCut);
-        // if (this.validationService.xxx()) {return this.calculateDfgService().dfgbuilder....}
-        //else {console.error 'kein valider Cut'}
-
-        // validateCut: True? --> split Event Log + split DFG / calculateDFG for each of the new eventLog
-
-        let eventLogs: EventLog[] = new Array();
+        console.log('2: cut durchgefuehrt!' + ' selected Cut: ' + selectedCut);
+        // let e1: EventLog = new EventLog();
+        // let e2: EventLog = new EventLog();
+        let eventLogs: Array<EventLog> = [new EventLog(), new EventLog()];
 
         switch (selectedCut) {
             case 'ExclusiveCut':
-                eventLogs = eventLog.splitByExclusiveCut(a1);
+                eventLogs.push(eventLog.splitByExclusiveCut(a1)[0]);
+                eventLogs.push(eventLog.splitByExclusiveCut(a1)[1]);
                 break;
             case 'SequenceCut':
                 eventLogs = eventLog.splitBySequenceCut(a2);
@@ -58,6 +64,8 @@ export class ExecuteCutService {
                 eventLogs = eventLog.splitByLoopCut(a1, a2);
                 break;
         }
+        // console.log(eventLogs[0]);
+        // console.log(eventLogs[1]);
 
         const subDfg1: Dfg = this.calculateDfgService.calculate(eventLogs[0]);
         const subDfg2: Dfg = this.calculateDfgService.calculate(eventLogs[1]);
@@ -65,8 +73,19 @@ export class ExecuteCutService {
         return { dfg1: subDfg1, dfg2: subDfg2 };
     }
 
-    // Methode, um Kanten einzulesen
-    getSelectedArcsFromDrawingArea(): void {}
+    public validateCut(
+        dfg: Dfg,
+        a1: Activities,
+        a2: Activities,
+        selectedCut: string,
+    ): boolean {
+        console.log('1: validate');
+
+        return (
+            dfg.canBeCutIn(a1, a2).result &&
+            dfg.canBeCutIn(a1, a2).matchingcut === selectedCut
+        );
+    }
 
     // Kanten / Cut an Service zur Ueberpruefung weitergeben
     // auf Ueberpruefung warten
@@ -74,36 +93,4 @@ export class ExecuteCutService {
     // true --> DFG aktualsieren + Feedback erfolgreicher Cut durchgefuehrt
 
     // false --> Feedback kein Cut durchgefuehrt, erneut pruefen + ausgewaehlte Cuts ausgewaehlt lassen
-
-    public validateCut(
-        dfg: Dfg,
-        a1: Activities,
-        a2: Activities,
-        selectedCut: string,
-    ): boolean {
-        // const calculatedDfg: Dfg = dfg;
-        // const arcsSelectedByUser: Arcs = selectedArcs;
-        // const cutSelectedByUserViaRadioButton: string = selectedCut;
-
-        // const partitions: Activities[] = dfg.calculatePartitions(selectedArcs);
-        // const a1: Activities = partitions[0];
-        // const a2: Activities = partitions[1];
-
-        // let result: boolean = false;
-
-        // if (
-        //     dfg.canBeCutIn(a1, a2).result &&
-        //     dfg.canBeCutIn(a1, a2).matchingcut === selectedCut
-        // ) {
-        //     result = true;
-        // }
-
-        // return result;
-
-        return (
-            dfg.canBeCutIn(a1, a2).result &&
-            dfg.canBeCutIn(a1, a2).matchingcut === selectedCut
-        );
-        // Event Log --> DFG --> Cut --> Partitionen --> CanBeCutIn --> True / False
-    }
 }
