@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Activity, DfgArc, Arc, Place, Transition } from './models';
+import { Activity, DfgArc, Arc, Place, Transition, Box } from './models';
 import { CalculateCoordinatesService } from 'src/app/services/calculate-coordinates.service';
 
 @Component({
@@ -9,6 +9,7 @@ import { CalculateCoordinatesService } from 'src/app/services/calculate-coordina
 })
 export class DrawingAreaComponent implements OnInit, OnDestroy {
     private _activities: Array<Activity> = new Array<Activity>();
+    private _boxes: Array<Box> = new Array<Box>();
     private _transitions: Array<Transition> = new Array<Transition>();
     private _places: Array<Place> = new Array<Place>();
     private _arcs: Array<Arc> = new Array<Arc>();
@@ -19,6 +20,10 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
     get activities(): Array<Activity> {
         return this._activities;
+    }
+
+    get boxes(): Array<Box> {
+        return this._boxes;
     }
 
     get transitions(): Array<Transition> {
@@ -37,7 +42,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         // Subcribe to Observable from service which calculates coordinates...
         this.calculateCoordiantesService.graph$.subscribe((graph) => {
             const nodes: Array<Activity> = graph.nodes.map((node) => {
-                return new Activity(node.id, node.x, node.y);
+                return new Activity(node);
             });
 
             const arcs: Array<Arc> = [];

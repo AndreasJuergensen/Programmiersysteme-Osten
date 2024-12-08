@@ -7,11 +7,13 @@ import {
     DrawingPlaceComponent,
     DrawingTransitionsComponent,
 } from './components';
+import { DrawingBoxComponent } from './components/drawing-box.component';
 
 @NgModule({
     declarations: [
         DrawingAreaComponent,
         DrawingActivityComponent,
+        DrawingBoxComponent,
         DrawingArcComponent,
         DrawingPlaceComponent,
         DrawingTransitionsComponent,
