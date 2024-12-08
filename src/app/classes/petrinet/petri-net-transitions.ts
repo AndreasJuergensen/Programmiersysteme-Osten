@@ -32,6 +32,10 @@ export class PetriNetTransitions {
         return true;
     }
 
+    getAllTransitions(): Array<PetriNetTransition> {
+        return this.transitions;
+    }
+
     getLastTransition(): PetriNetTransition {
         return this.transitions[this.transitions.length - 1];
     }

@@ -6,36 +6,17 @@ import {
     Graph,
     Node,
     Edge,
-    StackElement,
+    DfgStackElement,
     ActivityNode,
 } from '../classes/graph';
 import { DfgArc } from '../classes/dfg/arcs';
 import { environment } from 'src/environments/environment';
-import {
-    PetriNet,
-    PetriNetTransition,
-    Place,
-    PlaceToTransitionArc,
-    TransitionToPlaceArc,
-} from '../classes/petri-net';
 
 @Injectable({
     providedIn: 'root',
 })
 export class CalculateCoordinatesService {
     constructor() {}
-
-    private readonly petriNet: PetriNet = new PetriNet(
-        new Set<Place>(),
-        new Map<string, PetriNetTransition | Dfg>(),
-        new Set<PlaceToTransitionArc | TransitionToPlaceArc>(),
-    );
-
-    //     {
-    //     places: new Set<Place>(),
-    //     transitions: new Map<string, PetriNetTransition | Dfg>(),
-    //     arcs: new Set<PlaceToTransitionArc | TransitionToPlaceArc>(),
-    // };
 
     private readonly _graph$: BehaviorSubject<Graph> =
         new BehaviorSubject<Graph>(new Graph([], []));
@@ -98,7 +79,7 @@ export class CalculateCoordinatesService {
 
         // Put all neighbours of start activity into stack with the coordinates
         // of the start activity.
-        const stack: Array<StackElement> = neighbours
+        const stack: Array<DfgStackElement> = neighbours
             .getAllActivites()
             .map((neighbour) => {
                 return {
@@ -109,7 +90,7 @@ export class CalculateCoordinatesService {
             });
 
         while (stack.length > 0) {
-            const stackElement: StackElement = stack.pop()!;
+            const stackElement: DfgStackElement = stack.pop()!;
             if (this.InsertNewLevel(nodes, stackElement, xOfLastModeledNode)) {
                 yCoordinate = this.biggestYCoodinateOfNodes(nodes) + gapY;
             }
@@ -147,13 +128,13 @@ export class CalculateCoordinatesService {
     /**
      *
      * @param {Array<Node>} nodes - Already calculated nodes
-     * @param {StackElement} stackElement - Current node from stack
+     * @param {DfgStackElement} stackElement - Current node from stack
      * @param {number} xOfLastModeledNode - X-Value of last modeled node
      * @returns {boolean} Return true if we have to insert a new level
      */
     private InsertNewLevel(
         nodes: Array<Node>,
-        stackElement: StackElement,
+        stackElement: DfgStackElement,
         xOfLastModeledNode: number,
     ): boolean {
         return (
@@ -165,12 +146,12 @@ export class CalculateCoordinatesService {
     /**
      *
      * @param {Array<Node>} nodes - Already calculated nodes
-     * @param {StackElement} stackElement - StackElement which is tested
+     * @param {DfgStackElement} stackElement - StackElement which is tested
      * @returns {boolean} Returns true if node is already modeled
      */
     private IsNodeAlreadyModeled(
         nodes: Array<Node>,
-        stackElement: StackElement,
+        stackElement: DfgStackElement,
     ): boolean {
         return (
             nodes.find((node) => node.id === stackElement.activity.name) !==
