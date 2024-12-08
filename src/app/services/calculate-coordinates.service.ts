@@ -19,9 +19,17 @@ export class CalculateCoordinatesService {
         return this._graph$.asObservable();
     }
 
-    public calculateCoordinates(dfg: Dfg): void {
+    public calculateCoordinates(
+        dfg: Dfg,
+        initialXCoordinate: number = 100,
+        initialYCoordinate: number = 100,
+    ): void {
         // Stage 1
-        const nodes: Array<Node> = this.generateNodes(dfg);
+        const nodes: Array<Node> = this.generateNodes(
+            dfg,
+            initialXCoordinate,
+            initialYCoordinate,
+        );
         const dfgArcs: Array<DfgArc> = dfg.arcs.getArcs();
         const edges: Array<Edge> = this.generateEdges(nodes, dfgArcs);
 
@@ -37,17 +45,25 @@ export class CalculateCoordinatesService {
      * @param {Dfg} dfg - Dfg for which nodes are calculated
      * @returns {Array<Node>} Return an array of generated nodes
      */
-    private generateNodes(dfg: Dfg): Array<Node> {
+    private generateNodes(
+        dfg: Dfg,
+        initialXCoordinate: number,
+        initialYCoordinate: number,
+    ): Array<Node> {
         const nodes: Array<Node> = new Array<Node>();
 
         const gapX = environment.drawingGrid.gapX;
         const gapY = environment.drawingGrid.gapY;
 
-        let yCoordinate: number = 100;
-        let xOfLastModeledNode: number = 100;
+        let yCoordinate: number = initialYCoordinate;
+        let xOfLastModeledNode: number = initialXCoordinate;
 
         const playActivity: Activity = dfg.activities.getActivityByName('play');
-        nodes.push({ id: playActivity.name, x: 100, y: 100 });
+        nodes.push({
+            id: playActivity.name,
+            x: initialXCoordinate,
+            y: initialYCoordinate,
+        });
         const neighbours: Activities =
             dfg.arcs.calculateNextActivities(playActivity);
 
@@ -56,7 +72,11 @@ export class CalculateCoordinatesService {
         const stack: Array<StackElement> = neighbours
             .getAllActivites()
             .map((neighbour) => {
-                return { activity: neighbour, source_x: 100, source_y: 100 };
+                return {
+                    activity: neighbour,
+                    source_x: initialXCoordinate,
+                    source_y: initialYCoordinate,
+                };
             });
 
         while (stack.length > 0) {
