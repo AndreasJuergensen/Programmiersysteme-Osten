@@ -28,8 +28,45 @@ export class PetriNetManagementService {
         this._petriNet$.next(this._petriNet);
     }
 
-    // public updateByWhateverCut(fancyParameters...): void {
-    //   ...
-    //   this._petriNet$.next(whatever...);
-    // }
+    public updateByWhatEverCut(
+        selectedCut: string,
+        originDFG: Dfg,
+        subDFG1: Dfg,
+        subDFG2: Dfg,
+    ): void {
+        switch (selectedCut) {
+            case 'ExclusiveCut':
+                this._petriNet$.next(
+                    this._petriNet.updateByExclusiveCut(
+                        originDFG,
+                        subDFG1,
+                        subDFG2,
+                    ),
+                );
+                break;
+            case 'SequenceCut':
+                this._petriNet$.next(
+                    this._petriNet.updateBySequenceCut(
+                        originDFG,
+                        subDFG1,
+                        subDFG2,
+                    ),
+                );
+                break;
+            case 'ParallelCut':
+                this._petriNet$.next(
+                    this._petriNet.updateByParallelCut(
+                        originDFG,
+                        subDFG1,
+                        subDFG2,
+                    ),
+                );
+                break;
+            case 'LoopCut':
+                this._petriNet$.next(
+                    this._petriNet.updateByLoopCut(originDFG, subDFG1, subDFG2),
+                );
+                break;
+        }
+    }
 }

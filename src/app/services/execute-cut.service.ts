@@ -6,7 +6,6 @@ import { Activities } from '../classes/dfg/activities';
 import { EventLog } from '../classes/event-log';
 import { PetriNetManagementService } from './petri-net-management.service';
 
-
 @Injectable({
     providedIn: 'root',
 })
@@ -20,11 +19,7 @@ export class ExecuteCutService {
     private calculateDfgService: CalculateDfgService =
         new CalculateDfgService();
 
-    public execute(
-        dfg: Dfg,
-        selectedArcs: Arcs,
-        selectedCut: string,
-    ): void {
+    public execute(dfg: Dfg, selectedArcs: Arcs, selectedCut: string): void {
         const partitions: Activities[] = dfg.calculatePartitions(selectedArcs);
         const a1: Activities = partitions[0];
         const a2: Activities = partitions[1];
@@ -47,7 +42,12 @@ export class ExecuteCutService {
                 a2,
             )[1];
 
-            // this._petriNetManagementService.updateByWhateverCut(abc, xyz);
+            this._petriNetManagementService.updateByWhatEverCut(
+                selectedCut,
+                dfg,
+                subDfg1,
+                subDfg2,
+            );
             // return [subDfg1, subDfg2];
             // Petri Netz zurückgeben mit Übergabe des Original-DFG und der Teil-DFGs
         }
@@ -82,7 +82,8 @@ export class ExecuteCutService {
                 eventLogs.push(eventLog.splitByParallelCut(a1)[1]);
                 break;
             case 'LoopCut':
-                eventLogs = eventLog.splitByLoopCut(a1, a2);
+                eventLogs.push(eventLog.splitByLoopCut(a1, a2)[0]);
+                eventLogs.push(eventLog.splitByLoopCut(a1, a2)[1]);
                 break;
         }
 
