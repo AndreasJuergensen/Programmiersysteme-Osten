@@ -12,117 +12,156 @@ describe('ExecuteCutService', () => {
     beforeEach(() => {
         sut = new ExecuteCutService();
         calculateDfgService = new CalculateDfgService();
+        // jasmine.addMatchers({
+        //     toEqualIgnoringId: () => ({
+        //         compare: (
+        //             actual: { id: any; actual: any },
+        //             expected: { id: any; expected: any },
+        //         ) => {
+        //             const { id: _, ...actualWithoutId } = actual;
+        //             const { id: __, ...expectedWithoutId } = expected;
+
+        //             const pass =
+        //                 JSON.stringify(actualWithoutId) ===
+        //                 JSON.stringify(expectedWithoutId);
+
+        //             return {
+        //                 pass,
+        //                 message: pass
+        //                     ? 'Objects are equal ignoring id'
+        //                     : 'Objects differ when ignoring id',
+        //             };
+        //         },
+        //     }),
+        // });
     });
 
     // it('test', () => {});
 
-    // it('execute invalid exclusive cut on a simple dfg', () => {
-    //     const dfg: Dfg = new DfgBuilder()
-    //         .createActivity('A')
-    //         .createActivity('B')
-    //         .createActivity('C')
-    //         .addFromPlayArc('A')
-    //         .addFromPlayArc('C')
-    //         .addToStopArc('B')
-    //         .addToStopArc('C')
-    //         .addArc('A', 'B')
-    //         .build();
-    //     const cuttedArcs: Arcs = new Arcs()
-    //         .addArc(dfg.getArc('play', 'C'))
-    //         .addArc(dfg.getArc('play', 'A'));
+    it('execute invalid exclusive cut on a simple dfg', () => {
+        const eventLog: EventLog = new EventLog([
+            new Trace([new Activity('A'), new Activity('B')]),
+            new Trace([new Activity('C')]),
+        ]);
 
-    //     const selectedCutViaRadioButton: string = 'ExclusiveCut';
+        const dfg: Dfg = calculateDfgService.calculate(eventLog);
 
-    //     const result: { dfg1: Dfg; dfg2: Dfg } | void = sut.execute(
-    //         dfg,
-    //         cuttedArcs,
-    //         selectedCutViaRadioButton,
-    //     );
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(dfg.getArc('play', 'C'))
+            .addArc(dfg.getArc('play', 'A'));
 
-    //     expect(result).toEqual();
-    // });
+        const selectedCutViaRadioButton: string = 'ExclusiveCut';
 
-    // it('valid exclusive cut on a simple dfg', () => {
-    //     const eventLog: EventLog = new EventLog([
-    //         new Trace([new Activity('A'), new Activity('B')]),
-    //         new Trace([new Activity('C')]),
-    //     ]);
+        const result: [Dfg, Dfg] | void = sut.execute(
+            dfg,
+            cuttedArcs,
+            selectedCutViaRadioButton,
+        );
 
-    //     const dfg: Dfg = calculateDfgService.calculate(eventLog);
-    //     // console.log('test');
-    //     // console.log(dfg);
+        expect(result).toEqual();
+    });
 
-    //     // console.log(dfg.getEventLog());
+    it('valid exclusive cut on a simple dfg', () => {
+        const eventLog: EventLog = new EventLog([
+            new Trace([new Activity('A'), new Activity('B')]),
+            new Trace([new Activity('C')]),
+        ]);
 
-    //     const cuttedArcs: Arcs = new Arcs()
-    //         .addArc(dfg.getArc('play', 'C'))
-    //         .addArc(dfg.getArc('C', 'stop'));
+        const dfg: Dfg = calculateDfgService.calculate(eventLog);
 
-    //     const selectedCutViaRadioButton: string = 'ExclusiveCut';
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(dfg.getArc('play', 'C'))
+            .addArc(dfg.getArc('C', 'stop'));
 
-    //     const dfg1: Dfg = new DfgBuilder()
-    //         .createActivity('A')
-    //         .createActivity('B')
-    //         .addFromPlayArc('A')
-    //         .addToStopArc('B')
-    //         .addArc('A', 'B')
-    //         .build();
-    //     const dfg2: Dfg = new DfgBuilder()
-    //         .createActivity('C')
-    //         .addFromPlayArc('C')
-    //         .addToStopArc('C')
-    //         .build();
+        const selectedCutViaRadioButton: string = 'ExclusiveCut';
 
-    //     const result: { dfg1: Dfg; dfg2: Dfg } | void = sut.execute(
-    //         dfg,
-    //         cuttedArcs,
-    //         selectedCutViaRadioButton,
-    //     );
-    //     console.log(dfg1);
-    //     console.log(dfg2);
-    //     console.log(result);
+        const eventLog1: EventLog = new EventLog([
+            new Trace([new Activity('A'), new Activity('B')]),
+        ]);
+        const eventLog2: EventLog = new EventLog([
+            new Trace([new Activity('C')]),
+        ]);
 
-    //     expect(result).toEqual({ dfg1, dfg2 });
-    // });
+        const dfg1: Dfg = calculateDfgService.calculate(eventLog1);
+        const dfg2: Dfg = calculateDfgService.calculate(eventLog2);
+        const result: [Dfg, Dfg] | void = sut.execute(
+            dfg,
+            cuttedArcs,
+            selectedCutViaRadioButton,
+        );
 
-    // it('valid paralllel cut', () => {
-    //     const dfg: Dfg = new DfgBuilder()
-    //         .createActivity('A')
-    //         .createActivity('B')
-    //         .createActivity('C')
-    //         .createActivity('D')
-    //         .addFromPlayArc('A')
-    //         .addFromPlayArc('D')
-    //         .addToStopArc('C')
-    //         .addToStopArc('D')
-    //         .addArc('A', 'B')
-    //         .addArc('B', 'C')
-    //         .addArc('A', 'D')
-    //         .addArc('D', 'A')
-    //         .addArc('B', 'D')
-    //         .addArc('D', 'B')
-    //         .addArc('C', 'D')
-    //         .addArc('D', 'C')
-    //         .build();
-    //     const cuttedArcs: Arcs = new Arcs()
-    //         .addArc(dfg.getArc('play', 'D'))
-    //         .addArc(dfg.getArc('A', 'D'))
-    //         .addArc(dfg.getArc('D', 'A'))
-    //         .addArc(dfg.getArc('B', 'D'))
-    //         .addArc(dfg.getArc('D', 'B'))
-    //         .addArc(dfg.getArc('C', 'D'))
-    //         .addArc(dfg.getArc('D', 'C'))
-    //         .addArc(dfg.getArc('D', 'stop'));
-    //     const selectedCutViaRadioButton: string = 'ParallelCut';
+        expect(result).toEqual([dfg1, dfg2]);
+    });
 
-    //     const result: boolean = sut.validateCut(
-    //         dfg,
-    //         cuttedArcs,
-    //         selectedCutViaRadioButton,
-    //     );
+    it('valid paralllel cut', () => {
+        const eventLog: EventLog = new EventLog([
+            new Trace([
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('C'),
+                new Activity('D'),
+                new Activity('C'),
+            ]),
+            new Trace([
+                new Activity('D'),
+                new Activity('B'),
+                new Activity('D'),
+            ]),
+            new Trace([
+                new Activity('A'),
+                new Activity('D'),
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('C'),
+            ]),
+        ]);
 
-    //     expect(result).toBeTrue();
-    // });
+        const dfg: Dfg = calculateDfgService.calculate(eventLog);
+
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(dfg.getArc('play', 'D'))
+            .addArc(dfg.getArc('A', 'D'))
+            .addArc(dfg.getArc('D', 'A'))
+            .addArc(dfg.getArc('B', 'D'))
+            .addArc(dfg.getArc('D', 'B'))
+            .addArc(dfg.getArc('C', 'D'))
+            .addArc(dfg.getArc('D', 'C'))
+            .addArc(dfg.getArc('D', 'stop'));
+        const selectedCutViaRadioButton: string = 'ParallelCut';
+
+        const eventLog1: EventLog = new EventLog([
+            new Trace([
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('C'),
+                new Activity('C'),
+            ]),
+            new Trace([new Activity('B')]),
+            new Trace([
+                new Activity('A'),
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('C'),
+            ]),
+        ]);
+        const eventLog2: EventLog = new EventLog([
+            new Trace([new Activity('D')]),
+            new Trace([new Activity('D'), new Activity('D')]),
+            new Trace([new Activity('D')]),
+        ]);
+
+        const dfg1: Dfg = calculateDfgService.calculate(eventLog1);
+        const dfg2: Dfg = calculateDfgService.calculate(eventLog2);
+
+        const result: [Dfg, Dfg] | void = sut.execute(
+            dfg,
+            cuttedArcs,
+            selectedCutViaRadioButton,
+        );
+        console.log(result);
+
+        expect(result).toEqual([dfg1, dfg2]);
+    });
 
     // it('valid sequence cut', () => {
     //     const dfg: Dfg = new DfgBuilder()

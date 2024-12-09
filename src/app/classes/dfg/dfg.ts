@@ -10,14 +10,12 @@ export interface DfgJson {
 }
 export class Dfg implements PetriNetTransition {
     private static count: number = 0;
-    public id: string;
     constructor(
+        public id: string,
         private readonly _activities: Activities,
         private readonly _arcs: Arcs,
         private eventLog: EventLog,
-    ) {
-        this.id = 'dfg' + ++Dfg.count;
-    }
+    ) {}
 
     get activities(): Activities {
         return this._activities;
@@ -168,6 +166,6 @@ export class DfgBuilder {
     }
 
     build(): Dfg {
-        return new Dfg(this.activities, this.arcs, this.eventlog);
+        return new Dfg('', this.activities, this.arcs, this.eventlog);
     }
 }

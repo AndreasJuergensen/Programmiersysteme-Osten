@@ -15,11 +15,12 @@ export class ExecuteCutService {
 
     private calculateDfgService: CalculateDfgService =
         new CalculateDfgService();
+
     public execute(
         dfg: Dfg,
         selectedArcs: Arcs,
         selectedCut: string,
-    ): { dfg1: Dfg; dfg2: Dfg } | void {
+    ): [Dfg, Dfg] | void {
         const partitions: Activities[] = dfg.calculatePartitions(selectedArcs);
         const a1: Activities = partitions[0];
         const a2: Activities = partitions[1];
@@ -27,14 +28,22 @@ export class ExecuteCutService {
         if (!this.validateCut(dfg, a1, a2, selectedCut)) {
             console.log('3: kein valider Cut! Bitte nochmal probieren!'); // hier spaeter Aufruf des Feedback-Service
         } else {
-            console.log('3: else - Teil');
+            // console.log('3: else - Teil');
             // console.log(dfg.getEventLog());
-
-            return {
-                // Petri Netz zurückgeben mit Übergabe des Original-DFG und der Teil-DFGs
-                dfg1: this.cut(selectedCut, dfg.getEventLog(), a1, a2).dfg1,
-                dfg2: this.cut(selectedCut, dfg.getEventLog(), a1, a2).dfg2,
-            };
+            const subDfg1: Dfg = this.cut(
+                selectedCut,
+                dfg.getEventLog(),
+                a1,
+                a2,
+            )[0];
+            const subDfg2: Dfg = this.cut(
+                selectedCut,
+                dfg.getEventLog(),
+                a1,
+                a2,
+            )[1];
+            return [subDfg1, subDfg2];
+            // Petri Netz zurückgeben mit Übergabe des Original-DFG und der Teil-DFGs
         }
     }
 
@@ -43,34 +52,41 @@ export class ExecuteCutService {
         eventLog: EventLog,
         a1: Activities,
         a2: Activities,
-    ): { dfg1: Dfg; dfg2: Dfg } {
+    ): [Dfg, Dfg] {
         console.log('2: cut durchgefuehrt!' + ' selected Cut: ' + selectedCut);
         // let e1: EventLog = new EventLog();
         // let e2: EventLog = new EventLog();
-        let eventLogs: Array<EventLog> = [new EventLog(), new EventLog()];
+        let eventLogs = new Array<EventLog>();
 
         switch (selectedCut) {
             case 'ExclusiveCut':
                 eventLogs.push(eventLog.splitByExclusiveCut(a1)[0]);
+                // console.log(eventLogs[0]);
                 eventLogs.push(eventLog.splitByExclusiveCut(a1)[1]);
+                // console.log(eventLogs[1]);
                 break;
             case 'SequenceCut':
-                eventLogs = eventLog.splitBySequenceCut(a2);
+                eventLogs.push(eventLog.splitBySequenceCut(a2)[0]);
+                // console.log(eventLogs[0]);
+                eventLogs.push(eventLog.splitBySequenceCut(a2)[1]);
                 break;
             case 'ParallelCut':
-                eventLogs = eventLog.splitByParallelCut(a1);
+                eventLogs.push(eventLog.splitByParallelCut(a1)[0]);
+                // console.log(eventLogs[0]);
+                eventLogs.push(eventLog.splitByParallelCut(a1)[1]);
                 break;
             case 'LoopCut':
                 eventLogs = eventLog.splitByLoopCut(a1, a2);
                 break;
         }
-        // console.log(eventLogs[0]);
-        // console.log(eventLogs[1]);
 
         const subDfg1: Dfg = this.calculateDfgService.calculate(eventLogs[0]);
-        const subDfg2: Dfg = this.calculateDfgService.calculate(eventLogs[1]);
+        // console.log(subDfg1);
 
-        return { dfg1: subDfg1, dfg2: subDfg2 };
+        const subDfg2: Dfg = this.calculateDfgService.calculate(eventLogs[1]);
+        // console.log(subDfg2);
+
+        return [subDfg1, subDfg2];
     }
 
     public validateCut(
