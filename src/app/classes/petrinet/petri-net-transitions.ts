@@ -37,6 +37,15 @@ export class PetriNetTransitions {
         return this;
     }
 
+    eachTransitionIsBaseCase(): boolean {
+        for (const transition of this.transitions) {
+            if (transition instanceof Dfg) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     getLastTransition(): PetriNetTransition {
         return this.transitions[this.transitions.length - 1];
     }

@@ -143,6 +143,10 @@ export class PetriNet {
         return replacingTransition;
     }
 
+    isBasicPetriNet(): boolean {
+        return this.transitions.eachTransitionIsBaseCase();
+    }
+
     getAllPlaces(): Places {
         return this.places;
     }
