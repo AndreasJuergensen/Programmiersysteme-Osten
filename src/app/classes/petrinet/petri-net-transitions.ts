@@ -1,5 +1,19 @@
 import { Dfg } from '../dfg/dfg';
 
+export interface PetriNetTransition {
+    id: string;
+}
+
+export class Transition implements PetriNetTransition {
+    readonly id: string;
+    constructor(
+        private readonly name: string,
+        idCount: number,
+    ) {
+        this.id = 't' + idCount;
+    }
+}
+
 export class PetriNetTransitions {
     private readonly transitions: Array<PetriNetTransition> = new Array();
     private idCount: number = 0;
@@ -23,15 +37,6 @@ export class PetriNetTransitions {
         return this;
     }
 
-    allTransitionsAreBaseCases(): boolean {
-        for (const transition of this.transitions) {
-            if (transition instanceof Dfg) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     getLastTransition(): PetriNetTransition {
         return this.transitions[this.transitions.length - 1];
     }
@@ -43,19 +48,5 @@ export class PetriNetTransitions {
             }
         }
         throw new Error('Transition not found');
-    }
-}
-
-export interface PetriNetTransition {
-    id: string;
-}
-
-export class Transition implements PetriNetTransition {
-    readonly id: string;
-    constructor(
-        private readonly name: string,
-        idCount: number,
-    ) {
-        this.id = 't' + idCount;
     }
 }

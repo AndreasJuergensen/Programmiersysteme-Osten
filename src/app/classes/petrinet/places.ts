@@ -1,3 +1,6 @@
+export interface Place {
+    id: string;
+}
 export class Places {
     private readonly places: Array<Place> = new Array();
     private idCount: number = 0;
@@ -22,8 +25,4 @@ export class Places {
         }
         throw new Error('Place not found');
     }
-}
-
-export interface Place {
-    id: string;
 }
