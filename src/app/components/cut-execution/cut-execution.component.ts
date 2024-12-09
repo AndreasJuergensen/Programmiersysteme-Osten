@@ -30,6 +30,7 @@ export class CutExecutionComponent implements OnInit {
     constructor(
         private fb: FormBuilder,
         private executeCutService: ExecuteCutService,
+        // private kantenSammelService: KantenSammelService
     ) {
         this.radioForm = this.fb.group({
             selectedCut: [null],

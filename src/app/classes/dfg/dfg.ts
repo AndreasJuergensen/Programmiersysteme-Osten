@@ -10,12 +10,13 @@ export interface DfgJson {
 }
 export class Dfg implements PetriNetTransition {
     private static count: number = 0;
+    public id: string;
     constructor(
-        public id: string,
         private readonly _activities: Activities,
         private readonly _arcs: Arcs,
         private eventLog: EventLog,
-    ) {}
+    ) {
+        this.id = 'dfg' + ++Dfg.count;}
 
     get activities(): Activities {
         return this._activities;
@@ -44,15 +45,6 @@ export class Dfg implements PetriNetTransition {
 
         return { result: false, matchingcut: null };
     }
-
-    // canBeCutIn(a1: Activities, a2: Activities): boolean {
-    //     return (
-    //         new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs) ||
-    //         new SequenceCut(a1, a2).isPossible(this.activities, this.arcs) ||
-    //         new ParallelCut(a1, a2).isPossible(this.activities, this.arcs) ||
-    //         new LoopCut(a1, a2).isPossible(this.activities, this.arcs)
-    //     );
-    // }
 
     /* 
     cuttedArcs are the arcs that are choosen by user for cut, the return
@@ -166,6 +158,6 @@ export class DfgBuilder {
     }
 
     build(): Dfg {
-        return new Dfg('', this.activities, this.arcs, this.eventlog);
+        return new Dfg(this.activities, this.arcs, this.eventlog);
     }
 }

@@ -4,6 +4,8 @@ import { Dfg } from '../classes/dfg/dfg';
 import { Arcs } from '../classes/dfg/arcs';
 import { Activities } from '../classes/dfg/activities';
 import { EventLog } from '../classes/event-log';
+import { PetriNetManagementService } from './petri-net-management.service';
+
 
 @Injectable({
     providedIn: 'root',
@@ -11,7 +13,9 @@ import { EventLog } from '../classes/event-log';
 export class ExecuteCutService {
     // Event Log --> DFG --> Cut --> Partitionen --> CanBeCutIn --> True / False
 
-    constructor() {} // private selectedArcs: Arcs, // private dfg: Dfg,
+    constructor(
+        private _petriNetManagementService: PetriNetManagementService,
+    ) {} // private selectedArcs: Arcs, // private dfg: Dfg,
 
     private calculateDfgService: CalculateDfgService =
         new CalculateDfgService();
@@ -20,7 +24,7 @@ export class ExecuteCutService {
         dfg: Dfg,
         selectedArcs: Arcs,
         selectedCut: string,
-    ): [Dfg, Dfg] | void {
+    ): void {
         const partitions: Activities[] = dfg.calculatePartitions(selectedArcs);
         const a1: Activities = partitions[0];
         const a2: Activities = partitions[1];
@@ -42,7 +46,9 @@ export class ExecuteCutService {
                 a1,
                 a2,
             )[1];
-            return [subDfg1, subDfg2];
+
+            // this._petriNetManagementService.updateByWhateverCut(abc, xyz);
+            // return [subDfg1, subDfg2];
             // Petri Netz zurückgeben mit Übergabe des Original-DFG und der Teil-DFGs
         }
     }
