@@ -1,6 +1,16 @@
 import { Place } from './places';
 import { PetriNetTransition } from './petri-net-transitions';
 
+export interface PlaceToTransitionArc {
+    start: Place;
+    end: PetriNetTransition;
+}
+
+export interface TransitionToPlaceArc {
+    start: PetriNetTransition;
+    end: Place;
+}
+
 export class PetriNetArcs {
     private readonly arcs: Array<PlaceToTransitionArc | TransitionToPlaceArc> =
         new Array();
@@ -81,14 +91,4 @@ export class PetriNetArcs {
         }
         throw new Error('This transition is not reached by a place');
     }
-}
-
-export interface PlaceToTransitionArc {
-    start: Place;
-    end: PetriNetTransition;
-}
-
-export interface TransitionToPlaceArc {
-    start: PetriNetTransition;
-    end: Place;
 }
