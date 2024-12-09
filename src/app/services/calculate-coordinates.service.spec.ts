@@ -340,12 +340,10 @@ describe('CalculateCoordinatesService', () => {
                 { source: DNode, target: stopNode },
             ],
         };
-        console.log(expectedGraph);
 
         sut.calculateCoordinates(dfg);
 
         sut.graph$.subscribe((graph) => {
-            console.log(graph);
             expect(graph).toEqual(expectedGraph);
         });
     });
