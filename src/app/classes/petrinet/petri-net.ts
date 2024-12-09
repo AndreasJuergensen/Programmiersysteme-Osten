@@ -4,7 +4,6 @@ import { Places } from './places';
 import {
     PetriNetTransition,
     PetriNetTransitions,
-    Transition,
 } from './petri-net-transitions';
 
 export class PetriNet {
@@ -83,14 +82,11 @@ export class PetriNet {
         return this;
     }
 
-    // parallel cut needs new places for parallelism
     updateByParallelCut(originDFG: Dfg, subDFG1: Dfg, subDFG2: Dfg): PetriNet {
-        // replace origin dfg by first sub dfg using exisisting elements
         const firstReplacingTransition = this.replaceOriginBySub(
             originDFG,
             subDFG1,
         );
-        // import second sub dfg and connect with with new reaching elements
         this.arcs.addTransitionToPlaceArc(
             this.arcs.getPrevTransition(
                 this.arcs.getPrevPlace(firstReplacingTransition),
@@ -105,7 +101,6 @@ export class PetriNet {
                 this.places.getLastPlace(),
                 secondReplacingTransition,
             )
-            // connect second sub dfg to new reachable elements
             .addTransitionToPlaceArc(
                 secondReplacingTransition,
                 this.places.addPlace().getLastPlace(),
@@ -158,12 +153,5 @@ export class PetriNet {
 
     getAllArcs(): PetriNetArcs {
         return this.arcs;
-    }
-
-    /**
-     * SCRUM-19: Ende anzeigen
-     */
-    isBasicPetriNet(): boolean {
-        return this.transitions.allTransitionsAreBaseCases();
     }
 }
