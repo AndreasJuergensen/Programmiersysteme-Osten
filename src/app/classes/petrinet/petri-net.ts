@@ -7,9 +7,10 @@ import {
 } from './petri-net-transitions';
 
 export class PetriNet {
-    private _places: Places = new Places();
-    private _transitions: PetriNetTransitions = new PetriNetTransitions();
-    private _arcs: PetriNetArcs = new PetriNetArcs();
+    private readonly _places: Places = new Places();
+    private readonly _transitions: PetriNetTransitions =
+        new PetriNetTransitions();
+    private readonly _arcs: PetriNetArcs = new PetriNetArcs();
     private _isInitialized: boolean = false;
 
     constructor() {}
