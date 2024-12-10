@@ -4,8 +4,106 @@ import { PetriNetArcs } from './petri-net-arcs';
 import { PetriNetTransitions } from './petri-net-transitions';
 import { Places } from './places';
 
-describe('Petrinet update', () => {
-    it('by Exclusive Cut', () => {
+describe('A Petrinet', () => {
+    it('DFG is a base case', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .addFromPlayArc('A')
+            .addToStopArc('A')
+            .build();
+
+        const result: boolean = sut.isBaseCase();
+
+        expect(result).toBeTrue();
+    });
+
+    it('DFG is not a base case', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .addFromPlayArc('A')
+            .addToStopArc('B')
+            .addArc('A', 'B')
+            .build();
+
+        const result: boolean = sut.isBaseCase();
+
+        expect(result).toBeFalse();
+    });
+
+    it('DFG is a base case and base activity name is', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .addFromPlayArc('A')
+            .addToStopArc('A')
+            .build();
+
+        const sutIsBaseCase: boolean = sut.isBaseCase();
+        const result: string = sut.getBaseActivityName();
+
+        expect(sutIsBaseCase).toBeTrue();
+        expect(result).toEqual('A');
+    });
+
+    it('is initialized after origin DFG has already been initialized', () => {
+        const originDFG: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .addFromPlayArc('A')
+            .addToStopArc('A')
+            .build();
+
+        const sut: PetriNet = new PetriNet().initializeOriginDFG(originDFG);
+
+        expect(() => sut.initializeOriginDFG(originDFG)).toThrowError(
+            'The origin DFG for this Petrinet has already been set',
+        );
+    });
+
+    it('which is not initialized with origin DFG to be updated', () => {
+        const originDFG: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('Z')
+            .addFromPlayArc('A')
+            .addFromPlayArc('Z')
+            .addToStopArc('A')
+            .addToStopArc('Z')
+            .build();
+        const subDFG1: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .addFromPlayArc('A')
+            .addToStopArc('A')
+            .build();
+        const subDFG2: Dfg = new DfgBuilder()
+            .createActivity('Z')
+            .addFromPlayArc('Z')
+            .addToStopArc('Z')
+            .build();
+
+        const sut: PetriNet = new PetriNet();
+
+        expect(() =>
+            sut.updateByExclusiveCut(originDFG, subDFG1, subDFG2),
+        ).toThrowError(
+            'This PetriNet has not been initialized, thus it cannot be updated',
+        );
+        expect(() =>
+            sut.updateBySequenceCut(originDFG, subDFG1, subDFG2),
+        ).toThrowError(
+            'This PetriNet has not been initialized, thus it cannot be updated',
+        );
+        expect(() =>
+            sut.updateByParallelCut(originDFG, subDFG1, subDFG2),
+        ).toThrowError(
+            'This PetriNet has not been initialized, thus it cannot be updated',
+        );
+        expect(() =>
+            sut.updateByLoopCut(originDFG, subDFG1, subDFG2),
+        ).toThrowError(
+            'This PetriNet has not been initialized, thus it cannot be updated',
+        );
+    });
+
+    it('is updated by exclusive cut', () => {
         const originDFG: Dfg = new DfgBuilder()
             .createActivity('A')
             .createActivity('B')
@@ -22,23 +120,20 @@ describe('Petrinet update', () => {
             .createActivity('A')
             .createActivity('B')
             .addFromPlayArc('A')
-            .addArc('A', 'B')
             .addToStopArc('B')
+            .addArc('A', 'B')
             .build();
         const subDFG2: Dfg = new DfgBuilder()
             .createActivity('Z')
             .createActivity('Y')
             .addFromPlayArc('Z')
-            .addArc('Z', 'Y')
             .addToStopArc('Y')
+            .addArc('Z', 'Y')
             .build();
 
-        const sut: PetriNet = new PetriNet(originDFG);
-        const result: PetriNet = sut.updateByExclusiveCut(
-            originDFG,
-            subDFG1,
-            subDFG2,
-        );
+        const sut: PetriNet = new PetriNet()
+            .initializeOriginDFG(originDFG)
+            .updateByExclusiveCut(originDFG, subDFG1, subDFG2);
 
         const expectedPlaces: Places = new Places();
         const expectedTransitions: PetriNetTransitions =
@@ -47,28 +142,28 @@ describe('Petrinet update', () => {
                 .createTransition('stop');
         const expectedArcs: PetriNetArcs = new PetriNetArcs()
             .addPlaceToTransitionArc(
-                expectedPlaces.addPlace().getLastPlace(),
+                expectedPlaces.addPlace().getPlaceByID('p1'),
                 expectedTransitions.getTransitionByID('t1'),
             )
             .addTransitionToPlaceArc(
                 expectedTransitions.getTransitionByID('t1'),
-                expectedPlaces.addPlace().getLastPlace(),
+                expectedPlaces.addPlace().getPlaceByID('p2'),
             )
             .addPlaceToTransitionArc(
-                expectedPlaces.getLastPlace(),
+                expectedPlaces.getPlaceByID('p2'),
                 expectedTransitions.addDFG(subDFG1).getLastTransition(),
             )
             .addTransitionToPlaceArc(
                 expectedTransitions.getLastTransition(),
-                expectedPlaces.addPlace().getLastPlace(),
+                expectedPlaces.addPlace().getPlaceByID('p3'),
             )
             .addPlaceToTransitionArc(
-                expectedPlaces.getLastPlace(),
+                expectedPlaces.getPlaceByID('p3'),
                 expectedTransitions.getTransitionByID('t2'),
             )
             .addTransitionToPlaceArc(
                 expectedTransitions.getTransitionByID('t2'),
-                expectedPlaces.addPlace().getLastPlace(),
+                expectedPlaces.addPlace().getPlaceByID('p4'),
             )
             .addPlaceToTransitionArc(
                 expectedPlaces.getPlaceByID('p2'),
@@ -79,43 +174,41 @@ describe('Petrinet update', () => {
                 expectedPlaces.getPlaceByID('p3'),
             );
 
-        expect(result.getAllArcs()).toEqual(expectedArcs);
-        expect(result.getAllTransitions()).toEqual(expectedTransitions);
-        expect(result.getAllPlaces()).toEqual(expectedPlaces);
+        expect(sut.places).toEqual(expectedPlaces);
+        expect(sut.transitions).toEqual(expectedTransitions);
+        expect(sut.arcs).toEqual(expectedArcs);
     });
 
-    it('by Exclusive Cut with one sub as base case', () => {
+    it('update by sequence cut', () => {
         const originDFG: Dfg = new DfgBuilder()
             .createActivity('A')
             .createActivity('B')
             .createActivity('Z')
+            .createActivity('Y')
             .addFromPlayArc('A')
-            .addFromPlayArc('Z')
-            .addToStopArc('B')
-            .addToStopArc('Z')
+            .addToStopArc('Y')
             .addArc('A', 'B')
+            .addArc('B', 'Z')
+            .addArc('Z', 'Y')
             .build();
-
-        const sut: PetriNet = new PetriNet(originDFG);
-
         const subDFG1: Dfg = new DfgBuilder()
             .createActivity('A')
             .createActivity('B')
             .addFromPlayArc('A')
-            .addArc('A', 'B')
             .addToStopArc('B')
+            .addArc('A', 'B')
             .build();
         const subDFG2: Dfg = new DfgBuilder()
             .createActivity('Z')
+            .createActivity('Y')
             .addFromPlayArc('Z')
-            .addToStopArc('Z')
+            .addToStopArc('Y')
+            .addArc('Z', 'Y')
             .build();
 
-        const result: PetriNet = sut.updateByExclusiveCut(
-            originDFG,
-            subDFG1,
-            subDFG2,
-        );
+        const sut: PetriNet = new PetriNet()
+            .initializeOriginDFG(originDFG)
+            .updateBySequenceCut(originDFG, subDFG1, subDFG2);
 
         const expectedPlaces: Places = new Places();
         const expectedTransitions: PetriNetTransitions =
@@ -124,115 +217,208 @@ describe('Petrinet update', () => {
                 .createTransition('stop');
         const expectedArcs: PetriNetArcs = new PetriNetArcs()
             .addPlaceToTransitionArc(
-                expectedPlaces.addPlace().getLastPlace(),
+                expectedPlaces.addPlace().getPlaceByID('p1'),
                 expectedTransitions.getTransitionByID('t1'),
             )
             .addTransitionToPlaceArc(
                 expectedTransitions.getTransitionByID('t1'),
-                expectedPlaces.addPlace().getLastPlace(),
-            )
-            .addPlaceToTransitionArc(
-                expectedPlaces.getLastPlace(),
-                expectedTransitions.addDFG(subDFG1).getLastTransition(),
-            )
-            .addTransitionToPlaceArc(
-                expectedTransitions.getLastTransition(),
-                expectedPlaces.addPlace().getLastPlace(),
-            )
-            .addPlaceToTransitionArc(
-                expectedPlaces.getLastPlace(),
-                expectedTransitions.getTransitionByID('t2'),
-            )
-            .addTransitionToPlaceArc(
-                expectedTransitions.getTransitionByID('t2'),
-                expectedPlaces.addPlace().getLastPlace(),
+                expectedPlaces.addPlace().getPlaceByID('p2'),
             )
             .addPlaceToTransitionArc(
                 expectedPlaces.getPlaceByID('p2'),
-                expectedTransitions.addDFG(subDFG2).getLastTransition(),
+                expectedTransitions.addDFG(subDFG1).getLastTransition(),
             )
             .addTransitionToPlaceArc(
-                expectedTransitions.getLastTransition(),
+                expectedTransitions.addDFG(subDFG2).getLastTransition(),
+                expectedPlaces.addPlace().getPlaceByID('p3'),
+            )
+            .addPlaceToTransitionArc(
                 expectedPlaces.getPlaceByID('p3'),
+                expectedTransitions.getTransitionByID('t2'),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getTransitionByID('t2'),
+                expectedPlaces.addPlace().getPlaceByID('p4'),
             );
-
-        expect(result.getAllArcs()).toEqual(expectedArcs);
-        expect(result.getAllTransitions()).toEqual(expectedTransitions);
-        expect(result.getAllPlaces()).toEqual(expectedPlaces);
-    });
-
-        it('by Exclusive Cut with both subs as base case', () => {
-            const originDFG: Dfg = new DfgBuilder()
-                .createActivity('A')
-                .createActivity('Z')
-                .addFromPlayArc('A')
-                .addFromPlayArc('Z')
-                .addToStopArc('A')
-                .addToStopArc('Z')
-                .build();
-
-            const sut: PetriNet = new PetriNet(originDFG);
-
-            const subDFG1: Dfg = new DfgBuilder()
-                .createActivity('A')
-                .createActivity('B')
-                .addFromPlayArc('A')
-                .addArc('A', 'B')
-                .addToStopArc('B')
-                .build();
-            const subDFG2: Dfg = new DfgBuilder()
-                .createActivity('Z')
-                .addFromPlayArc('Z')
-                .addToStopArc('Z')
-                .build();
-
-            const result: PetriNet = sut.updateByExclusiveCut(
-                originDFG,
-                subDFG1,
-                subDFG2,
-            );
-
-            const expectedPlaces: Places = new Places();
-            const expectedTransitions: PetriNetTransitions =
-                new PetriNetTransitions()
-                    .createTransition('play')
-                    .createTransition('stop');
-            const expectedArcs: PetriNetArcs = new PetriNetArcs()
-                .addPlaceToTransitionArc(
-                    expectedPlaces.addPlace().getLastPlace(),
-                    expectedTransitions.getTransitionByID('t1'),
-                )
-                .addTransitionToPlaceArc(
-                    expectedTransitions.getTransitionByID('t1'),
-                    expectedPlaces.addPlace().getLastPlace(),
-                )
-                .addPlaceToTransitionArc(
-                    expectedPlaces.getLastPlace(),
-                    expectedTransitions.addDFG(subDFG1).getLastTransition(),
-                )
-                .addTransitionToPlaceArc(
-                    expectedTransitions.getLastTransition(),
-                    expectedPlaces.addPlace().getLastPlace(),
-                )
-                .addPlaceToTransitionArc(
-                    expectedPlaces.getLastPlace(),
-                    expectedTransitions.getTransitionByID('t2'),
-                )
-                .addTransitionToPlaceArc(
-                    expectedTransitions.getTransitionByID('t2'),
-                    expectedPlaces.addPlace().getLastPlace(),
-                )
-                .addPlaceToTransitionArc(
+        expectedArcs
+            .addTransitionToPlaceArc(
+                expectedArcs.getNextTransition(
                     expectedPlaces.getPlaceByID('p2'),
-                    expectedTransitions.addDFG(subDFG2).getLastTransition(),
-                )
-                .addTransitionToPlaceArc(
-                    expectedTransitions.getLastTransition(),
-                    expectedPlaces.getPlaceByID('p3'),
-                );
+                ),
+                expectedPlaces.addPlace().getPlaceByID('p5'),
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p5'),
+                expectedTransitions.getLastTransition(),
+            );
 
-            expect(result.getAllArcs()).toEqual(expectedArcs);
-            expect(result.getAllTransitions()).toEqual(expectedTransitions);
-            expect(result.getAllPlaces()).toEqual(expectedPlaces);
-        });
+        expect(sut.places).toEqual(expectedPlaces);
+        expect(sut.transitions).toEqual(expectedTransitions);
+        expect(sut.arcs).toEqual(expectedArcs);
+    });
+
+    it('update by parallel cut', () => {
+        const originDFG: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('Z')
+            .createActivity('Y')
+            .addFromPlayArc('A')
+            .addFromPlayArc('Z')
+            .addToStopArc('B')
+            .addToStopArc('Y')
+            .addArc('A', 'B')
+            .addArc('A', 'Z')
+            .addArc('A', 'Y')
+            .addArc('B', 'Z')
+            .addArc('B', 'Y')
+            .addArc('Z', 'Y')
+            .addArc('Z', 'A')
+            .addArc('Z', 'B')
+            .addArc('Y', 'A')
+            .addArc('Y', 'B')
+            .build();
+        const subDFG1: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .addFromPlayArc('A')
+            .addToStopArc('B')
+            .addArc('A', 'B')
+            .build();
+        const subDFG2: Dfg = new DfgBuilder()
+            .createActivity('Z')
+            .createActivity('Y')
+            .addFromPlayArc('Z')
+            .addToStopArc('Y')
+            .addArc('Z', 'Y')
+            .build();
+
+        const sut: PetriNet = new PetriNet()
+            .initializeOriginDFG(originDFG)
+            .updateByParallelCut(originDFG, subDFG1, subDFG2);
+
+        const expectedPlaces: Places = new Places();
+        const expectedTransitions: PetriNetTransitions =
+            new PetriNetTransitions()
+                .createTransition('play')
+                .createTransition('stop');
+        const expectedArcs: PetriNetArcs = new PetriNetArcs()
+            .addPlaceToTransitionArc(
+                expectedPlaces.addPlace().getPlaceByID('p1'),
+                expectedTransitions.getTransitionByID('t1'),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getTransitionByID('t1'),
+                expectedPlaces.addPlace().getPlaceByID('p2'),
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p2'),
+                expectedTransitions.addDFG(subDFG1).getLastTransition(),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getLastTransition(),
+                expectedPlaces.addPlace().getPlaceByID('p3'),
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p3'),
+                expectedTransitions.getTransitionByID('t2'),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getTransitionByID('t2'),
+                expectedPlaces.addPlace().getPlaceByID('p4'),
+            );
+        expectedArcs
+            .addTransitionToPlaceArc(
+                expectedTransitions.getTransitionByID('t1'),
+                expectedPlaces.addPlace().getPlaceByID('p5'),
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p5'),
+                expectedTransitions.addDFG(subDFG2).getLastTransition(),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getLastTransition(),
+                expectedPlaces.addPlace().getPlaceByID('p6'),
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p6'),
+                expectedTransitions.getTransitionByID('t2'),
+            );
+
+        expect(sut.places).toEqual(expectedPlaces);
+        expect(sut.transitions).toEqual(expectedTransitions);
+        expect(sut.arcs).toEqual(expectedArcs);
+    });
+
+    it('update by loop cut', () => {
+        const originDFG: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('Z')
+            .addFromPlayArc('A')
+            .addToStopArc('B')
+            .addArc('A', 'B')
+            .addArc('A', 'Z')
+            .addArc('Z', 'B')
+            .build();
+        const subDFG1: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .addFromPlayArc('A')
+            .addToStopArc('B')
+            .addArc('A', 'B')
+            .build();
+        const subDFG2: Dfg = new DfgBuilder()
+            .createActivity('Z')
+            .addFromPlayArc('Z')
+            .addToStopArc('Z')
+            .build();
+
+        const sut: PetriNet = new PetriNet()
+            .initializeOriginDFG(originDFG)
+            .updateByLoopCut(originDFG, subDFG1, subDFG2);
+
+        const expectedPlaces: Places = new Places();
+        const expectedTransitions: PetriNetTransitions =
+            new PetriNetTransitions()
+                .createTransition('play')
+                .createTransition('stop');
+        const expectedArcs: PetriNetArcs = new PetriNetArcs()
+            .addPlaceToTransitionArc(
+                expectedPlaces.addPlace().getPlaceByID('p1'),
+                expectedTransitions.getTransitionByID('t1'),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getTransitionByID('t1'),
+                expectedPlaces.addPlace().getPlaceByID('p2'),
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p2'),
+                expectedTransitions.addDFG(subDFG1).getLastTransition(),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getLastTransition(),
+                expectedPlaces.addPlace().getPlaceByID('p3'),
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p3'),
+                expectedTransitions.getTransitionByID('t2'),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getTransitionByID('t2'),
+                expectedPlaces.addPlace().getPlaceByID('p4'),
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p3'),
+                expectedTransitions.addDFG(subDFG2).getLastTransition(),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getLastTransition(),
+                expectedPlaces.getPlaceByID('p2'),
+            );
+
+        expect(sut.places).toEqual(expectedPlaces);
+        expect(sut.transitions).toEqual(expectedTransitions);
+        expect(sut.arcs).toEqual(expectedArcs);
+    });
 });
