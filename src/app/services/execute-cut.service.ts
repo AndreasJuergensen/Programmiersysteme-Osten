@@ -5,6 +5,7 @@ import { Arcs } from '../classes/dfg/arcs';
 import { Activities } from '../classes/dfg/activities';
 import { EventLog } from '../classes/event-log';
 import { PetriNetManagementService } from './petri-net-management.service';
+import { cutType } from '../components/cut-execution/cut-execution.component';
 
 @Injectable({
     providedIn: 'root',
@@ -24,29 +25,32 @@ export class ExecuteCutService {
         const a1: Activities = partitions[0];
         const a2: Activities = partitions[1];
 
+        let tempDfgArray = new Array<Dfg>();
+
         if (!this.validateCut(dfg, a1, a2, selectedCut)) {
-            console.log('3: kein valider Cut! Bitte nochmal probieren!'); // hier spaeter Aufruf des Feedback-Service
+            console.log('kein valider Cut! Bitte nochmal probieren!'); // hier spaeter Aufruf des Feedback-Service
         } else {
             // console.log('3: else - Teil');
             // console.log(dfg.getEventLog());
-            const subDfg1: Dfg = this.cut(
-                selectedCut,
-                dfg.getEventLog(),
-                a1,
-                a2,
-            )[0];
-            const subDfg2: Dfg = this.cut(
-                selectedCut,
-                dfg.getEventLog(),
-                a1,
-                a2,
-            )[1];
+            // const subDfg1: Dfg = this.cut(
+            //     selectedCut,
+            //     dfg.getEventLog(),
+            //     a1,
+            //     a2,
+            // )[0];
+            // const subDfg2: Dfg = this.cut(
+            //     selectedCut,
+            //     dfg.getEventLog(),
+            //     a1,
+            //     a2,
+            // )[1];
+            tempDfgArray = this.cut(selectedCut, dfg.getEventLog(), a1, a2);
 
             this._petriNetManagementService.updateByWhatEverCut(
                 selectedCut,
                 dfg,
-                subDfg1,
-                subDfg2,
+                tempDfgArray[0],
+                tempDfgArray[1],
             );
             // return [subDfg1, subDfg2];
             // Petri Netz zurückgeben mit Übergabe des Original-DFG und der Teil-DFGs
@@ -59,39 +63,36 @@ export class ExecuteCutService {
         a1: Activities,
         a2: Activities,
     ): [Dfg, Dfg] {
-        console.log('2: cut durchgefuehrt!' + ' selected Cut: ' + selectedCut);
-        // let e1: EventLog = new EventLog();
-        // let e2: EventLog = new EventLog();
+        console.log('Cut durchgefuehrt!' + ' selected Cut: ' + selectedCut);
+
         let eventLogs = new Array<EventLog>();
 
         switch (selectedCut) {
-            case 'ExclusiveCut':
+            case cutType.ExclusiveCut:
                 eventLogs.push(eventLog.splitByExclusiveCut(a1)[0]);
                 // console.log(eventLogs[0]);
                 eventLogs.push(eventLog.splitByExclusiveCut(a1)[1]);
                 // console.log(eventLogs[1]);
                 break;
-            case 'SequenceCut':
+            case cutType.SequenceCut:
                 eventLogs.push(eventLog.splitBySequenceCut(a2)[0]);
                 // console.log(eventLogs[0]);
                 eventLogs.push(eventLog.splitBySequenceCut(a2)[1]);
                 break;
-            case 'ParallelCut':
+            case cutType.ParallelCut:
                 eventLogs.push(eventLog.splitByParallelCut(a1)[0]);
                 // console.log(eventLogs[0]);
                 eventLogs.push(eventLog.splitByParallelCut(a1)[1]);
                 break;
-            case 'LoopCut':
+            case cutType.LoopCut:
                 eventLogs.push(eventLog.splitByLoopCut(a1, a2)[0]);
                 eventLogs.push(eventLog.splitByLoopCut(a1, a2)[1]);
                 break;
         }
 
         const subDfg1: Dfg = this.calculateDfgService.calculate(eventLogs[0]);
-        // console.log(subDfg1);
 
         const subDfg2: Dfg = this.calculateDfgService.calculate(eventLogs[1]);
-        // console.log(subDfg2);
 
         return [subDfg1, subDfg2];
     }
@@ -102,7 +103,7 @@ export class ExecuteCutService {
         a2: Activities,
         selectedCut: string,
     ): boolean {
-        console.log('1: validate');
+        console.log('validate');
 
         return (
             dfg.canBeCutIn(a1, a2).result &&
