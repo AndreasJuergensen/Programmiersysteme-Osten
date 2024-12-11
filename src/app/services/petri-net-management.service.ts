@@ -5,6 +5,7 @@ import { Dfg } from '../classes/dfg/dfg';
 import { Activities } from '../classes/dfg/activities';
 import { EventLog } from '../classes/event-log';
 import { Arcs } from '../classes/dfg/arcs';
+import { cutType } from '../components/cut-execution/cut-execution.component';
 
 @Injectable({
     providedIn: 'root',
@@ -35,7 +36,7 @@ export class PetriNetManagementService {
         subDFG2: Dfg,
     ): void {
         switch (selectedCut) {
-            case 'ExclusiveCut':
+            case cutType.ExclusiveCut:
                 this._petriNet$.next(
                     this._petriNet.updateByExclusiveCut(
                         originDFG,
@@ -44,7 +45,7 @@ export class PetriNetManagementService {
                     ),
                 );
                 break;
-            case 'SequenceCut':
+            case cutType.SequenceCut:
                 this._petriNet$.next(
                     this._petriNet.updateBySequenceCut(
                         originDFG,
@@ -53,7 +54,7 @@ export class PetriNetManagementService {
                     ),
                 );
                 break;
-            case 'ParallelCut':
+            case cutType.ParallelCut:
                 this._petriNet$.next(
                     this._petriNet.updateByParallelCut(
                         originDFG,
@@ -62,7 +63,7 @@ export class PetriNetManagementService {
                     ),
                 );
                 break;
-            case 'LoopCut':
+            case cutType.LoopCut:
                 this._petriNet$.next(
                     this._petriNet.updateByLoopCut(originDFG, subDFG1, subDFG2),
                 );

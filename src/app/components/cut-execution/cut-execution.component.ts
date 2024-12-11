@@ -9,7 +9,6 @@ import { Dfg } from 'src/app/classes/dfg/dfg';
 import { Activities } from 'src/app/classes/dfg/activities';
 import { Arcs } from 'src/app/classes/dfg/arcs';
 import { EventLog } from 'src/app/classes/event-log';
-import { DfgArc } from '../drawing-area';
 
 export enum cutType {
     ExclusiveCut = 'ExclusiveCut',

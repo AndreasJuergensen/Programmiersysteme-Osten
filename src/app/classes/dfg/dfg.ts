@@ -1,3 +1,4 @@
+import { cutType } from 'src/app/components/cut-execution/cut-execution.component';
 import { EventLog } from '../event-log';
 import { PetriNetTransition } from '../petrinet/petri-net-transitions';
 import { Activities, Activity } from './activities';
@@ -16,7 +17,8 @@ export class Dfg implements PetriNetTransition {
         private readonly _arcs: Arcs,
         private eventLog: EventLog,
     ) {
-        this.id = 'dfg' + ++Dfg.count;}
+        this.id = 'dfg' + ++Dfg.count;
+    }
 
     get activities(): Activities {
         return this._activities;
@@ -31,16 +33,16 @@ export class Dfg implements PetriNetTransition {
         a2: Activities,
     ): { result: boolean; matchingcut: string | null } {
         if (new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs)) {
-            return { result: true, matchingcut: 'ExclusiveCut' };
+            return { result: true, matchingcut: cutType.ExclusiveCut };
         }
         if (new SequenceCut(a1, a2).isPossible(this.activities, this.arcs)) {
-            return { result: true, matchingcut: 'SequenceCut' };
+            return { result: true, matchingcut: cutType.SequenceCut };
         }
         if (new ParallelCut(a1, a2).isPossible(this.activities, this.arcs)) {
-            return { result: true, matchingcut: 'ParallelCut' };
+            return { result: true, matchingcut: cutType.ParallelCut };
         }
         if (new LoopCut(a1, a2).isPossible(this.activities, this.arcs)) {
-            return { result: true, matchingcut: 'LoopCut' };
+            return { result: true, matchingcut: cutType.LoopCut };
         }
 
         return { result: false, matchingcut: null };
