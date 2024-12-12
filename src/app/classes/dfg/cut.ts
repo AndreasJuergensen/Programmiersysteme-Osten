@@ -136,6 +136,9 @@ class Cut {
         x: Activities,
     ): boolean {
         const arcsInX: Arcs = arcs.filterArcsCompletelyIn(x);
+        if (arcsInX.isEmpty()) {
+            return false;
+        }
         const everyActivityCanBeReachedFromStart: boolean = arcsInX
             .calculateTransitivelyReachableActivities(
                 new Activities([playActivity]),
@@ -204,13 +207,11 @@ class Cut {
         const a2Play: Activities = arcs.calculateFromOutsideReachableActivities(
             this.a2,
         );
-        for(const activities of a1Stop.split()) {
+        for (const activities of a1Stop.split()) {
             const canReachEveryActivityInA2Play: boolean = arcs
                 .calculateReachableActivities(activities)
-                .containsAllActivities(
-                    a2Play,
-                );
-            if(!canReachEveryActivityInA2Play) {
+                .containsAllActivities(a2Play);
+            if (!canReachEveryActivityInA2Play) {
                 return false;
             }
         }
@@ -224,11 +225,11 @@ class Cut {
         const a1Stop: Activities = arcs.calculateOutsideReachingActivities(
             this.a1,
         );
-        for(const activities of a1Stop.split()) {
+        for (const activities of a1Stop.split()) {
             const canReachStop: boolean = arcs
                 .calculateReachableActivities(activities)
                 .containsActivity(stopActivity);
-            if(!canReachStop) {
+            if (!canReachStop) {
                 return false;
             }
         }

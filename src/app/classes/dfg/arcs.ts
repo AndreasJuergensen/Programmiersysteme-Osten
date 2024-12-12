@@ -1,4 +1,3 @@
-import { from } from 'rxjs';
 import { Activities, Activity } from './activities';
 
 export class Arcs {
@@ -23,6 +22,15 @@ export class Arcs {
         return this.calculateReachableActivities(
             new Activities([startActivity]),
         );
+    }
+
+    calculateNextActivities(startActivity: Activity): Activities {
+        return Array.from(this.arcs.values())
+            .filter((arc) => arc.getStart().name == startActivity.name)
+            .reduce(
+                (prev, curr) => prev.addActivity(curr.getEnd()),
+                new Activities(),
+            );
     }
 
     calculateReachableActivities(startActivities: Activities): Activities {
@@ -54,7 +62,9 @@ export class Arcs {
     calculateTransitivelyReachableActivities(
         startActivities: Activities,
     ): Activities {
-        const reachableActivities: Activities = new Activities().addAll(startActivities);
+        const reachableActivities: Activities = new Activities().addAll(
+            startActivities,
+        );
         let prevReachableActivities: Activities;
         do {
             prevReachableActivities = new Activities().addAll(
@@ -104,12 +114,53 @@ export class Arcs {
 
     calculateOutsideReachingActivities(activities: Activities): Activities {
         const outsideReachingActivites: Activities = new Activities();
-        for(const arc of this.arcs) {
-            if(arc.startIsIncludedIn(activities) && !arc.endIsIncludedIn(activities)) {
-                outsideReachingActivites.addActivity(arc.getStart())
+        for (const arc of this.arcs) {
+            if (
+                arc.startIsIncludedIn(activities) &&
+                !arc.endIsIncludedIn(activities)
+            ) {
+                outsideReachingActivites.addActivity(arc.getStart());
             }
         }
         return outsideReachingActivites;
+    }
+
+    /* 
+    return partition containing all activities that are connected to play-activity
+     */
+    calculateActivityPartitionByActivitiesReachableFromPlay(
+        cuttedArcs: Arcs,
+        play: Activity,
+    ): Activities {
+        const notCuttedArcs: Arcs = this.removeArcsBy(cuttedArcs);
+        const partition: Activities =
+            notCuttedArcs.calculateTransitivelyReachableActivities(
+                new Activities([play]),
+            );
+        return partition.getReachingActivities(notCuttedArcs);
+    }
+
+    /* 
+    return partition containing all activities that are connected to given activity
+     */
+    calculateActivityPartitionByActivitiesConnectedTo(
+        cuttedArcs: Arcs,
+        activity: Activity,
+    ): Activities {
+        const notCuttedArcs: Arcs = this.removeArcsBy(cuttedArcs);
+        const partition: Activities =
+            notCuttedArcs.calculateTransitivelyReachingActivities(activity);
+        const reachableActivities: Activities =
+            notCuttedArcs.calculateTransitivelyReachableActivities(partition);
+        return partition.addAll(reachableActivities);
+    }
+    /* 
+    return all arcs from this Arcs, except that ones contained in cuttedArcs
+     */
+    private removeArcsBy(cuttedArcs: Arcs): Arcs {
+        return new Arcs(
+            this.arcs.filter((arc) => !cuttedArcs.containsArc(arc)),
+        );
     }
 
     addArc(arc: DfgArc): Arcs {
@@ -119,6 +170,15 @@ export class Arcs {
         return this;
     }
 
+
+    getArcs(): Array<DfgArc> {
+        return this.arcs;
+    }
+
+    isEmpty(): boolean {
+        return this.arcs.length === 0;
+    }
+
     private containsArc(arc: DfgArc): boolean {
         for (const a of this.arcs) {
             if (a.equals(arc)) {
@@ -126,6 +186,18 @@ export class Arcs {
             }
         }
         return false;
+    }
+
+    getArcByStartNameAndEndName(start: string, end: string): DfgArc {
+        for (const arc of this.arcs) {
+            if (
+                arc.getStart().asJson() === start &&
+                arc.getEnd().asJson() === end
+            ) {
+                return arc;
+            }
+        }
+        throw new Error('Arc not found');
     }
 
     asJson(): ArcJson[] {

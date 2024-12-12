@@ -1,3 +1,5 @@
+import { Arcs } from './arcs';
+
 export class Activities {
     readonly playActivity: Activity = new Activity('play');
     readonly stopActivity: Activity = new Activity('stop');
@@ -10,10 +12,19 @@ export class Activities {
         return this;
     }
 
+    removePlayAndStop(): Activities {
+        for (const activity of this.activities) {
+            if (activity.isPlayOrStop()) {
+                this.activities.splice(this.activities.indexOf(activity), 1);
+            }
+        }
+        return this;
+    }
+
     split(): Activities[] {
         const splitted: Activities[] = [];
-        for(const activity of this.activities) {
-            splitted.push(new Activities([activity]))
+        for (const activity of this.activities) {
+            splitted.push(new Activities([activity]));
         }
         return splitted;
     }
@@ -60,8 +71,8 @@ export class Activities {
     }
 
     containsActivity(activity: Activity): boolean {
-        for(const a of this.activities) {
-            if(a.equals(activity)) {
+        for (const a of this.activities) {
+            if (a.equals(activity)) {
                 return true;
             }
         }
@@ -69,8 +80,11 @@ export class Activities {
     }
 
     containsAnyActivityOf(activities: Activities): boolean {
-        for(const activity of activities.activities) {
-            if(activity.isNeitherPlayNorStop() && this.containsActivity(activity)) {
+        for (const activity of activities.activities) {
+            if (
+                activity.isNeitherPlayNorStop() &&
+                this.containsActivity(activity)
+            ) {
                 return true;
             }
         }
@@ -87,13 +101,64 @@ export class Activities {
         return this.activities.find((a) => a.equals(new Activity(name)))!;
     }
 
+    getAllActivites(): Array<Activity> {
+        return this.activities;
+    }
+
+    /**
+     * return all activities from this activities, that are not contained
+     * within the given partition
+     */
+    getActivitiesNotContainedIn(partition: Activities): Activities {
+        const remainingActivities: Activities = new Activities();
+        for (const acitivity of this.activities) {
+            if (!partition.containsActivity(acitivity))
+                remainingActivities.addActivity(acitivity);
+        }
+        return remainingActivities;
+    }
+
+    /**
+     * return all reaching activities from every activity
+     */
+    getReachingActivities(arcs: Arcs): Activities {
+        const reachingActivities: Activities = new Activities();
+        for (const activity of this.activities) {
+            reachingActivities.addAll(
+                arcs.calculateTransitivelyReachingActivities(activity),
+            );
+        }
+        return reachingActivities;
+    }
+
+    getFirstActivity(): Activity {
+        return this.activities[0];
+    }
+
+    getBaseActivity(): Activity {
+        return this.activities[this.activities.length - 1];
+    }
+
+    getLength(): number {
+        return this.activities.length;
+    }
+
     isNotEmpty(): boolean {
-        for(const activity of this.activities) {
-            if(activity.isNeitherPlayNorStop()) {
+        for (const activity of this.activities) {
+            if (activity.isNeitherPlayNorStop()) {
                 return true;
             }
         }
         return false;
+    }
+
+    isEmpty(): boolean {
+        for (const activity of this.activities) {
+            if (activity.isNeitherPlayNorStop()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     asJson(): string[] {
@@ -102,25 +167,37 @@ export class Activities {
 }
 
 export class Activity {
-    private readonly name: string;
+    private readonly _name: string;
 
     constructor(name: string) {
-        this.name = name;
+        this._name = name;
+    }
+
+    get name(): string {
+        return this._name;
     }
 
     equals(other: Activity): boolean {
-        return this.name === other.name;
+        return this._name === other._name;
     }
 
     isPlay(): boolean {
-        return this.name === 'play';
+        return this._name === 'play';
+    }
+
+    isStop(): boolean {
+        return this.name === 'stop';
     }
 
     isNeitherPlayNorStop(): boolean {
-        return !this.isPlay() && this.name !== 'stop';
+        return !this.isPlay() && !this.isStop();
+    }
+
+    isPlayOrStop(): boolean {
+        return this.isPlay() || this.isStop();
     }
 
     asJson(): string {
-        return this.name;
+        return this._name;
     }
 }
