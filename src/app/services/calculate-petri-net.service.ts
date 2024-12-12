@@ -19,6 +19,11 @@ import {
     PetriNetTransition,
     Transition,
 } from '../classes/petrinet/petri-net-transitions';
+import {
+    PetriNetArcs,
+    PlaceToTransitionArc,
+    TransitionToPlaceArc,
+} from '../classes/petrinet/petri-net-arcs';
 
 type GraphWithBoxDimension = [Graph, number, number];
 
@@ -47,7 +52,7 @@ export class CalculatePetriNetService {
      * @param petriNet
      * @returns
      */
-    private calculatePetriNet(petriNet: PetriNet): Graph {
+    public calculatePetriNet(petriNet: PetriNet): Graph {
         const dfgs: Array<Dfg> = new Array<Dfg>();
 
         //Schritt 1: Suche DFGs
@@ -59,18 +64,6 @@ export class CalculatePetriNetService {
                     dfgs.push(value);
                 }
             });
-
-        // //Schritt 2: Berechne Graphen der DFGs
-        // const dfgsAsGraphs: Array<Graph> = dfgs.map((dfg) =>
-        //     this.calculateCoodinatesService.calculateCoordinates(dfg),
-        // );
-
-        // //Schritt 3: Berechne Größe der DFGs
-        // const sizeOfGraphsOfDFGs: Array<[Graph, [number, number]]> =
-        //     dfgsAsGraphs.map((dfgAsGraph) => [
-        //         dfgAsGraph,
-        //         dfgAsGraph.getSize(),
-        //     ]);
 
         //Schritt 2: Berechne Graphen der DFGs und deren Größe
         dfgs.map((dfg) => {
@@ -92,10 +85,13 @@ export class CalculatePetriNetService {
             this._dfgGraphsAndBoxes,
         );
 
-        // const edges: Array<Edge> = this.generateEdges(petriNet.arcs);
+        const arcs: Array<PlaceToTransitionArc | TransitionToPlaceArc> =
+            petriNet.getAllArcs().arcs;
+        const edges: Array<Edge> = this.generateEdges(nodes, arcs);
 
-        // this.recalculateCoordinatesForOverlap(nodes, places, edges);
-        const graph = new Graph(nodes, []);
+        // this.recalculateCoordinatesForOverlap(nodes, edges);
+
+        const graph = new Graph(nodes, edges);
         this._graph$.next(graph);
         return graph;
     }
@@ -156,6 +152,9 @@ export class CalculatePetriNetService {
             const neighbours: Array<Place | PetriNetTransition> =
                 this.getNeighbours(stackElement, petriNet);
 
+            // Each stackelement needs the information about the kind of node
+            // If we have a box, we have to add and extra gapX or gapY
+            // information because a box is bigger
             stack.push(
                 ...neighbours.map((neighbour) => {
                     return {
@@ -198,7 +197,7 @@ export class CalculatePetriNetService {
 
             const x: number =
                 stackElement.source_x + graphWithBoxDimension[1] / 2 + gapX;
-            const y: number = yCoordinate + graphWithBoxDimension[2] / 2;
+            const y: number = yCoordinate; // + graphWithBoxDimension[2] / 2;
             return new BoxNode(
                 dfg.id,
                 x,
@@ -279,29 +278,118 @@ export class CalculatePetriNetService {
         );
     }
 
-    // /**
-    //  *
-    //  * @param places
-    //  * @returns
-    //  */
-    // private generatePlaceNodes(places: Array<Place>): Array<PlaceNode> {
-    //     return [];
-    // }
+    /**
+     *
+     * @param arcs
+     * @returns
+     */
+    private generateEdges(
+        nodes: Array<Node>,
+        arcs: Array<PlaceToTransitionArc | TransitionToPlaceArc>,
+    ): Array<Edge> {
+        const edges: Array<Edge> = new Array<Edge>();
 
-    // /**
-    //  *
-    //  * @param arcs
-    //  * @returns
-    //  */
-    // private generateEdges(
-    //     arcs: Array<PetriNetArcs>,
-    // ): Array<Edge> {
-    //     return [];
-    // }
+        arcs.forEach((arc) => {
+            const startNode: Node = nodes.find(
+                (node) => node.id === arc.start.id,
+            )!;
+            const endNode: Node = nodes.find((node) => node.id === arc.end.id)!;
+
+            edges.push(new Edge(startNode, endNode));
+        });
+
+        return edges;
+    }
 
     private recalculateCoordinatesForOverlap(
-        transitions: Array<Node>,
-        places: Array<Place>,
+        nodes: Array<Node>,
         edges: Array<Edge>,
-    ) {}
+    ) {
+        const gapY = environment.drawingGrid.gapY;
+
+        let nodeWasMoved: boolean;
+
+        do {
+            nodeWasMoved = false;
+            nodes.forEach((node) => {
+                if (
+                    this.checkNodeOverlap(node, nodes) ||
+                    this.checkEdgeOverlap(node, edges)
+                ) {
+                    node.addYOffset(gapY);
+                    nodeWasMoved = true;
+                }
+            });
+        } while (nodeWasMoved);
+    }
+
+    /**
+     * Returns true if node overlaps an other node.
+     * @param {Node} node - The node for which the check is performed
+     * @param {Array<Node>} nodes - Array of all nodes to check node against
+     * @returns {boolean} Returns true if node overlaps an other node
+     */
+    private checkNodeOverlap(node: Node, nodes: Array<Node>): boolean {
+        for (const n of nodes) {
+            if (node.isNodeOverlapped(n)) {
+                return true;
+            }
+
+            if (node instanceof BoxNode) {
+                if (!(node as BoxNode).isNodeOutsideOfBox(n)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true if edge overlaps a node. This is measured by distance between edge and node.
+     * @param {Node} node - The node for which the check is perfomed
+     * @param {Array<Edge>} edges - Array of all edges to check the distance against
+     * @returns {boolean} Returns true if node must be moved
+     */
+    private checkEdgeOverlap(node: Node, edges: Array<Edge>): boolean {
+        if (node instanceof BoxNode) {
+            for (const edge of edges) {
+                if (edge.isNodeStartOrEndNode(node)) {
+                    continue;
+                }
+
+                if (edge.intersectsBox(node as BoxNode)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        for (const edge of edges) {
+            if (edge.isNodeStartOrEndNode(node)) {
+                continue;
+            }
+
+            if (edge.isNodeOnSameHorizontalLevel(node)) {
+                if (edge.isNodeOnEdgeAndOnSameHorizontalLevel(node)) {
+                    return true;
+                } else {
+                    continue;
+                }
+            }
+
+            let distance = edge.distanceToNode(node);
+            const width = environment.drawingElements.activities.width;
+            const height = environment.drawingElements.activities.height;
+            const lengthDiagonal = Math.sqrt(
+                Math.pow(width / 2, 2) + Math.pow(height / 2, 2),
+            );
+            if (0 < distance && distance < Math.ceil(lengthDiagonal)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

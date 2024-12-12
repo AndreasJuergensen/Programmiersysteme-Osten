@@ -16,6 +16,10 @@ export class PetriNetArcs {
         new Array();
     constructor() {}
 
+    get arcs(): Array<PlaceToTransitionArc | TransitionToPlaceArc> {
+        return this._arcs;
+    }
+
     redirectArcStart(
         currentStart: PetriNetTransition,
         newStart: PetriNetTransition,
@@ -69,7 +73,7 @@ export class PetriNetArcs {
         const petriNetTransitions: Array<PetriNetTransition> =
             new Array<PetriNetTransition>();
 
-        for (const arc of this.arcs) {
+        for (const arc of this._arcs) {
             if (arc.start === place) {
                 petriNetTransitions.push(arc.end);
             }
@@ -99,7 +103,7 @@ export class PetriNetArcs {
     getNextPlaces(transition: PetriNetTransition): Array<Place> {
         const places: Array<Place> = new Array<Place>();
 
-        for (const arc of this.arcs) {
+        for (const arc of this._arcs) {
             if (arc.start === transition) {
                 places.push(arc.end);
             }

@@ -14,8 +14,8 @@ export abstract class Arc {
     y2: number = 0;
 
     constructor(
-        readonly start: Place | Transition | Activity,
-        readonly end: Place | Activity,
+        readonly start: Box | Activity | Place | Transition,
+        readonly end: Box | Activity | Place | Transition,
     ) {
         const lengthX = this.end.x - this.start.x;
         const lengthY = this.end.y - this.start.y;
@@ -103,8 +103,7 @@ export class PlaceToBoxArc extends Arc {
         const offsetArrow = 5;
         const widthHalf = (this.end as Box).width / 2;
         const heightHalf = (this.end as Box).height / 2;
-        const strokeHalf =
-            environment.drawingElements.boxes.strokeWidth / 2;
+        const strokeHalf = environment.drawingElements.boxes.strokeWidth / 2;
 
         let lengthToBorder = this.calculateLengthToBoxBorder(
             widthHalf,
@@ -146,6 +145,33 @@ export class PlaceToBoxArc extends Arc {
         return alphaDegAbs < 45
             ? (widthHalf + strokeHalf) / Math.cos(Math.abs(this.alphaRad))
             : (heightHalf + strokeHalf) / Math.sin(Math.abs(this.alphaRad));
+    }
+}
+
+export class BoxToPlaceArc extends Arc {
+    constructor(start: Box, end: Place) {
+        super(start, end);
+        this.calculateCoordinates();
+    }
+
+    override calculateCoordinates(): void {
+        const x1 = this.start.x;
+        const y1 = this.start.y;
+
+        const offsetArrow = 5;
+        const radius = environment.drawingElements.places.radius;
+        const strokeHalf = environment.drawingElements.places.strokeWidth / 2;
+
+        const lengthToBorder = radius + strokeHalf;
+        const realLength = this.length - lengthToBorder - offsetArrow;
+
+        const deltaX = realLength * Math.cos(Math.abs(this.alphaRad));
+        const deltaY = realLength * Math.sin(Math.abs(this.alphaRad));
+
+        this.x1 = x1;
+        this.x2 = x1 + this.sgnX * deltaX;
+        this.y1 = y1;
+        this.y2 = y1 + this.sgnY * deltaY;
     }
 }
 
