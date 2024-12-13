@@ -53,7 +53,7 @@ describe('A Petrinet', () => {
             .build();
 
         const sut: PetriNet = new PetriNet(dfg);
-        const result: string = sut.getInputPlace().id;
+        const result: string = sut.inputPlace.id;
 
         expect(result).toEqual('p1');
     });
@@ -66,7 +66,7 @@ describe('A Petrinet', () => {
             .build();
 
         const sut: PetriNet = new PetriNet(dfg);
-        const result: string = sut.getOutputPlace().id;
+        const result: string = sut.outputPlace.id;
 
         expect(result).toEqual('p4');
     });

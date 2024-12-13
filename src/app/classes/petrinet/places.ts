@@ -14,14 +14,6 @@ export class Places {
         return this;
     }
 
-    getInput(): Place {
-        return this._places[0];
-    }
-
-    getOutput(): Place {
-        return this._places[3];
-    }
-
     getLastPlace(): Place {
         return this._places[this._places.length - 1];
     }
@@ -33,5 +25,13 @@ export class Places {
             }
         }
         throw new Error('Place not found');
+    }
+
+    get input(): Place {
+        return this._places[0];
+    }
+
+    get output(): Place {
+        return this._places[3];
     }
 }

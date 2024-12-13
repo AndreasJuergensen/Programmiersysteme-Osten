@@ -148,12 +148,12 @@ export class PetriNet {
         return replacingTransition;
     }
 
-    getInputPlace(): Place {
-        return this._places.getInput();
+    get inputPlace(): Place {
+        return this._places.input;
     }
 
-    getOutputPlace(): Place {
-        return this._places.getOutput();
+    get outputPlace(): Place {
+        return this._places.output;
     }
 
     get places(): Places {
