@@ -45,62 +45,30 @@ describe('A Petrinet', () => {
         expect(result).toEqual('A');
     });
 
-    it('is initialized after origin DFG has already been initialized', () => {
-        const originDFG: Dfg = new DfgBuilder()
+    it('input place id is "p1" after initialization', () => {
+        const dfg: Dfg = new DfgBuilder()
             .createActivity('A')
             .addFromPlayArc('A')
             .addToStopArc('A')
             .build();
 
-        const sut: PetriNet = new PetriNet().initializeOriginDFG(originDFG);
+        const sut: PetriNet = new PetriNet(dfg);
+        const result: string = sut.getInputPlace().id;
 
-        expect(() => sut.initializeOriginDFG(originDFG)).toThrowError(
-            'The origin DFG for this Petrinet has already been set',
-        );
+        expect(result).toEqual('p1');
     });
 
-    it('which is not initialized with origin DFG to be updated', () => {
-        const originDFG: Dfg = new DfgBuilder()
-            .createActivity('A')
-            .createActivity('Z')
-            .addFromPlayArc('A')
-            .addFromPlayArc('Z')
-            .addToStopArc('A')
-            .addToStopArc('Z')
-            .build();
-        const subDFG1: Dfg = new DfgBuilder()
+    it('output place id is "p4" after initialization', () => {
+        const dfg: Dfg = new DfgBuilder()
             .createActivity('A')
             .addFromPlayArc('A')
             .addToStopArc('A')
             .build();
-        const subDFG2: Dfg = new DfgBuilder()
-            .createActivity('Z')
-            .addFromPlayArc('Z')
-            .addToStopArc('Z')
-            .build();
 
-        const sut: PetriNet = new PetriNet();
+        const sut: PetriNet = new PetriNet(dfg);
+        const result: string = sut.getOutputPlace().id;
 
-        expect(() =>
-            sut.updateByExclusiveCut(originDFG, subDFG1, subDFG2),
-        ).toThrowError(
-            'This PetriNet has not been initialized, thus it cannot be updated',
-        );
-        expect(() =>
-            sut.updateBySequenceCut(originDFG, subDFG1, subDFG2),
-        ).toThrowError(
-            'This PetriNet has not been initialized, thus it cannot be updated',
-        );
-        expect(() =>
-            sut.updateByParallelCut(originDFG, subDFG1, subDFG2),
-        ).toThrowError(
-            'This PetriNet has not been initialized, thus it cannot be updated',
-        );
-        expect(() =>
-            sut.updateByLoopCut(originDFG, subDFG1, subDFG2),
-        ).toThrowError(
-            'This PetriNet has not been initialized, thus it cannot be updated',
-        );
+        expect(result).toEqual('p4');
     });
 
     it('is updated by exclusive cut', () => {

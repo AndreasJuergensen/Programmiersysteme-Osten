@@ -12,7 +12,7 @@ export interface TransitionToPlaceArc {
 }
 
 export class PetriNetArcs {
-    private readonly arcs: Array<PlaceToTransitionArc | TransitionToPlaceArc> =
+    private readonly _arcs: Array<PlaceToTransitionArc | TransitionToPlaceArc> =
         new Array();
     constructor() {}
 
@@ -20,7 +20,7 @@ export class PetriNetArcs {
         currentStart: PetriNetTransition,
         newStart: PetriNetTransition,
     ): PetriNetArcs {
-        for (const arc of this.arcs.values()) {
+        for (const arc of this._arcs.values()) {
             if (arc.start === currentStart) {
                 arc.start = newStart;
             }
@@ -32,7 +32,7 @@ export class PetriNetArcs {
         currentEnd: PetriNetTransition,
         newEnd: PetriNetTransition,
     ): PetriNetArcs {
-        for (const arc of this.arcs.values()) {
+        for (const arc of this._arcs.values()) {
             if (arc.end === currentEnd) {
                 arc.end = newEnd;
             }
@@ -44,7 +44,7 @@ export class PetriNetArcs {
         startPlace: Place,
         endTransition: PetriNetTransition,
     ): PetriNetArcs {
-        this.arcs.push({ start: startPlace, end: endTransition });
+        this._arcs.push({ start: startPlace, end: endTransition });
         return this;
     }
 
@@ -52,12 +52,12 @@ export class PetriNetArcs {
         startTransition: PetriNetTransition,
         endPlace: Place,
     ): PetriNetArcs {
-        this.arcs.push({ start: startTransition, end: endPlace });
+        this._arcs.push({ start: startTransition, end: endPlace });
         return this;
     }
 
     getNextTransition(place: Place): PetriNetTransition {
-        for (const arc of this.arcs) {
+        for (const arc of this._arcs) {
             if (arc.start === place) {
                 return arc.end;
             }
@@ -66,7 +66,7 @@ export class PetriNetArcs {
     }
 
     getPrevTransition(place: Place): PetriNetTransition {
-        for (const arc of this.arcs) {
+        for (const arc of this._arcs) {
             if (arc.end === place) {
                 return arc.start;
             }
@@ -75,7 +75,7 @@ export class PetriNetArcs {
     }
 
     getNextPlace(transition: PetriNetTransition): Place {
-        for (const arc of this.arcs) {
+        for (const arc of this._arcs) {
             if (arc.start === transition) {
                 return arc.end;
             }
@@ -84,7 +84,7 @@ export class PetriNetArcs {
     }
 
     getPrevPlace(transition: PetriNetTransition): Place {
-        for (const arc of this.arcs) {
+        for (const arc of this._arcs) {
             if (arc.end === transition) {
                 return arc.start;
             }

@@ -144,7 +144,7 @@ describe('CalculateDfgService', () => {
         const eventLog = new EventLog([new Trace([new Activity('A')])]);
 
         const dfg: Dfg = sut.calculate(eventLog);
-        const result: EventLog = dfg.getEventLog();
+        const result: EventLog = dfg.eventLog;
         expect(result).toEqual(eventLog);
     });
 });
