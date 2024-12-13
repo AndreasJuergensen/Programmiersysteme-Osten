@@ -9,22 +9,14 @@ export interface DfgJson {
     arcs: ArcJson[];
 }
 export class Dfg implements PetriNetTransition {
-    private static count: number = 0;
+    private static idCount: number = 0;
     public id: string;
     constructor(
         private readonly _activities: Activities,
         private readonly _arcs: Arcs,
-        private eventLog: EventLog,
+        private readonly _eventLog: EventLog,
     ) {
-        this.id = 'dfg' + ++Dfg.count;
-    }
-
-    get activities(): Activities {
-        return this._activities;
-    }
-
-    get arcs(): Arcs {
-        return this._arcs;
+        this.id = 'dfg' + ++Dfg.idCount;
     }
 
     canBeCutIn(a1: Activities, a2: Activities): boolean {
@@ -81,8 +73,16 @@ export class Dfg implements PetriNetTransition {
         return this.arcs.getArcByStartNameAndEndName(start, end);
     }
 
-    getEventLog(): EventLog {
-        return this.eventLog;
+    get activities(): Activities {
+        return this._activities;
+    }
+
+    get arcs(): Arcs {
+        return this._arcs;
+    }
+
+    get eventLog(): EventLog {
+        return this._eventLog;
     }
 
     asJson(): DfgJson {

@@ -1,119 +1,119 @@
 import { Dfg } from '../dfg/dfg';
 import { PetriNetArcs } from './petri-net-arcs';
-import { Places } from './places';
+import { Place, Places } from './places';
 import {
     PetriNetTransition,
     PetriNetTransitions,
-    Transition,
 } from './petri-net-transitions';
 
 export class PetriNet {
-    private readonly places: Places = new Places();
-    private readonly transitions: PetriNetTransitions =
+    private readonly _places: Places = new Places();
+    private readonly _transitions: PetriNetTransitions =
         new PetriNetTransitions();
-    private readonly arcs: PetriNetArcs = new PetriNetArcs();
+    private readonly _arcs: PetriNetArcs = new PetriNetArcs();
 
-    constructor(dfg: Dfg) {
-        this.transitions.createTransition('play').createTransition('stop');
-        this.arcs
+    constructor(dfg?: Dfg) {
+        dfg ? this.initializeOriginDFG(dfg) : undefined;
+    }
+
+    private initializeOriginDFG(dfg: Dfg): PetriNet {
+        this._transitions.createTransition('play').createTransition('stop');
+        this._arcs
             .addPlaceToTransitionArc(
-                this.places.addPlace().getLastPlace(),
-                this.transitions.getTransitionByID('t1'),
+                this._places.addPlace().getLastPlace(),
+                this._transitions.getTransitionByID('t1'),
             )
             .addTransitionToPlaceArc(
-                this.transitions.getTransitionByID('t1'),
-                this.places.addPlace().getLastPlace(),
+                this._transitions.getTransitionByID('t1'),
+                this._places.addPlace().getLastPlace(),
             )
             .addPlaceToTransitionArc(
-                this.places.getLastPlace(),
-                this.transitions.addDFG(dfg).getLastTransition(),
+                this._places.getLastPlace(),
+                this._transitions.addDFG(dfg).getLastTransition(),
             )
             .addTransitionToPlaceArc(
-                this.transitions.getLastTransition(),
-                this.places.addPlace().getLastPlace(),
+                this._transitions.getLastTransition(),
+                this._places.addPlace().getLastPlace(),
             )
             .addPlaceToTransitionArc(
-                this.places.getLastPlace(),
-                this.transitions.getTransitionByID('t2'),
+                this._places.getLastPlace(),
+                this._transitions.getTransitionByID('t2'),
             )
             .addTransitionToPlaceArc(
-                this.transitions.getTransitionByID('t2'),
-                this.places.addPlace().getLastPlace(),
+                this._transitions.getTransitionByID('t2'),
+                this._places.addPlace().getLastPlace(),
             );
+        return this;
     }
 
     updateByExclusiveCut(originDFG: Dfg, subDFG1: Dfg, subDFG2: Dfg): PetriNet {
         const firstReplacingTransition: PetriNetTransition =
             this.replaceOriginBySub(originDFG, subDFG1);
-        const secondReplacingTransition: PetriNetTransition = this.transitions
+        const secondReplacingTransition: PetriNetTransition = this._transitions
             .addDFG(subDFG2)
             .getLastTransition();
-        this.arcs
+        this._arcs
             .addPlaceToTransitionArc(
-                this.arcs.getPrevPlace(firstReplacingTransition),
+                this._arcs.getPrevPlace(firstReplacingTransition),
                 secondReplacingTransition,
             )
             .addTransitionToPlaceArc(
                 secondReplacingTransition,
-                this.arcs.getNextPlace(firstReplacingTransition),
+                this._arcs.getNextPlace(firstReplacingTransition),
             );
         return this;
     }
 
     updateBySequenceCut(originDFG: Dfg, subDFG1: Dfg, subDFG2: Dfg): PetriNet {
-        const firstReplacingTransition: PetriNetTransition = this.transitions
+        const firstReplacingTransition: PetriNetTransition = this._transitions
             .addDFG(subDFG1)
             .getLastTransition();
-        this.arcs
+        this._arcs
             .redirectArcEnd(originDFG, firstReplacingTransition)
             .addTransitionToPlaceArc(
                 firstReplacingTransition,
-                this.places.addPlace().getLastPlace(),
+                this._places.addPlace().getLastPlace(),
             );
-        const secondReplacingTransition: PetriNetTransition = this.transitions
+        const secondReplacingTransition: PetriNetTransition = this._transitions
             .addDFG(subDFG2)
             .getLastTransition();
-        this.arcs
+        this._arcs
             .addPlaceToTransitionArc(
-                this.arcs.getNextPlace(firstReplacingTransition),
+                this._arcs.getNextPlace(firstReplacingTransition),
                 secondReplacingTransition,
             )
             .redirectArcStart(originDFG, secondReplacingTransition);
-        this.transitions.deleteDFG(originDFG);
+        this._transitions.deleteDFG(originDFG);
         return this;
     }
 
-    // parallel cut needs new places for parallelism
     updateByParallelCut(originDFG: Dfg, subDFG1: Dfg, subDFG2: Dfg): PetriNet {
-        // replace origin dfg by first sub dfg using exisisting elements
         const firstReplacingTransition = this.replaceOriginBySub(
             originDFG,
             subDFG1,
         );
-        // import second sub dfg and connect with with new reaching elements
-        this.arcs.addTransitionToPlaceArc(
-            this.arcs.getPrevTransition(
-                this.arcs.getPrevPlace(firstReplacingTransition),
+        this._arcs.addTransitionToPlaceArc(
+            this._arcs.getPrevTransition(
+                this._arcs.getPrevPlace(firstReplacingTransition),
             ),
-            this.places.addPlace().getLastPlace(),
+            this._places.addPlace().getLastPlace(),
         );
-        const secondReplacingTransition: PetriNetTransition = this.transitions
+        const secondReplacingTransition: PetriNetTransition = this._transitions
             .addDFG(subDFG2)
             .getLastTransition();
-        this.arcs
+        this._arcs
             .addPlaceToTransitionArc(
-                this.places.getLastPlace(),
+                this._places.getLastPlace(),
                 secondReplacingTransition,
             )
-            // connect second sub dfg to new reachable elements
             .addTransitionToPlaceArc(
                 secondReplacingTransition,
-                this.places.addPlace().getLastPlace(),
+                this._places.addPlace().getLastPlace(),
             )
             .addPlaceToTransitionArc(
-                this.places.getLastPlace(),
-                this.arcs.getNextTransition(
-                    this.arcs.getNextPlace(firstReplacingTransition),
+                this._places.getLastPlace(),
+                this._arcs.getNextTransition(
+                    this._arcs.getNextPlace(firstReplacingTransition),
                 ),
             );
         return this;
@@ -122,48 +122,49 @@ export class PetriNet {
     updateByLoopCut(originDFG: Dfg, subDFG1: Dfg, subDFG2: Dfg): PetriNet {
         const firstReplacingTransition: PetriNetTransition =
             this.replaceOriginBySub(originDFG, subDFG1);
-        const secondReplacingTransition: PetriNetTransition = this.transitions
+        const secondReplacingTransition: PetriNetTransition = this._transitions
             .addDFG(subDFG2)
             .getLastTransition();
-        this.arcs
+        this._arcs
             .addPlaceToTransitionArc(
-                this.arcs.getNextPlace(firstReplacingTransition),
+                this._arcs.getNextPlace(firstReplacingTransition),
                 secondReplacingTransition,
             )
             .addTransitionToPlaceArc(
                 secondReplacingTransition,
-                this.arcs.getPrevPlace(firstReplacingTransition),
+                this._arcs.getPrevPlace(firstReplacingTransition),
             );
         return this;
     }
 
-    replaceOriginBySub(originDFG: Dfg, sub: Dfg): PetriNetTransition {
-        const replacingTransition: PetriNetTransition = this.transitions
+    private replaceOriginBySub(originDFG: Dfg, sub: Dfg): PetriNetTransition {
+        const replacingTransition: PetriNetTransition = this._transitions
             .addDFG(sub)
             .getLastTransition();
-        this.arcs
+        this._arcs
             .redirectArcEnd(originDFG, replacingTransition)
             .redirectArcStart(originDFG, replacingTransition);
-        this.transitions.deleteDFG(originDFG);
+        this._transitions.deleteDFG(originDFG);
         return replacingTransition;
     }
 
-    getAllPlaces(): Places {
-        return this.places;
+    get inputPlace(): Place {
+        return this._places.input;
     }
 
-    getAllTransitions(): PetriNetTransitions {
-        return this.transitions;
+    get outputPlace(): Place {
+        return this._places.output;
     }
 
-    getAllArcs(): PetriNetArcs {
-        return this.arcs;
+    get places(): Places {
+        return this._places;
     }
 
-    /**
-     * SCRUM-19: Ende anzeigen
-     */
-    isBasicPetriNet(): boolean {
-        return this.transitions.allTransitionsAreBaseCases();
+    get transitions(): PetriNetTransitions {
+        return this._transitions;
+    }
+
+    get arcs(): PetriNetArcs {
+        return this._arcs;
     }
 }

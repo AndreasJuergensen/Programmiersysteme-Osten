@@ -1,51 +1,5 @@
 import { Dfg } from '../dfg/dfg';
 
-export class PetriNetTransitions {
-    private readonly transitions: Array<PetriNetTransition> = new Array();
-    private idCount: number = 0;
-    constructor() {}
-
-    addDFG(dfg: Dfg): PetriNetTransitions {
-        if (dfg.isBaseCase()) {
-            return this.createTransition(dfg.getBaseActivityName());
-        }
-        this.transitions.push(dfg);
-        return this;
-    }
-
-    createTransition(transitionName: string): PetriNetTransitions {
-        this.transitions.push(new Transition(transitionName, ++this.idCount));
-        return this;
-    }
-
-    deleteDFG(dfg: Dfg): PetriNetTransitions {
-        this.transitions.splice(this.transitions.indexOf(dfg), 1);
-        return this;
-    }
-
-    allTransitionsAreBaseCases(): boolean {
-        for (const transition of this.transitions) {
-            if (transition instanceof Dfg) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    getLastTransition(): PetriNetTransition {
-        return this.transitions[this.transitions.length - 1];
-    }
-
-    getTransitionByID(transitionID: string): PetriNetTransition {
-        for (const transition of this.transitions) {
-            if (transition.id === transitionID) {
-                return transition;
-            }
-        }
-        throw new Error('Transition not found');
-    }
-}
-
 export interface PetriNetTransition {
     id: string;
 }
@@ -57,5 +11,42 @@ export class Transition implements PetriNetTransition {
         idCount: number,
     ) {
         this.id = 't' + idCount;
+    }
+}
+
+export class PetriNetTransitions {
+    private readonly _transitions: Array<PetriNetTransition> = new Array();
+    private idCount: number = 0;
+    constructor() {}
+
+    addDFG(dfg: Dfg): PetriNetTransitions {
+        if (dfg.isBaseCase()) {
+            return this.createTransition(dfg.getBaseActivityName());
+        }
+        this._transitions.push(dfg);
+        return this;
+    }
+
+    createTransition(transitionName: string): PetriNetTransitions {
+        this._transitions.push(new Transition(transitionName, ++this.idCount));
+        return this;
+    }
+
+    deleteDFG(dfg: Dfg): PetriNetTransitions {
+        this._transitions.splice(this._transitions.indexOf(dfg), 1);
+        return this;
+    }
+
+    getLastTransition(): PetriNetTransition {
+        return this._transitions[this._transitions.length - 1];
+    }
+
+    getTransitionByID(transitionID: string): PetriNetTransition {
+        for (const transition of this._transitions) {
+            if (transition.id === transitionID) {
+                return transition;
+            }
+        }
+        throw new Error('Transition not found');
     }
 }
