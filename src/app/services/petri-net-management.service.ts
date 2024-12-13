@@ -29,45 +29,23 @@ export class PetriNetManagementService {
         this._petriNet$.next(this._petriNet);
     }
 
-    public updateByWhatEverCut(
-        selectedCut: string,
-        originDFG: Dfg,
-        subDFG1: Dfg,
-        subDFG2: Dfg,
-    ): void {
-        switch (selectedCut) {
-            case cutType.ExclusiveCut:
-                this._petriNet$.next(
-                    this._petriNet.updateByExclusiveCut(
-                        originDFG,
-                        subDFG1,
-                        subDFG2,
-                    ),
-                );
-                break;
-            case cutType.SequenceCut:
-                this._petriNet$.next(
-                    this._petriNet.updateBySequenceCut(
-                        originDFG,
-                        subDFG1,
-                        subDFG2,
-                    ),
-                );
-                break;
-            case cutType.ParallelCut:
-                this._petriNet$.next(
-                    this._petriNet.updateByParallelCut(
-                        originDFG,
-                        subDFG1,
-                        subDFG2,
-                    ),
-                );
-                break;
-            case cutType.LoopCut:
-                this._petriNet$.next(
-                    this._petriNet.updateByLoopCut(originDFG, subDFG1, subDFG2),
-                );
-                break;
-        }
+    public updatePn(): void {
+        this._petriNet$.next(this._petriNet);
+    }
+
+    updatePnByExclusiveCut(originDFG: Dfg, subDFG1: Dfg, subDFG2: Dfg): void {
+        this._petriNet.updateByExclusiveCut(originDFG, subDFG1, subDFG2);
+    }
+
+    updatePnBySequenceCut(originDFG: Dfg, subDFG1: Dfg, subDFG2: Dfg): void {
+        this._petriNet.updateBySequenceCut(originDFG, subDFG1, subDFG2);
+    }
+
+    updatePnByParalleleCut(originDFG: Dfg, subDFG1: Dfg, subDFG2: Dfg): void {
+        this._petriNet.updateByParallelCut(originDFG, subDFG1, subDFG2);
+    }
+
+    updatePnByLoopCut(originDFG: Dfg, subDFG1: Dfg, subDFG2: Dfg): void {
+        this._petriNet.updateByLoopCut(originDFG, subDFG1, subDFG2);
     }
 }
