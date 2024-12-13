@@ -38,8 +38,7 @@ export class ExecuteCutService {
         switch (selectedCut) {
             case cutType.ExclusiveCut:
                 eventLogs = dfg.getEventLog().splitByExclusiveCut(a1);
-                Dfgs.push(this.calculateDfgService.calculate(eventLogs[0]));
-                Dfgs.push(this.calculateDfgService.calculate(eventLogs[1]));
+                Dfgs = this.createSubDfgs(eventLogs[0], eventLogs[1]);
                 this._petriNetManagementService.updatePnByExclusiveCut(
                     dfg,
                     Dfgs[0],
@@ -49,8 +48,7 @@ export class ExecuteCutService {
                 break;
             case cutType.SequenceCut:
                 eventLogs = dfg.getEventLog().splitBySequenceCut(a2);
-                Dfgs.push(this.calculateDfgService.calculate(eventLogs[0]));
-                Dfgs.push(this.calculateDfgService.calculate(eventLogs[1]));
+                Dfgs = this.createSubDfgs(eventLogs[0], eventLogs[1]);
                 this._petriNetManagementService.updatePnBySequenceCut(
                     dfg,
                     Dfgs[0],
@@ -60,8 +58,7 @@ export class ExecuteCutService {
                 break;
             case cutType.ParallelCut:
                 eventLogs = dfg.getEventLog().splitByParallelCut(a1);
-                Dfgs.push(this.calculateDfgService.calculate(eventLogs[0]));
-                Dfgs.push(this.calculateDfgService.calculate(eventLogs[1]));
+                Dfgs = this.createSubDfgs(eventLogs[0], eventLogs[1]);
                 this._petriNetManagementService.updatePnByParalleleCut(
                     dfg,
                     Dfgs[0],
@@ -71,8 +68,7 @@ export class ExecuteCutService {
                 break;
             case cutType.LoopCut:
                 eventLogs = dfg.getEventLog().splitByLoopCut(a1, a2);
-                Dfgs.push(this.calculateDfgService.calculate(eventLogs[0]));
-                Dfgs.push(this.calculateDfgService.calculate(eventLogs[1]));
+                Dfgs = this.createSubDfgs(eventLogs[0], eventLogs[1]);
                 this._petriNetManagementService.updatePnByLoopCut(
                     dfg,
                     Dfgs[0],
@@ -87,6 +83,17 @@ export class ExecuteCutService {
         console.log('Petri Netz aktualisiert!'); // hier spaeter Aufruf des Feedback-Service
 
         // Petri Netz zurückgeben mit Übergabe des Original-DFG und der Teil-DFGs
+    }
+
+    private createSubDfgs(
+        eventLog1: EventLog,
+        eventLog2: EventLog,
+    ): Array<Dfg> {
+        let Dfgs = new Array<Dfg>();
+        Dfgs.push(this.calculateDfgService.calculate(eventLog1));
+        Dfgs.push(this.calculateDfgService.calculate(eventLog2));
+
+        return Dfgs;
     }
 
     // Kanten / Cut an Service zur Ueberpruefung weitergeben
