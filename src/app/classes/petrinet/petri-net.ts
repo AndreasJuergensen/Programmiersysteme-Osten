@@ -16,7 +16,7 @@ export class PetriNet {
         dfg ? this.initializeOriginDFG(dfg) : undefined;
     }
 
-    initializeOriginDFG(dfg: Dfg): PetriNet {
+    private initializeOriginDFG(dfg: Dfg): PetriNet {
         this._transitions.createTransition('play').createTransition('stop');
         this._arcs
             .addPlaceToTransitionArc(

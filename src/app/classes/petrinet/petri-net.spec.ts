@@ -99,9 +99,11 @@ describe('A Petrinet', () => {
             .addArc('Z', 'Y')
             .build();
 
-        const sut: PetriNet = new PetriNet()
-            .initializeOriginDFG(originDFG)
-            .updateByExclusiveCut(originDFG, subDFG1, subDFG2);
+        const sut: PetriNet = new PetriNet(originDFG).updateByExclusiveCut(
+            originDFG,
+            subDFG1,
+            subDFG2,
+        );
 
         const expectedPlaces: Places = new Places();
         const expectedTransitions: PetriNetTransitions =
@@ -174,9 +176,11 @@ describe('A Petrinet', () => {
             .addArc('Z', 'Y')
             .build();
 
-        const sut: PetriNet = new PetriNet()
-            .initializeOriginDFG(originDFG)
-            .updateBySequenceCut(originDFG, subDFG1, subDFG2);
+        const sut: PetriNet = new PetriNet(originDFG).updateBySequenceCut(
+            originDFG,
+            subDFG1,
+            subDFG2,
+        );
 
         const expectedPlaces: Places = new Places();
         const expectedTransitions: PetriNetTransitions =
@@ -261,9 +265,11 @@ describe('A Petrinet', () => {
             .addArc('Z', 'Y')
             .build();
 
-        const sut: PetriNet = new PetriNet()
-            .initializeOriginDFG(originDFG)
-            .updateByParallelCut(originDFG, subDFG1, subDFG2);
+        const sut: PetriNet = new PetriNet(originDFG).updateByParallelCut(
+            originDFG,
+            subDFG1,
+            subDFG2,
+        );
 
         const expectedPlaces: Places = new Places();
         const expectedTransitions: PetriNetTransitions =
@@ -342,9 +348,11 @@ describe('A Petrinet', () => {
             .addToStopArc('Z')
             .build();
 
-        const sut: PetriNet = new PetriNet()
-            .initializeOriginDFG(originDFG)
-            .updateByLoopCut(originDFG, subDFG1, subDFG2);
+        const sut: PetriNet = new PetriNet(originDFG).updateByLoopCut(
+            originDFG,
+            subDFG1,
+            subDFG2,
+        );
 
         const expectedPlaces: Places = new Places();
         const expectedTransitions: PetriNetTransitions =
