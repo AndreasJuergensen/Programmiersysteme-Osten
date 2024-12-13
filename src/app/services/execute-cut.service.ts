@@ -44,7 +44,6 @@ export class ExecuteCutService {
                     Dfgs[0],
                     Dfgs[1],
                 );
-                this._petriNetManagementService.updatePn();
                 break;
             case cutType.SequenceCut:
                 eventLogs = dfg.getEventLog().splitBySequenceCut(a2);
@@ -54,7 +53,6 @@ export class ExecuteCutService {
                     Dfgs[0],
                     Dfgs[1],
                 );
-                this._petriNetManagementService.updatePn();
                 break;
             case cutType.ParallelCut:
                 eventLogs = dfg.getEventLog().splitByParallelCut(a1);
@@ -64,7 +62,6 @@ export class ExecuteCutService {
                     Dfgs[0],
                     Dfgs[1],
                 );
-                this._petriNetManagementService.updatePn();
                 break;
             case cutType.LoopCut:
                 eventLogs = dfg.getEventLog().splitByLoopCut(a1, a2);
@@ -74,7 +71,6 @@ export class ExecuteCutService {
                     Dfgs[0],
                     Dfgs[1],
                 );
-                this._petriNetManagementService.updatePn();
                 break;
         }
 
