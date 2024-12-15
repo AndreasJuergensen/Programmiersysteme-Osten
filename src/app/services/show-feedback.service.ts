@@ -35,4 +35,11 @@ export class ShowFeedbackService {
             });
         }
     }
+
+    openHelDialog(details: string): void {
+        this.dialog.open(FeedbackDialogComponent, {
+            data: { details },
+            width: '600px',
+        });
+    }
 }

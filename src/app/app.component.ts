@@ -4,6 +4,7 @@ import { EventLogDialogComponent } from './components/event-log-dialog/event-log
 import { EventLog } from './classes/event-log';
 import { Subscription } from 'rxjs';
 import { FeedbackFormComponent } from './components/feedback-form/feedback-form.component';
+import { ShowFeedbackService } from './services/show-feedback.service';
 
 @Component({
     selector: 'app-root',
@@ -11,7 +12,10 @@ import { FeedbackFormComponent } from './components/feedback-form/feedback-form.
     styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-    constructor(private _matDialog: MatDialog) {}
+    constructor(
+        private _matDialog: MatDialog,
+        private feedbackService: ShowFeedbackService,
+    ) {}
 
     public openDialog(): void {
         const config: MatDialogConfig = { width: '800px' };
@@ -38,5 +42,15 @@ export class AppComponent {
             next: (result) => console.log(result),
             complete: () => sub.unsubscribe(),
         });
+    }
+
+    public openHelp(): void {
+        const helpMessage = `
+      Willkommen im Hilfe-Bereich! 
+      Hier finden Sie Informationen und Anleitungen zur Nutzung dieser Anwendung. 
+      Wenn Sie weitere Fragen haben, kontaktieren Sie bitte unseren Support.
+    `;
+
+        this.feedbackService.openHelDialog(helpMessage);
     }
 }

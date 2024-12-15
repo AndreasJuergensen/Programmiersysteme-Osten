@@ -19,7 +19,9 @@ export class TriggerPopupComponent {
         this.feedbackService.showMessage(
             'errooooor',
             true,
-            'dies ist eine detaillierte Beschreibung von etwas......',
+            'dies ist eine detaillierte Beschreibung von etwas......\\' +
+                'lalalalllalllalalallalalaallallalalalaa' +
+                'lalalalalallalalal',
         );
     }
 }
