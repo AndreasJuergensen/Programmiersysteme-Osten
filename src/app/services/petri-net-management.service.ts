@@ -47,7 +47,7 @@ export class PetriNetManagementService {
         this.updatePn();
     }
 
-    public updatePnByParalleleCut(
+    public updatePnByParallelCut(
         originDFG: Dfg,
         subDFG1: Dfg,
         subDFG2: Dfg,
