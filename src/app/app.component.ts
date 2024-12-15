@@ -3,7 +3,6 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { EventLogDialogComponent } from './components/event-log-dialog/event-log-dialog.component';
 import { EventLog } from './classes/event-log';
 import { Subscription } from 'rxjs';
-import { FeedbackFormComponent } from './components/feedback-form/feedback-form.component';
 import { ShowFeedbackService } from './services/show-feedback.service';
 
 @Component({
@@ -31,26 +30,17 @@ export class AppComponent {
         });
     }
 
-    public popUpDialog(): void {
-        const config: MatDialogConfig = { width: '400px' };
-        const popupRef = this._matDialog.open<
-            FeedbackFormComponent,
-            MatDialogConfig
-        >(FeedbackFormComponent, config);
-
-        const sub: Subscription = popupRef.afterClosed().subscribe({
-            next: (result) => console.log(result),
-            complete: () => sub.unsubscribe(),
-        });
-    }
-
     public openHelp(): void {
+        // hier könnte man ggfs. nähere Informationen zur Anwendung platzieren
+        // oder dynmaisch je nach aktuellem Bearbeitungsstand des Users unterschiedlcihe
+        // Hilfestellungen geben
+
         const helpMessage = `
       Willkommen im Hilfe-Bereich! 
       Hier finden Sie Informationen und Anleitungen zur Nutzung dieser Anwendung. 
       Wenn Sie weitere Fragen haben, kontaktieren Sie bitte unseren Support.
     `;
 
-        this.feedbackService.openHelDialog(helpMessage);
+        this.feedbackService.openHelpDialog(helpMessage);
     }
 }

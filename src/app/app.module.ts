@@ -16,9 +16,7 @@ import {
 } from '@angular/common/http';
 import { DrawingAreaModule } from './components/drawing-area/drawing-area.module';
 import { FormsModule } from '@angular/forms';
-import { FeedbackFormComponent } from './components/feedback-form/feedback-form.component';
 import { MatDialogModule } from '@angular/material/dialog';
-import { TriggerPopupComponent } from './components/trigger-popup/trigger-popup.component';
 
 @NgModule({
     declarations: [AppComponent, FooterComponent],
@@ -34,9 +32,7 @@ import { TriggerPopupComponent } from './components/trigger-popup/trigger-popup.
         DrawingAreaModule,
         MatSnackBarModule,
         FormsModule,
-        FeedbackFormComponent,
         MatDialogModule,
-        TriggerPopupComponent,
     ],
     providers: [
         {

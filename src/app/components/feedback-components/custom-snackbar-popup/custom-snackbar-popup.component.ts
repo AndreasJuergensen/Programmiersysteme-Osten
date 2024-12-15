@@ -7,15 +7,15 @@ import { CommonModule } from '@angular/common';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 
 @Component({
-    selector: 'app-custom-popup',
+    selector: 'app-custom-snackbar-popup',
     standalone: true,
     imports: [CommonModule],
-    templateUrl: './custom-popup.component.html',
-    styleUrl: './custom-popup.component.css',
+    templateUrl: './custom-snackbar-popup.component.html',
+    styleUrl: './custom-snackbar-popup.component.css',
 })
-export class CustomPopupComponent {
+export class CustomSnackbarPopupComponent {
     constructor(
-        public snackBarRef: MatSnackBarRef<CustomPopupComponent>,
+        public snackBarRef: MatSnackBarRef<CustomSnackbarPopupComponent>,
         @Inject(MAT_SNACK_BAR_DATA)
         public data: { message: string; isError: boolean },
         private feedbackService: ShowFeedbackService,
