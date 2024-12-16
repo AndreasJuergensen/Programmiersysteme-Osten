@@ -143,8 +143,8 @@ export class PlaceToBoxArc extends Arc {
         }
 
         return alphaDegAbs < 45
-            ? (widthHalf + strokeHalf) / Math.cos(Math.abs(this.alphaRad))
-            : (heightHalf + strokeHalf) / Math.sin(Math.abs(this.alphaRad));
+            ? (heightHalf + strokeHalf) / Math.sin(Math.abs(this.alphaRad))
+            : (widthHalf + strokeHalf) / Math.cos(Math.abs(this.alphaRad));
     }
 }
 
