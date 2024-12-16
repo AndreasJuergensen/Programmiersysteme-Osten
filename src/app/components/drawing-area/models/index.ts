@@ -1,2 +1,2 @@
-export * from './edges';
+export * from './arcs';
 export * from './nodes';

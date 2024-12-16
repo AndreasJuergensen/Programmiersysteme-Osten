@@ -1,5 +1,5 @@
 import { EventLog } from '../event-log';
-import { PetriNetTransition } from '../petri-net';
+import { PetriNetTransition } from '../petrinet/petri-net-transitions';
 import { Activities, Activity } from './activities';
 import { ArcJson, Arcs, DfgArc } from './arcs';
 import { ExclusiveCut, LoopCut, ParallelCut, SequenceCut } from './cut';
@@ -9,19 +9,22 @@ export interface DfgJson {
     arcs: ArcJson[];
 }
 export class Dfg implements PetriNetTransition {
+    private static idCount: number = 0;
+    public id: string;
     constructor(
-        public id: string,
-        private readonly activities: Activities,
-        private readonly arcs: Arcs,
-        private eventLog: EventLog,
-    ) {}
+        private readonly _activities: Activities,
+        private readonly _arcs: Arcs,
+        private readonly _eventLog: EventLog,
+    ) {
+        this.id = 'dfg' + ++Dfg.idCount;
+    }
 
     canBeCutIn(a1: Activities, a2: Activities): boolean {
         return (
-            new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs) ||
-            new SequenceCut(a1, a2).isPossible(this.activities, this.arcs) ||
-            new ParallelCut(a1, a2).isPossible(this.activities, this.arcs) ||
-            new LoopCut(a1, a2).isPossible(this.activities, this.arcs)
+            new ExclusiveCut(a1, a2).isPossible(this._activities, this._arcs) ||
+            new SequenceCut(a1, a2).isPossible(this._activities, this._arcs) ||
+            new ParallelCut(a1, a2).isPossible(this._activities, this._arcs) ||
+            new LoopCut(a1, a2).isPossible(this._activities, this._arcs)
         );
     }
 
@@ -51,23 +54,42 @@ export class Dfg implements PetriNetTransition {
         return [a1, a2];
     }
 
+    isBaseCase(): boolean {
+        if (this.activities.getLength() === 3) {
+            return true;
+        }
+        return false;
+    }
+
+    getBaseActivityName(): string {
+        return this.activities.getBaseActivity().asJson();
+    }
+
     /* 
     return the DfgArc by start and end name with same obj-ref as in this Dfg,
     thus same behavior as the arc is clicked in petrinet
-     */
+    */
     getArc(start: string, end: string): DfgArc {
         return this.arcs.getArcByStartNameAndEndName(start, end);
     }
 
-    asJson(): DfgJson {
-        return {
-            activities: this.activities.asJson(),
-            arcs: this.arcs.asJson(),
-        };
+    get activities(): Activities {
+        return this._activities;
     }
 
-    getEventLog(): EventLog {
-        return this.eventLog;
+    get arcs(): Arcs {
+        return this._arcs;
+    }
+
+    get eventLog(): EventLog {
+        return this._eventLog;
+    }
+
+    asJson(): DfgJson {
+        return {
+            activities: this._activities.asJson(),
+            arcs: this._arcs.asJson(),
+        };
     }
 }
 
@@ -126,6 +148,6 @@ export class DfgBuilder {
     }
 
     build(): Dfg {
-        return new Dfg('', this.activities, this.arcs, this.eventlog);
+        return new Dfg(this.activities, this.arcs, this.eventlog);
     }
 }
