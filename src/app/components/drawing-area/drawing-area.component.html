@@ -1,10 +1,10 @@
 <svg>
-    <ng-container *ngFor="let box of boxes">
-        <svg:g app-drawing-box [box]="box"></svg:g>
-    </ng-container>
-
     <ng-container *ngFor="let arc of arcs">
         <svg:g app-drawing-arc [arc]="arc"></svg:g>
+    </ng-container>
+
+    <ng-container *ngFor="let box of boxes">
+        <svg:g app-drawing-box [box]="box"></svg:g>
     </ng-container>
 
     <ng-container *ngFor="let activity of activities">

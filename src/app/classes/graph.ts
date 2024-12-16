@@ -293,4 +293,5 @@ export interface PetriNetStackElement {
     node: Place | PetriNetTransition;
     source_x: number;
     source_y: number;
+    additionalXOffset: number;
 }

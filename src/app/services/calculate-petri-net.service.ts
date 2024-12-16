@@ -128,6 +128,7 @@ export class CalculatePetriNetService {
                     node: neighbour,
                     source_x: 100,
                     source_y: 100,
+                    additionalXOffset: 0,
                 };
             },
         );
@@ -155,12 +156,19 @@ export class CalculatePetriNetService {
             // Each stackelement needs the information about the kind of node
             // If we have a box, we have to add and extra gapX or gapY
             // information because a box is bigger
+
+            let additionalXOffset: number = 0;
+            if (generatedNode instanceof BoxNode) {
+                additionalXOffset = (generatedNode as BoxNode).width / 2;
+            }
+
             stack.push(
                 ...neighbours.map((neighbour) => {
                     return {
                         node: neighbour,
                         source_x: generatedNode.x,
                         source_y: generatedNode.y,
+                        additionalXOffset: additionalXOffset,
                     };
                 }),
             );
@@ -196,7 +204,10 @@ export class CalculatePetriNetService {
                 this._dfgGraphsAndBoxes.get(dfg.id)!;
 
             const x: number =
-                stackElement.source_x + graphWithBoxDimension[1] / 2 + gapX;
+                stackElement.source_x +
+                graphWithBoxDimension[1] / 2 +
+                gapX +
+                stackElement.additionalXOffset;
             const y: number = yCoordinate; // + graphWithBoxDimension[2] / 2;
             return new BoxNode(
                 dfg.id,
@@ -211,7 +222,7 @@ export class CalculatePetriNetService {
             const transition = stackElement.node as Transition;
             return new TransitionNode(
                 transition.id,
-                stackElement.source_x + gapX,
+                stackElement.source_x + gapX + stackElement.additionalXOffset,
                 yCoordinate,
             );
         }
@@ -219,7 +230,7 @@ export class CalculatePetriNetService {
         const place = stackElement.node as Place;
         return new PlaceNode(
             place.id,
-            stackElement.source_x + gapX,
+            stackElement.source_x + gapX + stackElement.additionalXOffset,
             yCoordinate,
         );
     }
