@@ -35,6 +35,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     private _transitions: Array<Transition> = new Array<Transition>();
     private _places: Array<Place> = new Array<Place>();
     private _arcs: Array<Arc> = new Array<Arc>();
+    private _boxArcs: Array<Arc> = new Array<Arc>();
 
     constructor(private calculatePetriNetService: CalculatePetriNetService) {}
 
@@ -56,6 +57,10 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
     get arcs(): Array<Arc> {
         return this._arcs;
+    }
+
+    get boxArcs(): Array<Arc> {
+        return this._boxArcs;
     }
 
     ngOnInit(): void {
@@ -87,18 +92,25 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 });
 
                 const arcs: Array<Arc> = new Array<Arc>();
+                const boxArcs: Array<Arc> = new Array<Arc>();
 
                 graph.edges.forEach((edge) => {
                     if (edge.source instanceof ActivityNode) {
                         const startActivity = activities.find(
-                            (activity) => activity.id === edge.source.id,
+                            (activity) =>
+                                activity.id === edge.source.id &&
+                                activity.x === edge.source.x &&
+                                activity.y === edge.source.y,
                         )!;
 
                         const endActivity = activities.find(
-                            (activity) => activity.id === edge.target.id,
+                            (activity) =>
+                                activity.id === edge.target.id &&
+                                activity.x === edge.target.x &&
+                                activity.y === edge.target.y,
                         )!;
 
-                        arcs.push(new DfgArc(startActivity, endActivity));
+                        boxArcs.push(new DfgArc(startActivity, endActivity));
                     }
 
                     if (edge.source instanceof TransitionNode) {
@@ -161,6 +173,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 this._transitions = transitions;
                 this._places = places;
                 this._arcs = arcs;
+                this._boxArcs = boxArcs;
             },
         );
     }

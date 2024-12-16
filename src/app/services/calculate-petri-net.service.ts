@@ -25,7 +25,7 @@ import {
     TransitionToPlaceArc,
 } from '../classes/petrinet/petri-net-arcs';
 
-type GraphWithBoxDimension = [Graph, number, number];
+type GraphWithBoxDimension = [Graph, number, number, Dfg];
 
 @Injectable({
     providedIn: 'root',
@@ -76,6 +76,7 @@ export class CalculatePetriNetService {
                 dfgAsGraph,
                 sizeOfGraph[0],
                 sizeOfGraph[1],
+                dfg,
             ]);
         });
 
@@ -91,9 +92,45 @@ export class CalculatePetriNetService {
 
         // this.recalculateCoordinatesForOverlap(nodes, edges);
 
+        // Recalculate dfg graph nodes
+        this.recalculateDfgCoordinates(nodes, edges).forEach((graph) => {
+            nodes.push(...graph.nodes);
+            edges.push(...graph.edges);
+            console.log(edges);
+        });
+
         const graph = new Graph(nodes, edges);
         this._graph$.next(graph);
         return graph;
+    }
+
+    private recalculateDfgCoordinates(
+        nodes: Array<Node>,
+        edges: Array<Edge>,
+    ): Array<Graph> {
+        const boxNodes: Array<BoxNode> = new Array<BoxNode>();
+
+        nodes.forEach((node) => {
+            if (node instanceof BoxNode) {
+                boxNodes.push(node as BoxNode);
+            }
+        });
+
+        const graphs: Array<Graph> = new Array<Graph>();
+
+        boxNodes.forEach((node) => {
+            const dfg = this._dfgGraphsAndBoxes.get(node.id)?.[3]!;
+
+            const x = node.x - node.width / 2 + 50;
+            const y = node.y - node.height / 2 + 50;
+
+            const dfgGraph =
+                this.calculateCoodinatesService.calculateCoordinates(dfg, x, y);
+
+            graphs.push(dfgGraph);
+        });
+
+        return graphs;
     }
 
     /**
@@ -149,6 +186,8 @@ export class CalculatePetriNetService {
                 yCoordinate,
             );
             nodes.push(generatedNode);
+
+            if (generatedNode.id === 'dfg1') console.log(generatedNode);
 
             const neighbours: Array<Place | PetriNetTransition> =
                 this.getNeighbours(stackElement, petriNet);
@@ -370,6 +409,7 @@ export class CalculatePetriNetService {
                 }
 
                 if (edge.intersectsBox(node as BoxNode)) {
+                    console.log(edge.source);
                     return true;
                 }
             }
