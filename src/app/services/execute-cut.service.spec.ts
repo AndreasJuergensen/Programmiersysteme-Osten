@@ -5,7 +5,7 @@ import { CalculateDfgService } from './calculate-dfg.service';
 import { EventLog, Trace } from '../classes/event-log';
 import { Activity } from '../classes/dfg/activities';
 import { PetriNetManagementService } from './petri-net-management.service';
-import { cutType } from '../components/cut-execution/cut-execution.component';
+import { CutType } from '../components/cut-execution/cut-execution.component';
 
 describe('ExecuteCutService', () => {
     let sut: ExecuteCutService;
@@ -38,7 +38,7 @@ describe('ExecuteCutService', () => {
         const cuttedArcs: Arcs = new Arcs()
             .addArc(dfg.getArc('B', 'C'))
             .addArc(dfg.getArc('C', 'A'));
-        const selectedCutViaRadioButton: cutType = cutType.SequenceCut;
+        const selectedCutViaRadioButton: CutType = CutType.SequenceCut;
         pnManagementServiceSpy.initialize(dfg);
 
         spyOn(pnManagementServiceSpy, 'updatePnByLoopCut');
@@ -76,7 +76,7 @@ describe('ExecuteCutService', () => {
             .addArc(dfg.getArc('A', 'B'))
             .addArc(dfg.getArc('B', 'C'))
             .addArc(dfg.getArc('C', 'B'));
-        const selectedCutViaRadioButton: cutType = cutType.ParallelCut;
+        const selectedCutViaRadioButton: CutType = CutType.ParallelCut;
         pnManagementServiceSpy.initialize(dfg);
 
         spyOn(pnManagementServiceSpy, 'updatePnByParallelCut');
@@ -99,7 +99,7 @@ describe('ExecuteCutService', () => {
         const cuttedArcs: Arcs = new Arcs()
             .addArc(dfg.getArc('play', 'C'))
             .addArc(dfg.getArc('C', 'stop'));
-        const selectedCutViaRadioButton: cutType = cutType.ExclusiveCut;
+        const selectedCutViaRadioButton: CutType = CutType.ExclusiveCut;
         pnManagementServiceSpy.initialize(dfg);
 
         spyOn(pnManagementServiceSpy, 'updatePnByExclusiveCut');
@@ -117,7 +117,7 @@ describe('ExecuteCutService', () => {
         ]);
         const dfg: Dfg = calculateDfgService.calculate(eventLog);
         const cuttedArcs: Arcs = new Arcs().addArc(dfg.getArc('A', 'B'));
-        const selectedCutViaRadioButton: cutType = cutType.SequenceCut;
+        const selectedCutViaRadioButton: CutType = CutType.SequenceCut;
         pnManagementServiceSpy.initialize(dfg);
 
         spyOn(pnManagementServiceSpy, 'updatePnBySequenceCut');
@@ -152,7 +152,7 @@ describe('ExecuteCutService', () => {
             .addArc(dfg.getArc('C', 'A'))
             .addArc(dfg.getArc('B', 'C'))
             .addArc(dfg.getArc('C', 'B'));
-        const selectedCutViaRadioButton: cutType = cutType.ParallelCut;
+        const selectedCutViaRadioButton: CutType = CutType.ParallelCut;
         pnManagementServiceSpy.initialize(dfg);
 
         spyOn(pnManagementServiceSpy, 'updatePnByParallelCut');
@@ -177,7 +177,7 @@ describe('ExecuteCutService', () => {
         const cuttedArcs: Arcs = new Arcs()
             .addArc(dfg.getArc('B', 'C'))
             .addArc(dfg.getArc('C', 'A'));
-        const selectedCutViaRadioButton: cutType = cutType.LoopCut;
+        const selectedCutViaRadioButton: CutType = CutType.LoopCut;
         pnManagementServiceSpy.initialize(dfg);
 
         spyOn(pnManagementServiceSpy, 'updatePnByLoopCut');

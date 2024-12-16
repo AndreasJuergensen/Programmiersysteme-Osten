@@ -1,4 +1,4 @@
-import { cutType } from 'src/app/components/cut-execution/cut-execution.component';
+import { CutType } from 'src/app/components/cut-execution/cut-execution.component';
 import { EventLog } from '../event-log';
 import { PetriNetTransition } from '../petrinet/petri-net-transitions';
 import { Activities, Activity } from './activities';
@@ -23,18 +23,18 @@ export class Dfg implements PetriNetTransition {
     canBeCutIn(
         a1: Activities,
         a2: Activities,
-    ): { result: boolean; matchingcut: string | null } {
+    ): { result: boolean; matchingcut: CutType | null } {
         if (new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs)) {
-            return { result: true, matchingcut: cutType.ExclusiveCut };
+            return { result: true, matchingcut: CutType.ExclusiveCut };
         }
         if (new SequenceCut(a1, a2).isPossible(this.activities, this.arcs)) {
-            return { result: true, matchingcut: cutType.SequenceCut };
+            return { result: true, matchingcut: CutType.SequenceCut };
         }
         if (new ParallelCut(a1, a2).isPossible(this.activities, this.arcs)) {
-            return { result: true, matchingcut: cutType.ParallelCut };
+            return { result: true, matchingcut: CutType.ParallelCut };
         }
         if (new LoopCut(a1, a2).isPossible(this.activities, this.arcs)) {
-            return { result: true, matchingcut: cutType.LoopCut };
+            return { result: true, matchingcut: CutType.LoopCut };
         }
 
         return { result: false, matchingcut: null };

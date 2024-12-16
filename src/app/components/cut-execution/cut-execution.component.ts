@@ -10,7 +10,7 @@ import { Activities } from 'src/app/classes/dfg/activities';
 import { Arcs } from 'src/app/classes/dfg/arcs';
 import { EventLog } from 'src/app/classes/event-log';
 
-export enum cutType {
+export enum CutType {
     ExclusiveCut = 'ExclusiveCut',
     SequenceCut = 'SequenceCut',
     ParallelCut = 'ParallelCut',
@@ -32,10 +32,10 @@ export enum cutType {
 export class CutExecutionComponent implements OnInit {
     radioForm: FormGroup;
     radioOptions: string[] = [
-        cutType.ExclusiveCut,
-        cutType.SequenceCut,
-        cutType.ParallelCut,
-        cutType.LoopCut,
+        CutType.ExclusiveCut,
+        CutType.SequenceCut,
+        CutType.ParallelCut,
+        CutType.LoopCut,
     ];
 
     dfgDummy: Dfg = new Dfg(new Activities(), new Arcs(), new EventLog());
