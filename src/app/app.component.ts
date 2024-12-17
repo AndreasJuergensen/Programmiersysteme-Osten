@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { CalculateDfgService } from './services/calculate-dfg.service';
 import { Dfg } from './classes/dfg/dfg';
 import { PetriNetManagementService } from './services/petri-net-management.service';
+import { ShowFeedbackService } from './services/show-feedback.service';
 
 @Component({
     selector: 'app-root',
@@ -17,6 +18,7 @@ export class AppComponent {
         private _matDialog: MatDialog,
         private _calculateDfgService: CalculateDfgService,
         private _petriNetManagementService: PetriNetManagementService,
+        private feedbackService: ShowFeedbackService,
     ) {}
 
     public openDialog(): void {
@@ -38,5 +40,19 @@ export class AppComponent {
             },
             complete: () => sub.unsubscribe(),
         });
+    }
+
+    public openHelp(): void {
+        // hier könnte man ggfs. nähere Informationen zur Anwendung platzieren
+        // oder dynmaisch je nach aktuellem Bearbeitungsstand des Users unterschiedlcihe
+        // Hilfestellungen geben
+
+        const helpMessage = `
+      Willkommen im Hilfe-Bereich! 
+      Hier finden Sie Informationen und Anleitungen zur Nutzung dieser Anwendung. 
+      Wenn Sie weitere Fragen haben, kontaktieren Sie bitte unseren Support.
+    `;
+
+        this.feedbackService.openHelpDialog(helpMessage);
     }
 }
