@@ -90,13 +90,12 @@ export class CalculatePetriNetService {
             petriNet.getAllArcs().arcs;
         const edges: Array<Edge> = this.generateEdges(nodes, arcs);
 
-        // this.recalculateCoordinatesForOverlap(nodes, edges);
+        this.recalculateCoordinatesForOverlap(nodes, edges);
 
         // Recalculate dfg graph nodes
         this.recalculateDfgCoordinates(nodes, edges).forEach((graph) => {
             nodes.push(...graph.nodes);
             edges.push(...graph.edges);
-            console.log(edges);
         });
 
         const graph = new Graph(nodes, edges);
@@ -362,12 +361,13 @@ export class CalculatePetriNetService {
         do {
             nodeWasMoved = false;
             nodes.forEach((node) => {
-                if (
-                    this.checkNodeOverlap(node, nodes) ||
-                    this.checkEdgeOverlap(node, edges)
-                ) {
+                if (this.checkNodeOverlap(node, nodes)) {
                     node.addYOffset(gapY);
                     nodeWasMoved = true;
+                }
+
+                if (this.checkEdgeOverlap(node, edges)) {
+                    nodeWasMoved = false;
                 }
             });
         } while (nodeWasMoved);
@@ -403,14 +403,24 @@ export class CalculatePetriNetService {
      */
     private checkEdgeOverlap(node: Node, edges: Array<Edge>): boolean {
         if (node instanceof BoxNode) {
+            console.log(node.id);
             for (const edge of edges) {
                 if (edge.isNodeStartOrEndNode(node)) {
                     continue;
                 }
 
                 if (edge.intersectsBox(node as BoxNode)) {
-                    console.log(edge.source);
-                    return true;
+                    const gapY = environment.drawingGrid.gapY;
+
+                    if (edge.source instanceof BoxNode) {
+                        edge.source.addYOffset(gapY);
+                    }
+
+                    if (edge.target instanceof BoxNode) {
+                        edge.target.addYOffset(gapY);
+                    }
+
+                    continue;
                 }
             }
 

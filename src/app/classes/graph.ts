@@ -132,10 +132,13 @@ export class BoxNode extends Node {
             nodeHeight = environment.drawingElements.transitions.height;
         }
 
-        const xBoxLeft: number = this.x - this._width / 2;
-        const xBoxRight: number = this.x + this._width / 2;
-        const yBoxTop: number = this.y - this._height / 2;
-        const yBoxBottom: number = this.y + this._height / 2;
+        const strokeWidth: number =
+            environment.drawingElements.boxes.strokeWidth;
+
+        const xBoxLeft: number = this.x - (this._width + strokeWidth) / 2;
+        const xBoxRight: number = this.x + (this._width + strokeWidth) / 2;
+        const yBoxTop: number = this.y - (this._height + strokeWidth) / 2;
+        const yBoxBottom: number = this.y + (this._height + strokeWidth) / 2;
 
         const xNodeLeft: number = node.x - nodeWidth / 2;
         const xNodeRight: number = node.x + nodeWidth / 2;
@@ -229,10 +232,18 @@ export class Edge {
     }
 
     intersectsBox(node: BoxNode): boolean {
-        const xBoxLeft: number = node.x - node.width / 2;
-        const xBoxRight: number = node.x + node.width / 2;
-        const yBoxTop: number = node.y - node.height / 2;
-        const yBoxBottom: number = node.y + node.height / 2;
+        if (node.id === 'dfg2') {
+            const boxRightDownCornerX = node.x + node.width / 2;
+            const boxRightDownCornerY = node.y + node.height / 2;
+
+            console.log(boxRightDownCornerX + ',' + boxRightDownCornerY);
+        }
+        const boxStroke: number = environment.drawingElements.boxes.strokeWidth;
+
+        const xBoxLeft: number = node.x - (node.width + boxStroke) / 2;
+        const xBoxRight: number = node.x + (node.width + boxStroke) / 2;
+        const yBoxTop: number = node.y - (node.height + boxStroke) / 2;
+        const yBoxBottom: number = node.y + (node.height + boxStroke) / 2;
 
         const yCoordinateOfIntersectionPointXLeft: number =
             this._gradient * xBoxLeft + this._yAxisPoint;
@@ -243,25 +254,55 @@ export class Edge {
         const xCoordinateOfIntersectionPointYBottom: number =
             (yBoxBottom - this._yAxisPoint) / this._gradient;
 
+        /////
+        const intersectionNodeXLeft = new DummyNode(
+            '',
+            xBoxLeft,
+            yCoordinateOfIntersectionPointXLeft,
+        );
+
+        console.log(intersectionNodeXLeft);
+
+        const isIntersectionNodeXLeftOutsideOfBox = node.isNodeOutsideOfBox(
+            intersectionNodeXLeft,
+        );
+
+        console.log(isIntersectionNodeXLeftOutsideOfBox);
+
+        /////
+        const intersectionNodeXRight = new DummyNode(
+            '',
+            xBoxRight,
+            yCoordinateOfIntersectionPointXRight,
+        );
+
+        console.log(intersectionNodeXRight);
+
+        const isIntersectionNodeXRightOutsideOfBox = node.isNodeOutsideOfBox(
+            intersectionNodeXRight,
+        );
+
+        console.log(isIntersectionNodeXRightOutsideOfBox);
+
         return (
-            node.isNodeOutsideOfBox(
+            !node.isNodeOutsideOfBox(
                 new DummyNode(
                     '',
                     xBoxLeft,
                     yCoordinateOfIntersectionPointXLeft,
                 ),
             ) ||
-            node.isNodeOutsideOfBox(
+            !node.isNodeOutsideOfBox(
                 new DummyNode(
                     '',
                     xBoxRight,
                     yCoordinateOfIntersectionPointXRight,
                 ),
             ) ||
-            node.isNodeOutsideOfBox(
+            !node.isNodeOutsideOfBox(
                 new DummyNode('', yBoxTop, xCoordinateOfIntersectionPointYTop),
             ) ||
-            node.isNodeOutsideOfBox(
+            !node.isNodeOutsideOfBox(
                 new DummyNode(
                     '',
                     yBoxBottom,
