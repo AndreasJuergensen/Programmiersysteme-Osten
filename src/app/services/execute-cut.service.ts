@@ -6,6 +6,7 @@ import { Activities } from '../classes/dfg/activities';
 import { EventLog } from '../classes/event-log';
 import { PetriNetManagementService } from './petri-net-management.service';
 import { CutType } from '../components/cut-execution/cut-execution.component';
+import { ShowFeedbackService } from './show-feedback.service';
 
 @Injectable({
     providedIn: 'root',
@@ -14,6 +15,7 @@ export class ExecuteCutService {
     constructor(
         private _petriNetManagementService: PetriNetManagementService,
         private _calculateDfgService: CalculateDfgService,
+        private _feedbackService: ShowFeedbackService,
     ) {}
 
     public execute(dfg: Dfg, selectedArcs: Arcs, selectedCut: CutType): void {
@@ -26,7 +28,13 @@ export class ExecuteCutService {
             dfg.canBeCutIn(a1, a2).matchingcut === selectedCut;
 
         if (!isValidCut) {
-            console.log('kein valider Cut! Bitte nochmal probieren!'); // hier spaeter Aufruf des Feedback-Service
+            console.log('kein valider Cut! Bitte nochmal probieren!');
+            this._feedbackService.showMessage(
+                'kein valider Cut',
+                true,
+                'die ausgewhälten Kanten passen nicht zu dem von' +
+                    ' Ihnen ausgewählten Cut. Bitte erneut versuchen. Für Hilfestellungen nutzen Sie den Hilfe-Button.',
+            );
             return;
         }
 
@@ -73,8 +81,15 @@ export class ExecuteCutService {
         }
 
         console.log('Cut durchgefuehrt!' + ' selected Cut: ' + selectedCut); // hier spaeter Aufruf des Feedback-Service
-
+        this._feedbackService.showMessage(
+            'Cut erfolgreich! ' + '(' + selectedCut + ')',
+            false,
+        );
         console.log('Petri Netz aktualisiert!'); // hier spaeter Aufruf des Feedback-Service
+        this._feedbackService.showMessage(
+            'Das Petri-Netz wurde nun aktualisiert.',
+            true,
+        );
     }
 
     private createSubDfgs(eventLogs: [EventLog, EventLog]): [Dfg, Dfg] {

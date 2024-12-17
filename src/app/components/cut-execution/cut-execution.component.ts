@@ -9,6 +9,7 @@ import { Dfg } from 'src/app/classes/dfg/dfg';
 import { Activities } from 'src/app/classes/dfg/activities';
 import { Arcs } from 'src/app/classes/dfg/arcs';
 import { EventLog } from 'src/app/classes/event-log';
+import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 
 export enum CutType {
     ExclusiveCut = 'ExclusiveCut',
@@ -44,17 +45,16 @@ export class CutExecutionComponent implements OnInit {
     constructor(
         private fb: FormBuilder,
         private executeCutService: ExecuteCutService,
+        private feedbackService: ShowFeedbackService,
         // private kantenSammelService: KantenSammelService
     ) {
         this.radioForm = this.fb.group({
-            selectedCut: [null],
+            selectedCut: null,
         });
     }
 
     ngOnInit(): void {
-        this.radioForm.get('selectedCut')?.valueChanges.subscribe((value) => {
-            console.log('Radio Button Selected:', value); // Optionale Debug-Ausgabe
-        });
+        this.radioForm.get('selectedCut')?.valueChanges.subscribe(() => {});
     }
 
     onCutClick(): void {
@@ -67,13 +67,19 @@ export class CutExecutionComponent implements OnInit {
             );
             this.resetRadioSelection();
         } else {
-            console.warn('No option selected!'); // hier Feedback ausgeben, falls kein Cut ausgewaehlt wurde
+            this.feedbackService.showMessage(
+                'Es wurde kein Cut ausgewählt!',
+                true,
+                'Sie müssen einen Cut über die Radio-Buttons auswählen, um einen Cut durchführen zu können.',
+            );
         }
     }
 
     onCancelClick(): void {
-        this.resetRadioSelection();
-        console.log('Selection canceled'); // hier Feedback ausgeben, dass Auswahl abgebrochen wurde
+        if (this.radioForm.get('selectedCut')?.value !== null) {
+            this.resetRadioSelection();
+            this.feedbackService.showMessage('Cutauswahl abgebrochen.', false);
+        }
     }
 
     resetRadioSelection(): void {
