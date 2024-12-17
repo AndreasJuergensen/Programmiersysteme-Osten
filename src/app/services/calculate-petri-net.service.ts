@@ -4,7 +4,6 @@ import {
     Graph,
     Node,
     PlaceNode,
-    DfgStackElement,
     PetriNetStackElement,
     BoxNode,
     TransitionNode,
@@ -20,7 +19,6 @@ import {
     Transition,
 } from '../classes/petrinet/petri-net-transitions';
 import {
-    PetriNetArcs,
     PlaceToTransitionArc,
     TransitionToPlaceArc,
 } from '../classes/petrinet/petri-net-arcs';
@@ -90,6 +88,8 @@ export class CalculatePetriNetService {
             petriNet.getAllArcs().arcs;
         const edges: Array<Edge> = this.generateEdges(nodes, arcs);
 
+        this.movePossibleOutsideBoxesIntoDrawingArea(nodes);
+
         this.recalculateCoordinatesForOverlap(nodes, edges);
 
         // Recalculate dfg graph nodes
@@ -101,6 +101,44 @@ export class CalculatePetriNetService {
         const graph = new Graph(nodes, edges);
         this._graph$.next(graph);
         return graph;
+    }
+
+    private movePossibleOutsideBoxesIntoDrawingArea(nodes: Array<Node>): void {
+        let smallestY: number = 0;
+        let upperY: number = 0;
+
+        for (const node of nodes) {
+            if (node instanceof BoxNode) {
+                const stroke = environment.drawingElements.boxes.strokeWidth;
+                const height = (node as BoxNode).height;
+
+                upperY = node.y - (height + stroke) / 2;
+            }
+
+            if (node instanceof PlaceNode) {
+                const stroke = environment.drawingElements.places.strokeWidth;
+                const radius = environment.drawingElements.places.radius;
+
+                upperY = node.y - radius - stroke / 2;
+            }
+
+            if (node instanceof TransitionNode) {
+                const stroke =
+                    environment.drawingElements.transitions.strokeWidth;
+                const height = environment.drawingElements.transitions.height;
+
+                upperY = node.y - (height + stroke) / 2;
+            }
+
+            if (upperY < smallestY) {
+                smallestY = upperY;
+            }
+        }
+
+        if (smallestY < 0) {
+            const offset = Math.abs(smallestY) + 50;
+            nodes.forEach((node) => node.addYOffset(offset));
+        }
     }
 
     private recalculateDfgCoordinates(
@@ -185,8 +223,6 @@ export class CalculatePetriNetService {
                 yCoordinate,
             );
             nodes.push(generatedNode);
-
-            if (generatedNode.id === 'dfg1') console.log(generatedNode);
 
             const neighbours: Array<Place | PetriNetTransition> =
                 this.getNeighbours(stackElement, petriNet);

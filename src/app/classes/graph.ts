@@ -235,8 +235,6 @@ export class Edge {
         if (node.id === 'dfg2') {
             const boxRightDownCornerX = node.x + node.width / 2;
             const boxRightDownCornerY = node.y + node.height / 2;
-
-            console.log(boxRightDownCornerX + ',' + boxRightDownCornerY);
         }
         const boxStroke: number = environment.drawingElements.boxes.strokeWidth;
 
@@ -253,36 +251,6 @@ export class Edge {
             (yBoxTop - this._yAxisPoint) / this._gradient;
         const xCoordinateOfIntersectionPointYBottom: number =
             (yBoxBottom - this._yAxisPoint) / this._gradient;
-
-        /////
-        const intersectionNodeXLeft = new DummyNode(
-            '',
-            xBoxLeft,
-            yCoordinateOfIntersectionPointXLeft,
-        );
-
-        console.log(intersectionNodeXLeft);
-
-        const isIntersectionNodeXLeftOutsideOfBox = node.isNodeOutsideOfBox(
-            intersectionNodeXLeft,
-        );
-
-        console.log(isIntersectionNodeXLeftOutsideOfBox);
-
-        /////
-        const intersectionNodeXRight = new DummyNode(
-            '',
-            xBoxRight,
-            yCoordinateOfIntersectionPointXRight,
-        );
-
-        console.log(intersectionNodeXRight);
-
-        const isIntersectionNodeXRightOutsideOfBox = node.isNodeOutsideOfBox(
-            intersectionNodeXRight,
-        );
-
-        console.log(isIntersectionNodeXRightOutsideOfBox);
 
         return (
             !node.isNodeOutsideOfBox(

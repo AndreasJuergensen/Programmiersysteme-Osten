@@ -130,11 +130,6 @@ export class PlaceToBoxArc extends Arc {
         switch (alphaDegAbs) {
             case 0:
                 return widthHalf + strokeHalf;
-            case 45:
-                return Math.sqrt(
-                    Math.pow(widthHalf + strokeHalf, 2) +
-                        Math.pow(heightHalf + strokeHalf, 2),
-                );
             case 90:
                 return heightHalf + strokeHalf;
 
@@ -142,9 +137,7 @@ export class PlaceToBoxArc extends Arc {
                 break;
         }
 
-        return alphaDegAbs < 45
-            ? (heightHalf + strokeHalf) / Math.sin(Math.abs(this.alphaRad))
-            : (widthHalf + strokeHalf) / Math.cos(Math.abs(this.alphaRad));
+        return (heightHalf + strokeHalf) / Math.sin(Math.abs(this.alphaRad));
     }
 }
 
