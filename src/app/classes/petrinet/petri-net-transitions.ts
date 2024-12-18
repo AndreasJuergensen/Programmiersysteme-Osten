@@ -42,7 +42,7 @@ export class PetriNetTransitions {
     }
 
     eachTransitionIsBaseCase(): boolean {
-        for (const transition of this.transitions) {
+        for (const transition of this._transitions) {
             if (transition instanceof Dfg) {
                 return false;
             }
