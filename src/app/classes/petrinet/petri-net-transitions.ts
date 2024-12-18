@@ -19,6 +19,10 @@ export class PetriNetTransitions {
     private idCount: number = 0;
     constructor() {}
 
+    get transitions(): Array<PetriNetTransition> {
+        return this._transitions;
+    }
+
     addDFG(dfg: Dfg): PetriNetTransitions {
         if (dfg.isBaseCase()) {
             return this.createTransition(dfg.getBaseActivityName());

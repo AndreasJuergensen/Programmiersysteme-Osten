@@ -10,14 +10,14 @@ export class Places {
     addInputPlace(): Places {
         const placeId: string = 'input';
         const place: Place = { id: placeId };
-        this.places.push(place);
+        this._places.push(place);
         return this;
     }
 
     addOutputPlace(): Places {
         const placeId: string = 'output';
         const place: Place = { id: placeId };
-        this.places.push(place);
+        this._places.push(place);
         return this;
     }
 

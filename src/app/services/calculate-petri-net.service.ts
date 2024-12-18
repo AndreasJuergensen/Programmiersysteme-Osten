@@ -54,14 +54,11 @@ export class CalculatePetriNetService {
         const dfgs: Array<Dfg> = new Array<Dfg>();
 
         //Schritt 1: Suche DFGs
-        petriNet
-            .getAllTransitions()
-            .getAllTransitions()
-            .forEach((value, key) => {
-                if (value instanceof Dfg) {
-                    dfgs.push(value);
-                }
-            });
+        petriNet.transitions.transitions.forEach((value, key) => {
+            if (value instanceof Dfg) {
+                dfgs.push(value);
+            }
+        });
 
         //Schritt 2: Berechne Graphen der DFGs und deren Größe
         dfgs.map((dfg) => {
@@ -85,7 +82,7 @@ export class CalculatePetriNetService {
         );
 
         const arcs: Array<PlaceToTransitionArc | TransitionToPlaceArc> =
-            petriNet.getAllArcs().arcs;
+            petriNet.arcs.arcs;
         const edges: Array<Edge> = this.generateEdges(nodes, arcs);
 
         this.movePossibleOutsideBoxesIntoDrawingArea(nodes);
