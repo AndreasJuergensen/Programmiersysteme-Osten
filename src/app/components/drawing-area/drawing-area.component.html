@@ -3,6 +3,14 @@
         <svg:g app-drawing-arc [arc]="arc"></svg:g>
     </ng-container>
 
+    <ng-container *ngFor="let box of boxes">
+        <svg:g app-drawing-box [box]="box"></svg:g>
+    </ng-container>
+
+    <ng-container *ngFor="let boxArc of boxArcs">
+        <svg:g app-drawing-arc [arc]="boxArc"></svg:g>
+    </ng-container>
+
     <ng-container *ngFor="let activity of activities">
         <svg:g app-drawing-activity [activity]="activity"></svg:g>
     </ng-container>
