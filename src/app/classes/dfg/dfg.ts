@@ -1,3 +1,4 @@
+import { CutType } from 'src/app/components/cut-execution/cut-execution.component';
 import { EventLog } from '../event-log';
 import { PetriNetTransition } from '../petrinet/petri-net-transitions';
 import { Activities, Activity } from './activities';
@@ -19,13 +20,24 @@ export class Dfg implements PetriNetTransition {
         this.id = 'dfg' + ++Dfg.idCount;
     }
 
-    canBeCutIn(a1: Activities, a2: Activities): boolean {
-        return (
-            new ExclusiveCut(a1, a2).isPossible(this._activities, this._arcs) ||
-            new SequenceCut(a1, a2).isPossible(this._activities, this._arcs) ||
-            new ParallelCut(a1, a2).isPossible(this._activities, this._arcs) ||
-            new LoopCut(a1, a2).isPossible(this._activities, this._arcs)
-        );
+    canBeCutIn(
+        a1: Activities,
+        a2: Activities,
+    ): { result: boolean; matchingcut: CutType | null } {
+        if (new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs)) {
+            return { result: true, matchingcut: CutType.ExclusiveCut };
+        }
+        if (new SequenceCut(a1, a2).isPossible(this.activities, this.arcs)) {
+            return { result: true, matchingcut: CutType.SequenceCut };
+        }
+        if (new ParallelCut(a1, a2).isPossible(this.activities, this.arcs)) {
+            return { result: true, matchingcut: CutType.ParallelCut };
+        }
+        if (new LoopCut(a1, a2).isPossible(this.activities, this.arcs)) {
+            return { result: true, matchingcut: CutType.LoopCut };
+        }
+
+        return { result: false, matchingcut: null };
     }
 
     /* 

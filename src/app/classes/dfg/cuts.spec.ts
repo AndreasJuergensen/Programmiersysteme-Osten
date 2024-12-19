@@ -22,7 +22,7 @@ describe('A Dfg', () => {
         const a1: Activities = partitions[0];
         const a2: Activities = partitions[1];
 
-        const result: boolean = sut.canBeCutIn(a1, a2);
+        const result: boolean = sut.canBeCutIn(a1, a2).result;
 
         expect(result).toBeFalse();
     });
@@ -44,7 +44,7 @@ describe('A Dfg', () => {
         const a1: Activities = partitions[0];
         const a2: Activities = partitions[1];
 
-        const result: boolean = sut.canBeCutIn(a1, a2);
+        const result: boolean = sut.canBeCutIn(a1, a2).result;
 
         expect(result).toBeFalse();
     });
@@ -68,7 +68,7 @@ describe('A Dfg', () => {
         const a1: Activities = partitions[0];
         const a2: Activities = partitions[1];
 
-        const result: boolean = sut.canBeCutIn(a1, a2);
+        const result: boolean = sut.canBeCutIn(a1, a2).result;
 
         expect(result).toBeFalse();
     });
@@ -88,7 +88,7 @@ describe('A Dfg', () => {
         const a2: Activities = partitions[1];
         a2.createActivity('C');
 
-        const result: boolean = sut.canBeCutIn(a1, a2);
+        const result: boolean = sut.canBeCutIn(a1, a2).result;
 
         expect(result).toBeFalse();
     });
@@ -108,7 +108,7 @@ describe('A Dfg', () => {
         const a1: Activities = partitions[0];
         const a2: Activities = partitions[1];
 
-        const result: boolean = sut.canBeCutIn(a1, a2);
+        const result: boolean = sut.canBeCutIn(a1, a2).result;
 
         expect(result).toBeFalse();
     });
@@ -139,7 +139,7 @@ describe('A Dfg', () => {
             const a1: Activities = partitions[0];
             const a2: Activities = partitions[1];
 
-            const result: boolean = sut.canBeCutIn(a1, a2);
+            const result: boolean = sut.canBeCutIn(a1, a2).result;
 
             expect(result).toBeTrue();
         },
@@ -176,7 +176,7 @@ describe('A Dfg', () => {
             const a1: Activities = partitions[0];
             const a2: Activities = partitions[1];
 
-            const result: boolean = sut.canBeCutIn(a1, a2);
+            const result: boolean = sut.canBeCutIn(a1, a2).result;
 
             expect(result).toBeTrue();
         },
@@ -219,7 +219,7 @@ describe('A Dfg', () => {
             const a1: Activities = partitions[0];
             const a2: Activities = partitions[1];
 
-            const result: boolean = sut.canBeCutIn(a1, a2);
+            const result: boolean = sut.canBeCutIn(a1, a2).result;
 
             expect(result).toBeTrue();
         },
@@ -256,7 +256,7 @@ describe('A Dfg', () => {
             const a1: Activities = partitions[0];
             const a2: Activities = partitions[1];
 
-            const result: boolean = sut.canBeCutIn(a1, a2);
+            const result: boolean = sut.canBeCutIn(a1, a2).result;
 
             expect(result).toBeTrue();
         },
