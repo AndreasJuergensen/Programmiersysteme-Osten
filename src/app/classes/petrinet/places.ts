@@ -7,6 +7,20 @@ export class Places {
 
     constructor() {}
 
+    addInputPlace(): Places {
+        const placeId: string = 'input';
+        const place: Place = { id: placeId };
+        this._places.push(place);
+        return this;
+    }
+
+    addOutputPlace(): Places {
+        const placeId: string = 'output';
+        const place: Place = { id: placeId };
+        this._places.push(place);
+        return this;
+    }
+
     addPlace(): Places {
         const placeID: string = 'p' + ++this.idCount;
         const place: Place = { id: placeID };
