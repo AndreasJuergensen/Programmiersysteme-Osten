@@ -4,6 +4,9 @@ import { EventLogDialogComponent } from './components/event-log-dialog/event-log
 import { EventLog } from './classes/event-log';
 import { Subscription } from 'rxjs';
 import { ShowFeedbackService } from './services/show-feedback.service';
+import { CalculatePetriNetService } from './services/calculate-petri-net.service';
+import { PetriNet } from './classes/petrinet/petri-net';
+import { DfgBuilder } from './classes/dfg/dfg';
 
 @Component({
     selector: 'app-root',
@@ -14,6 +17,7 @@ export class AppComponent {
     constructor(
         private _matDialog: MatDialog,
         private feedbackService: ShowFeedbackService,
+        private pnCalculationService: CalculatePetriNetService,
     ) {}
 
     public openDialog(): void {
@@ -42,5 +46,27 @@ export class AppComponent {
     `;
 
         this.feedbackService.openHelpDialog(helpMessage);
+    }
+
+    // This method is for test purposes only!
+    // Remove after connection all pieces!
+    public createTestPN(): void {
+        const dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('X')
+            .createActivity('Y')
+            .createActivity('Z')
+            .addFromPlayArc('A')
+            .addFromPlayArc('X')
+            .addArc('A', 'B')
+            .addArc('X', 'Y')
+            .addArc('Y', 'Z')
+            .addToStopArc('B')
+            .addToStopArc('Z')
+            .build();
+        const petriNet: PetriNet = new PetriNet(dfg);
+
+        this.pnCalculationService.calculatePetriNet(petriNet);
     }
 }
