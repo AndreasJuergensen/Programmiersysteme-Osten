@@ -6,11 +6,17 @@ import { EventLog, Trace } from '../classes/event-log';
 import { Activity } from '../classes/dfg/activities';
 import { PetriNetManagementService } from './petri-net-management.service';
 import { CutType } from '../components/cut-execution/cut-execution.component';
+import { mock, instance } from 'ts-mockito';
+import { ShowFeedbackService } from './show-feedback.service';
 
 describe('ExecuteCutService', () => {
     let sut: ExecuteCutService;
     let calculateDfgService: CalculateDfgService;
     let pnManagementServiceSpy: PetriNetManagementService;
+
+    let mockedFoo: ShowFeedbackService = mock(ShowFeedbackService);
+
+    let foo: ShowFeedbackService = instance(mockedFoo);
 
     beforeEach(() => {
         pnManagementServiceSpy = new PetriNetManagementService();
@@ -18,6 +24,7 @@ describe('ExecuteCutService', () => {
         sut = new ExecuteCutService(
             pnManagementServiceSpy,
             calculateDfgService,
+            foo,
         );
     });
 
