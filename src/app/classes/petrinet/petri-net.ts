@@ -17,10 +17,12 @@ export class PetriNet {
     }
 
     private initializeOriginDFG(dfg: Dfg): PetriNet {
+        this._places.addInputPlace().addOutputPlace();
         this._transitions.createTransition('play').createTransition('stop');
+
         this._arcs
             .addPlaceToTransitionArc(
-                this._places.addPlace().getLastPlace(),
+                this._places.input,
                 this._transitions.getTransitionByID('t1'),
             )
             .addTransitionToPlaceArc(
@@ -41,8 +43,9 @@ export class PetriNet {
             )
             .addTransitionToPlaceArc(
                 this._transitions.getTransitionByID('t2'),
-                this._places.addPlace().getLastPlace(),
+                this._places.output,
             );
+
         return this;
     }
 

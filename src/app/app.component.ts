@@ -7,6 +7,9 @@ import { CalculateDfgService } from './services/calculate-dfg.service';
 import { Dfg } from './classes/dfg/dfg';
 import { PetriNetManagementService } from './services/petri-net-management.service';
 import { ShowFeedbackService } from './services/show-feedback.service';
+import { CalculatePetriNetService } from './services/calculate-petri-net.service';
+import { PetriNet } from './classes/petrinet/petri-net';
+import { DfgBuilder } from './classes/dfg/dfg';
 
 @Component({
     selector: 'app-root',
@@ -19,6 +22,7 @@ export class AppComponent {
         private _calculateDfgService: CalculateDfgService,
         private _petriNetManagementService: PetriNetManagementService,
         private feedbackService: ShowFeedbackService,
+        private pnCalculationService: CalculatePetriNetService,
     ) {}
 
     public openDialog(): void {
@@ -54,5 +58,27 @@ export class AppComponent {
     `;
 
         this.feedbackService.openHelpDialog(helpMessage);
+    }
+
+    // This method is for test purposes only!
+    // Remove after connection all pieces!
+    public createTestPN(): void {
+        const dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('X')
+            .createActivity('Y')
+            .createActivity('Z')
+            .addFromPlayArc('A')
+            .addFromPlayArc('X')
+            .addArc('A', 'B')
+            .addArc('X', 'Y')
+            .addArc('Y', 'Z')
+            .addToStopArc('B')
+            .addToStopArc('Z')
+            .build();
+        const petriNet: PetriNet = new PetriNet(dfg);
+
+        this.pnCalculationService.calculatePetriNet(petriNet);
     }
 }

@@ -46,6 +46,6 @@ export class Places {
     }
 
     get output(): Place {
-        return this._places[3];
+        return this._places[1];
     }
 }

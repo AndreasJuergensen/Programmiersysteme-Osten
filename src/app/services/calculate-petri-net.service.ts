@@ -185,7 +185,7 @@ export class CalculatePetriNetService {
         let yCoordinate: number = 100;
         let xOfLastModeledNode: number = 100;
 
-        const inputPlace: Place = petriNet.places.getPlaceByID('input');
+        const inputPlace: Place = petriNet.places.input;
         nodes.push(new PlaceNode('input', 100, 100));
 
         const neighbours: Array<PetriNetTransition> =
