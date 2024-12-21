@@ -57,6 +57,5 @@ export class PetriNetManagementService {
 
     private updatePn(): void {
         this._petriNet$.next(this._petriNet);
-        this.updatePn();
     }
 }

@@ -14,9 +14,12 @@ describe('ExecuteCutService', () => {
     let calculateDfgService: CalculateDfgService;
     let pnManagementServiceSpy: PetriNetManagementService;
 
-    let mockedFoo: ShowFeedbackService = mock(ShowFeedbackService);
+    let showFeedbackServiceMock: ShowFeedbackService =
+        mock(ShowFeedbackService);
 
-    let foo: ShowFeedbackService = instance(mockedFoo);
+    let showFeedbackServiceMockInstance: ShowFeedbackService = instance(
+        showFeedbackServiceMock,
+    );
 
     beforeEach(() => {
         pnManagementServiceSpy = new PetriNetManagementService();
@@ -24,7 +27,7 @@ describe('ExecuteCutService', () => {
         sut = new ExecuteCutService(
             pnManagementServiceSpy,
             calculateDfgService,
-            foo,
+            showFeedbackServiceMockInstance,
         );
     });
 
