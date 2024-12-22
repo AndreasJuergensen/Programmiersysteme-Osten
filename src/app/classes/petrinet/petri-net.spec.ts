@@ -407,4 +407,128 @@ describe('A Petrinet', () => {
         expect(sut.transitions).toEqual(expectedTransitions);
         expect(sut.arcs).toEqual(expectedArcs);
     });
+
+    it('update by flower fall through', () => {
+        const originDFG: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('Z')
+            .createActivity('Y')
+            .addFromPlayArc('A')
+            .addFromPlayArc('Z')
+            .addToStopArc('B')
+            .addToStopArc('Y')
+            .addArc('A', 'B')
+            .addArc('Z', 'Y')
+            .addArc('B', 'Y')
+            .build();
+        const flowerDFG1: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .addFromPlayArc('A')
+            .addToStopArc('A')
+            .build();
+        const flowerDFG2: Dfg = new DfgBuilder()
+            .createActivity('B')
+            .addFromPlayArc('B')
+            .addToStopArc('B')
+            .build();
+        const flowerDFG3: Dfg = new DfgBuilder()
+            .createActivity('Z')
+            .addFromPlayArc('Z')
+            .addToStopArc('Z')
+            .build();
+        const flowerDFG4: Dfg = new DfgBuilder()
+            .createActivity('Y')
+            .addFromPlayArc('Y')
+            .addToStopArc('Y')
+            .build();
+
+        const fallThroughDFGs: Dfg[] = [
+            flowerDFG1,
+            flowerDFG2,
+            flowerDFG3,
+            flowerDFG4,
+        ];
+
+        const sut: PetriNet = new PetriNet(originDFG).updateByFlowerFallThrough(
+            originDFG,
+            fallThroughDFGs,
+        );
+
+        const expectedPlaces: Places = new Places()
+            .addInputPlace()
+            .addOutputPlace();
+        const expectedTransitions: PetriNetTransitions =
+            new PetriNetTransitions()
+                .createTransition('play')
+                .createTransition('stop');
+        const expectedArcs: PetriNetArcs = new PetriNetArcs()
+            .addPlaceToTransitionArc(
+                expectedPlaces.input,
+                expectedTransitions.getTransitionByID('t1'),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getTransitionByID('t1'),
+                expectedPlaces.addPlace().getPlaceByID('p1'),
+            );
+        expectedTransitions
+            .addDFG(originDFG)
+            .transitions.splice(
+                expectedTransitions.transitions.indexOf(
+                    expectedTransitions.getLastTransition(),
+                ),
+                1,
+            );
+        expectedPlaces
+            .addPlace()
+            .places.splice(
+                expectedPlaces.places.indexOf(expectedPlaces.getLastPlace()),
+                1,
+            );
+        expectedArcs
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p1'),
+                expectedTransitions.getTransitionByID('t2'),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getTransitionByID('t2'),
+                expectedPlaces.output,
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p1'),
+                expectedTransitions.addDFG(flowerDFG1).getLastTransition(),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getLastTransition(),
+                expectedPlaces.getPlaceByID('p1'),
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p1'),
+                expectedTransitions.addDFG(flowerDFG2).getLastTransition(),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getLastTransition(),
+                expectedPlaces.getPlaceByID('p1'),
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p1'),
+                expectedTransitions.addDFG(flowerDFG3).getLastTransition(),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getLastTransition(),
+                expectedPlaces.getPlaceByID('p1'),
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p1'),
+                expectedTransitions.addDFG(flowerDFG4).getLastTransition(),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getLastTransition(),
+                expectedPlaces.getPlaceByID('p1'),
+            );
+
+        expect(sut.places).toEqual(expectedPlaces);
+        expect(sut.transitions).toEqual(expectedTransitions);
+        expect(sut.arcs).toEqual(expectedArcs);
+    });
 });

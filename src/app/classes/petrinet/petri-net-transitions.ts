@@ -36,9 +36,19 @@ export class PetriNetTransitions {
         return this;
     }
 
-    deleteDFG(dfg: Dfg): PetriNetTransitions {
+    removeDFG(dfg: Dfg): PetriNetTransitions {
         this._transitions.splice(this._transitions.indexOf(dfg), 1);
         return this;
+    }
+
+    getAllDFGs(): Dfg[] {
+        const dfgs: Dfg[] = [];
+        for (const transition of this.transitions) {
+            if (transition instanceof Dfg) {
+                dfgs.push(transition);
+            }
+        }
+        return dfgs;
     }
 
     getLastTransition(): PetriNetTransition {

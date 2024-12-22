@@ -465,3 +465,42 @@ describe('A Loop Cut', () => {
         expect(result).toEqual([expectedEventLog1, expectedEventLog2]);
     });
 });
+
+describe('A Flower Model', () => {
+    it('split an EventLog', () => {
+        const sut: EventLog = new EventLog([
+            new Trace([new Activity('A')]),
+            new Trace([new Activity('B')]),
+            new Trace([new Activity('C')]),
+            new Trace([new Activity('A'), new Activity('B')]),
+            new Trace([new Activity('A'), new Activity('C')]),
+            new Trace([new Activity('A'), new Activity('D')]),
+            new Trace([
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('C'),
+            ]),
+        ]);
+
+        const expectedEventLog1: EventLog = new EventLog([
+            new Trace([new Activity('A')]),
+        ]);
+        const expectedEventLog2: EventLog = new EventLog([
+            new Trace([new Activity('B')]),
+        ]);
+        const expectedEventLog3: EventLog = new EventLog([
+            new Trace([new Activity('C')]),
+        ]);
+        const expectedEventLog4: EventLog = new EventLog([
+            new Trace([new Activity('D')]),
+        ]);
+        const result: EventLog[] = sut.splitByFlowerFallThrough();
+
+        expect(result).toEqual([
+            expectedEventLog1,
+            expectedEventLog2,
+            expectedEventLog3,
+            expectedEventLog4,
+        ]);
+    });
+});

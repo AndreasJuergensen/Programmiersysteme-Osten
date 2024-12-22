@@ -2,10 +2,10 @@ import { Activities, Activity } from './dfg/activities';
 import { ExclusiveCut, LoopCut, ParallelCut, SequenceCut } from './dfg/cut';
 
 export class EventLog {
-    private readonly traces: Trace[];
+    constructor(private readonly _traces: Trace[] = []) {}
 
-    constructor(traces: Trace[] = []) {
-        this.traces = traces;
+    get traces(): Trace[] {
+        return this._traces;
     }
 
     addTrace(trace: Trace): void {
@@ -102,14 +102,54 @@ export class EventLog {
         }
         return [e1, e2];
     }
+
+    splitByActivityOncePerTrace(activity: Activity): [EventLog, EventLog] {
+        const partition: Activities = new Activities([activity]);
+        return this.splitByParallelCut(partition);
+    }
+
+    splitByFlowerFallThrough(): EventLog[] {
+        const eventLogs: EventLog[] = [];
+        for (const trace of this.traces) {
+            for (const activity of trace.activities) {
+                const eventLog: EventLog = new EventLog([
+                    new Trace([activity]),
+                ]);
+                const eventLogExistsAlready: boolean = eventLogs.some((log) =>
+                    log.equals(eventLog),
+                );
+                if (!eventLogExistsAlready) {
+                    eventLogs.push(eventLog);
+                }
+            }
+        }
+        return eventLogs;
+    }
+
+    activityOncePerTraceIsPossibleBy(activity: Activity): boolean {
+        for (const trace of this.traces) {
+            if (!trace.containsActivityOnce(activity)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private equals(other: EventLog): boolean {
+        if (this.traces.length !== other.traces.length) {
+            return false;
+        }
+        for (let i = 0; i < this.traces.length; i++) {
+            if (!this.traces[i].equals(other.traces[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 export class Trace {
-    private readonly activities: Activity[];
-
-    constructor(activities: Activity[] = []) {
-        this.activities = activities;
-    }
+    constructor(private readonly _activities: Activity[] = []) {}
 
     addActivity(activity: Activity): void {
         this.activities.push(activity);
@@ -123,7 +163,36 @@ export class Trace {
         return partition.containsActivity(this.activities[index]);
     }
 
+    containsActivityOnce(searchActivity: Activity): boolean {
+        let activityOccursOnce: boolean = false;
+        for (const activity of this.activities) {
+            if (activity.equals(searchActivity)) {
+                if (activityOccursOnce) {
+                    return false;
+                }
+                activityOccursOnce = true;
+            }
+        }
+        return activityOccursOnce;
+    }
+
+    equals(other: Trace): boolean {
+        if (this.activities.length !== other.activities.length) {
+            return false;
+        }
+        for (let i = 0; i < this.activities.length; i++) {
+            if (!this.activities[i].equals(other.activities[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     isEmpty(): boolean {
         return this.activities.length === 0;
+    }
+
+    get activities(): Activity[] {
+        return this._activities;
     }
 }
