@@ -17,6 +17,7 @@ import {
 import { DrawingAreaModule } from './components/drawing-area/drawing-area.module';
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
+import { CutExecutionComponent } from './components/cut-execution/cut-execution.component';
 import { TextFieldModule } from '@angular/cdk/text-field';
 
 @NgModule({
@@ -34,6 +35,7 @@ import { TextFieldModule } from '@angular/cdk/text-field';
         MatSnackBarModule,
         FormsModule,
         MatDialogModule,
+        CutExecutionComponent,
         TextFieldModule,
     ],
     providers: [

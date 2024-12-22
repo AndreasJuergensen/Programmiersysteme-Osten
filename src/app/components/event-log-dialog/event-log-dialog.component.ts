@@ -9,14 +9,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { Activity } from 'src/app/classes/dfg/activities';
-import { Dfg } from 'src/app/classes/dfg/dfg';
 import { EventLog } from 'src/app/classes/event-log';
-import { CalculateCoordinatesService } from 'src/app/services/calculate-coordinates.service';
-import { CalculateDfgService } from 'src/app/services/calculate-dfg.service';
 import { EventLogParserService } from 'src/app/services/event-log-parser.service';
 import { CommonModule } from '@angular/common';
 import { EventLogValidationService } from 'src/app/services/event-log-validation.service';
+import { CalculateCoordinatesService } from 'src/app/services/calculate-coordinates.service';
+import { CalculateDfgService } from 'src/app/services/calculate-dfg.service';
+import { Dfg } from 'src/app/classes/dfg/dfg';
 
 @Component({
     selector: 'app-event-log-dialog',
