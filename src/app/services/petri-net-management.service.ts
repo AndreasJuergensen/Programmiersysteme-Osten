@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { PetriNet } from '../classes/petrinet/petri-net';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Dfg } from '../classes/dfg/dfg';
+import { ShowFeedbackService } from './show-feedback.service';
 
 @Injectable({
     providedIn: 'root',
@@ -16,11 +17,17 @@ export class PetriNetManagementService {
         return this._petriNet$.asObservable();
     }
 
-    constructor() {}
+    constructor(private _showFeedbackService: ShowFeedbackService) {}
 
     public initialize(dfg: Dfg): void {
         this._petriNet = new PetriNet(dfg);
         this._petriNet$.next(this._petriNet);
+        if (this._petriNet.isBasicPetriNet()) {
+            this._showFeedbackService.showMessage(
+                'There is nothing to split on this event log.',
+                false,
+            );
+        }
     }
 
     public updatePnByExclusiveCut(
@@ -57,5 +64,11 @@ export class PetriNetManagementService {
 
     private updatePn(): void {
         this._petriNet$.next(this._petriNet);
+        if (this._petriNet.isBasicPetriNet()) {
+            this._showFeedbackService.showMessage(
+                'The input event log is completely splitted.',
+                false,
+            );
+        }
     }
 }
