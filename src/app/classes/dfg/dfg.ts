@@ -66,6 +66,28 @@ export class Dfg implements PetriNetTransition {
         return [a1, a2];
     }
 
+    canBeCutByAnyPartitions(): boolean {
+        const copy: Activities = new Activities()
+            .addAll(this.activities)
+            .removePlayAndStop();
+        for (let mask = 1; mask < 1 << copy.getLength(); mask++) {
+            const sub1: Activities = new Activities();
+            const sub2: Activities = new Activities();
+            for (let i = 0; i < copy.getLength(); i++) {
+                const activity: Activity = copy.getActivityByIndex(i);
+                if ((mask & (1 << i)) !== 0) {
+                    sub1.addActivity(activity);
+                } else {
+                    sub2.addActivity(activity);
+                }
+            }
+            if (this.canBeCutIn(sub1, sub2).result) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     isBaseCase(): boolean {
         if (this.activities.getLength() === 3) {
             return true;
