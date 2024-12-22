@@ -44,14 +44,14 @@ export class AppComponent {
                 const dfg: Dfg = this._calculateDfgService.calculate(eventLog);
                 this._petriNetManagementService.initialize(dfg);
 
-                // this._petriNetManagementService.petriNet$.subscribe((net) => {
-                //     this.petriNet = net;
-                // });
+                this._petriNetManagementService.petriNet$.subscribe((net) => {
+                    this.petriNet = net;
+                });
                 // const petriNet: BehaviorSubject<PetriNet>;
                 // petriNet = this._petriNetManagementService.petriNet$;
 
-                // this.pnCalculationService.calculatePetriNet(this.petriNet);
-                // console.log(this.petriNet);
+                this.pnCalculationService.calculatePetriNet(this.petriNet);
+                console.log(this.petriNet);
             },
             complete: () => sub.unsubscribe(),
         });

@@ -7,7 +7,7 @@
                 matInput
                 cdkTextareaAutosize
                 cdkAutosizeMinRows="4"
-                placeholder="A+B+C 
+                placeholder="A B C + D
                 ..."
                 [formControl]="eventLogControl"
             ></textarea>
@@ -25,11 +25,11 @@
                     eventLogControl.dirty
                 "
             >
-                Ungültige Eingabe. > A+B+C C+A+Z ...
+                Ungültige Eingabe. > A B C + C + A Z ...
             </mat-error>
             <mat-hint
-                >Aktivitäten pro Trace verkettet durch ein Plus (+) eingeben.
-                Ein Trace pro Zeile. (A+B+C C ...)
+                >Aktivitäten pro Trace verkettet durch ein Leerzeichen eingeben.
+                Die Traces durch ein Plus (+) verkettet eingeben.
             </mat-hint>
         </mat-form-field>
     </form>
