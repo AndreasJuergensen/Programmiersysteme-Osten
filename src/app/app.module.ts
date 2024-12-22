@@ -17,6 +17,7 @@ import {
 import { DrawingAreaModule } from './components/drawing-area/drawing-area.module';
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
+import { CutExecutionComponent } from './components/cut-execution/cut-execution.component';
 
 @NgModule({
     declarations: [AppComponent, FooterComponent],
@@ -33,6 +34,7 @@ import { MatDialogModule } from '@angular/material/dialog';
         MatSnackBarModule,
         FormsModule,
         MatDialogModule,
+        CutExecutionComponent,
     ],
     providers: [
         {
