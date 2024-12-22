@@ -22,6 +22,7 @@ import {
     PlaceToTransitionArc,
     TransitionToPlaceArc,
 } from '../classes/petrinet/petri-net-arcs';
+import { PetriNetManagementService } from './petri-net-management.service';
 
 type GraphWithBoxDimension = [Graph, number, number, Dfg];
 
@@ -30,8 +31,13 @@ type GraphWithBoxDimension = [Graph, number, number, Dfg];
 })
 export class CalculatePetriNetService {
     constructor(
+        private petriNetManagementService: PetriNetManagementService,
         private calculateCoodinatesService: CalculateCoordinatesService,
-    ) {}
+    ) {
+        this.petriNetManagementService.petriNet$.subscribe((petriNet) =>
+            this.calculatePetriNet(petriNet),
+        );
+    }
 
     private _dfgGraphsAndBoxes: Map<string, GraphWithBoxDimension> = new Map<
         string,
