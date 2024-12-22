@@ -59,26 +59,4 @@ export class AppComponent {
 
         this.feedbackService.openHelpDialog(helpMessage);
     }
-
-    // This method is for test purposes only!
-    // Remove after connection all pieces!
-    public createTestPN(): void {
-        const dfg = new DfgBuilder()
-            .createActivity('A')
-            .createActivity('B')
-            .createActivity('X')
-            .createActivity('Y')
-            .createActivity('Z')
-            .addFromPlayArc('A')
-            .addFromPlayArc('X')
-            .addArc('A', 'B')
-            .addArc('X', 'Y')
-            .addArc('Y', 'Z')
-            .addToStopArc('B')
-            .addToStopArc('Z')
-            .build();
-        const petriNet: PetriNet = new PetriNet(dfg);
-
-        this.pnCalculationService.calculatePetriNet(petriNet);
-    }
 }
