@@ -1,20 +1,47 @@
-<h2 mat-dialog-title>Input Event Log</h2>
+<h2 mat-dialog-title>Event-Log-Eingabe</h2>
 <mat-dialog-content class="mat-typography">
     <form>
         <mat-form-field style="width: 100%">
-            <mat-label>Enter a sequence...</mat-label>
+            <mat-label>Bitte hier EventLog eingeben.</mat-label>
             <textarea
                 matInput
-                placeholder="Ex. It makes me feel..."
-                [(ngModel)]="eventLogInput"
-                [ngModelOptions]="{ standalone: true }"
+                cdkTextareaAutosize
+                cdkAutosizeMinRows="4"
+                placeholder="A+B+C 
+                ..."
+                [formControl]="eventLogControl"
             ></textarea>
+            <mat-error
+                *ngIf="
+                    eventLogControl.hasError('required') &&
+                    eventLogControl.dirty
+                "
+            >
+                keine leere Eingabe möglich
+            </mat-error>
+            <mat-error
+                *ngIf="
+                    eventLogControl.hasError('invalidInput') &&
+                    eventLogControl.dirty
+                "
+            >
+                Ungültige Eingabe. > A+B+C C+A+Z ...
+            </mat-error>
+            <mat-hint
+                >Aktivitäten pro Trace verkettet durch ein Plus (+) eingeben.
+                Ein Trace pro Zeile. (A+B+C C ...)
+            </mat-hint>
         </mat-form-field>
     </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>Cancel</button>
-    <button mat-button (click)="onOkClick()" cdkFocusInitial>
+    <button
+        mat-button
+        (click)="onOkClick()"
+        cdkFocusInitial
+        [disabled]="eventLogControl.invalid"
+    >
         Ok
     </button>
 </mat-dialog-actions>
