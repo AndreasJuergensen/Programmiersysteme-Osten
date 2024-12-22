@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { EventLogDialogComponent } from './components/event-log-dialog/event-log-dialog.component';
 import { EventLog } from './classes/event-log';
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { CalculateDfgService } from './services/calculate-dfg.service';
 import { Dfg } from './classes/dfg/dfg';
 import { PetriNetManagementService } from './services/petri-net-management.service';
@@ -17,6 +17,8 @@ import { DfgBuilder } from './classes/dfg/dfg';
     styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
+    petriNet: PetriNet = new PetriNet();
+
     constructor(
         private _matDialog: MatDialog,
         private _calculateDfgService: CalculateDfgService,
@@ -41,6 +43,15 @@ export class AppComponent {
 
                 const dfg: Dfg = this._calculateDfgService.calculate(eventLog);
                 this._petriNetManagementService.initialize(dfg);
+
+                // this._petriNetManagementService.petriNet$.subscribe((net) => {
+                //     this.petriNet = net;
+                // });
+                // const petriNet: BehaviorSubject<PetriNet>;
+                // petriNet = this._petriNetManagementService.petriNet$;
+
+                // this.pnCalculationService.calculatePetriNet(this.petriNet);
+                // console.log(this.petriNet);
             },
             complete: () => sub.unsubscribe(),
         });

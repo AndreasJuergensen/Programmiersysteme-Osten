@@ -13,9 +13,6 @@ import { EventLog } from 'src/app/classes/event-log';
 import { EventLogParserService } from 'src/app/services/event-log-parser.service';
 import { CommonModule } from '@angular/common';
 import { EventLogValidationService } from 'src/app/services/event-log-validation.service';
-import { CalculateCoordinatesService } from 'src/app/services/calculate-coordinates.service';
-import { CalculateDfgService } from 'src/app/services/calculate-dfg.service';
-import { Dfg } from 'src/app/classes/dfg/dfg';
 
 @Component({
     selector: 'app-event-log-dialog',
@@ -44,8 +41,6 @@ export class EventLogDialogComponent implements OnInit {
     constructor(
         private dialogRef: MatDialogRef<EventLogDialogComponent, EventLog>,
         private eventLogParserService: EventLogParserService,
-        private calculateDfgService: CalculateDfgService,
-        private calculateCoordinatesService: CalculateCoordinatesService,
         private eventLogValidationService: EventLogValidationService,
     ) {}
 
@@ -72,10 +67,7 @@ export class EventLogDialogComponent implements OnInit {
         const eventLog: EventLog = this.eventLogParserService.parse(
             this.eventLogControl.value!,
         );
-        const dfg: Dfg = this.calculateDfgService.calculate(eventLog);
-        const graph =
-            this.calculateCoordinatesService.calculateCoordinates(dfg);
-        console.log(graph);
+
         this.dialogRef.close(eventLog);
     }
 }
