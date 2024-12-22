@@ -13,9 +13,12 @@ export class Activities {
     }
 
     removePlayAndStop(): Activities {
-        for (const activity of this.activities) {
-            if (activity.isPlayOrStop()) {
-                this.activities.splice(this.activities.indexOf(activity), 1);
+        let count: number = 0;
+        while (count < this.activities.length) {
+            if (this.activities[count].isPlayOrStop()) {
+                this.activities.splice(count, 1);
+            } else {
+                count++;
             }
         }
         return this;
@@ -99,6 +102,10 @@ export class Activities {
             throw new Error('Activity not found');
         }
         return this.activities.find((a) => a.equals(new Activity(name)))!;
+    }
+
+    getActivityByIndex(index: number): Activity {
+        return this.activities[index];
     }
 
     getAllActivites(): Array<Activity> {
