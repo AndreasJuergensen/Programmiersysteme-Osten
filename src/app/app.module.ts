@@ -18,28 +18,28 @@ import { DrawingAreaModule } from './components/drawing-area/drawing-area.module
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { CutExecutionComponent } from './components/cut-execution/cut-execution.component';
-import { ExampleEventLogsComponent } from "./components/example-event-logs/example-event-logs.component";
+import { ExampleEventLogsComponent } from './components/example-event-logs/example-event-logs.component';
 import { TextFieldModule } from '@angular/cdk/text-field';
 
 @NgModule({
     declarations: [AppComponent, FooterComponent],
     bootstrap: [AppComponent],
     imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    ReactiveFormsModule,
-    DrawingAreaModule,
-    MatSnackBarModule,
-    FormsModule,
-    MatDialogModule,
-    CutExecutionComponent,
-    ExampleEventLogsComponent
+        BrowserModule,
+        BrowserAnimationsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButtonModule,
+        MatIconModule,
+        ReactiveFormsModule,
+        DrawingAreaModule,
+        MatSnackBarModule,
+        FormsModule,
+        MatDialogModule,
+        CutExecutionComponent,
+        ExampleEventLogsComponent,
         TextFieldModule,
-],
+    ],
     providers: [
         {
             provide: APP_BASE_HREF,
