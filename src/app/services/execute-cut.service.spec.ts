@@ -22,7 +22,7 @@ describe('ExecuteCutService', () => {
     );
 
     beforeEach(() => {
-        pnManagementServiceSpy = new PetriNetManagementService();
+        pnManagementServiceSpy = new PetriNetManagementService(showFeedbackServiceMockInstance);
         calculateDfgService = new CalculateDfgService();
         sut = new ExecuteCutService(
             pnManagementServiceSpy,
