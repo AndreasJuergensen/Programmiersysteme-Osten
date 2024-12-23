@@ -10,6 +10,7 @@ import { Activities } from 'src/app/classes/dfg/activities';
 import { Arcs } from 'src/app/classes/dfg/arcs';
 import { EventLog } from 'src/app/classes/event-log';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
+import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
 
 export enum CutType {
     ExclusiveCut = 'ExclusiveCut',
@@ -43,12 +44,13 @@ export class CutExecutionComponent implements OnInit {
     arcsSelectedDummy: Arcs = new Arcs();
 
     constructor(
-        private fb: FormBuilder,
-        private executeCutService: ExecuteCutService,
-        private feedbackService: ShowFeedbackService,
+        private _fb: FormBuilder,
+        private _executeCutService: ExecuteCutService,
+        private _feedbackService: ShowFeedbackService,
+        private _petriNetManagementService: PetriNetManagementService,
         // private kantenSammelService: KantenSammelService
     ) {
-        this.radioForm = this.fb.group({
+        this.radioForm = this._fb.group({
             selectedCut: null,
         });
     }
@@ -60,14 +62,14 @@ export class CutExecutionComponent implements OnInit {
     onCutClick(): void {
         const selectedValue = this.radioForm.get('selectedCut')?.value;
         if (selectedValue) {
-            this.executeCutService.execute(
+            this._executeCutService.execute(
                 this.dfgDummy,
                 this.arcsSelectedDummy,
                 selectedValue,
             );
             this.resetRadioSelection();
         } else {
-            this.feedbackService.showMessage(
+            this._feedbackService.showMessage(
                 'Es wurde kein Cut ausgewählt!',
                 true,
                 'Sie müssen einen Cut über die Radio-Buttons auswählen, um einen Cut durchführen zu können.',
@@ -78,11 +80,15 @@ export class CutExecutionComponent implements OnInit {
     onCancelClick(): void {
         if (this.radioForm.get('selectedCut')?.value !== null) {
             this.resetRadioSelection();
-            this.feedbackService.showMessage('Cutauswahl abgebrochen.', false);
+            this._feedbackService.showMessage('Cutauswahl abgebrochen.', false);
         }
     }
 
     resetRadioSelection(): void {
         this.radioForm.get('selectedCut')?.setValue(null);
+    }
+
+    get actionButtonsAreDisabled(): boolean {
+        return !this._petriNetManagementService.isModifiable;
     }
 }
