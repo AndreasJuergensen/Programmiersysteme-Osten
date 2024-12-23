@@ -1,16 +1,33 @@
-import { TestBed } from '@angular/core/testing';
-
 import { EventLogValidationService } from './event-log-validation.service';
 
 describe('EventLogValidationService', () => {
-  let service: EventLogValidationService;
+    let sut: EventLogValidationService;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(EventLogValidationService);
-  });
+    beforeEach(() => {
+        sut = new EventLogValidationService();
+    });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+    it('empty string', () => {
+        const input: string = '';
+        const result = sut.validateInput(input);
+        expect(result).toBeFalse();
+    });
+
+    it('string starts with a plus "+" ', () => {
+        const input: string = '+A B C + D';
+        const result = sut.validateInput(input);
+        expect(result).toBeFalse();
+    });
+
+    it('string / Traces separated by two plusses "++" ', () => {
+        const input: string = 'A B C ++ D';
+        const result = sut.validateInput(input);
+        expect(result).toBeFalse();
+    });
+
+    it('valid string / event log ', () => {
+        const input: string = 'A B C + X Y Z + Test Test1 Test2';
+        const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
 });
