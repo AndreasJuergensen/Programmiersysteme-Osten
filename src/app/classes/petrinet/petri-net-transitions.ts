@@ -41,6 +41,15 @@ export class PetriNetTransitions {
         return this;
     }
 
+    eachTransitionIsBaseCase(): boolean {
+        for (const transition of this._transitions) {
+            if (transition instanceof Dfg) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     getLastTransition(): PetriNetTransition {
         return this._transitions[this._transitions.length - 1];
     }

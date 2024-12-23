@@ -1,13 +1,18 @@
 <h3>1. Kanten wählen -> 2. Cut wählen -> 3. Cut durchführen!</h3>
-<form [formGroup]="radioForm">
-    <mat-radio-group formControlName="selectedCut">
-        <mat-radio-button *ngFor="let option of radioOptions" [value]="option">
-            {{ option }}
-        </mat-radio-button>
-    </mat-radio-group>
-</form>
-<button mat-raised-button="primary" (click)="onCutClick()">
-    Cut durchfuehren
-</button>
-<!-- Abstand einfuegen? Wie? -->
-<button mat-stroked-button (click)="onCancelClick()">Cancel</button>
+<div [ngClass]="{ 'disabled-component': actionButtonsAreDisabled }">
+    <form [formGroup]="radioForm">
+        <mat-radio-group formControlName="selectedCut">
+            <mat-radio-button
+                *ngFor="let option of radioOptions"
+                [value]="option"
+            >
+                {{ option }}
+            </mat-radio-button>
+        </mat-radio-group>
+    </form>
+    <button mat-raised-button="primary" (click)="onCutClick()">
+        Cut durchfuehren
+    </button>
+    <!-- Abstand einfuegen? Wie? -->
+    <button mat-stroked-button (click)="onCancelClick()">Cancel</button>
+</div>

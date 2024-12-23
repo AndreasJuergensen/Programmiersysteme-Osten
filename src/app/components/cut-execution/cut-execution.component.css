@@ -1,0 +1,5 @@
+/* CSS-Klasse für den deaktivierten Zustand */
+.disabled-component {
+    pointer-events: none;
+    opacity: 0.5;
+}

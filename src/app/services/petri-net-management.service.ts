@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { PetriNet } from '../classes/petrinet/petri-net';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Dfg } from '../classes/dfg/dfg';
+import { ShowFeedbackService } from './show-feedback.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PetriNetManagementService {
     private _petriNet: PetriNet = new PetriNet();
+    private _isModifiable: boolean = false;
 
     private _petriNet$: BehaviorSubject<PetriNet> =
         new BehaviorSubject<PetriNet>(this._petriNet);
@@ -16,10 +18,23 @@ export class PetriNetManagementService {
         return this._petriNet$.asObservable();
     }
 
-    constructor() {}
+    get isModifiable(): boolean {
+        return this._isModifiable;
+    }
+
+    constructor(private _showFeedbackService: ShowFeedbackService) {}
 
     public initialize(dfg: Dfg): void {
         this._petriNet = new PetriNet(dfg);
+        if (this._petriNet.isBasicPetriNet()) {
+            this._isModifiable = false;
+            this._showFeedbackService.showMessage(
+                'There is nothing to split on this event log.',
+                false,
+            );
+        } else {
+            this._isModifiable = true;
+        }
         this._petriNet$.next(this._petriNet);
     }
 
@@ -56,6 +71,15 @@ export class PetriNetManagementService {
     }
 
     private updatePn(): void {
+        if (this._petriNet.isBasicPetriNet()) {
+            this._isModifiable = false;
+            this._showFeedbackService.showMessage(
+                'The input event log is completely splitted.',
+                false,
+            );
+        } else {
+            this._isModifiable = true;
+        }
         this._petriNet$.next(this._petriNet);
     }
 }
