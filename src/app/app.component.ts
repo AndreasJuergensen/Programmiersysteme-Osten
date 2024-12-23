@@ -43,15 +43,6 @@ export class AppComponent {
 
                 const dfg: Dfg = this._calculateDfgService.calculate(eventLog);
                 this._petriNetManagementService.initialize(dfg);
-
-                this._petriNetManagementService.petriNet$.subscribe((net) => {
-                    this.petriNet = net;
-                });
-                // const petriNet: BehaviorSubject<PetriNet>;
-                // petriNet = this._petriNetManagementService.petriNet$;
-
-                this.pnCalculationService.calculatePetriNet(this.petriNet);
-                console.log(this.petriNet);
             },
             complete: () => sub.unsubscribe(),
         });
@@ -69,27 +60,5 @@ export class AppComponent {
     `;
 
         this.feedbackService.openHelpDialog(helpMessage);
-    }
-
-    // This method is for test purposes only!
-    // Remove after connection all pieces!
-    public createTestPN(): void {
-        const dfg = new DfgBuilder()
-            .createActivity('A')
-            .createActivity('B')
-            .createActivity('X')
-            .createActivity('Y')
-            .createActivity('Z')
-            .addFromPlayArc('A')
-            .addFromPlayArc('X')
-            .addArc('A', 'B')
-            .addArc('X', 'Y')
-            .addArc('Y', 'Z')
-            .addToStopArc('B')
-            .addToStopArc('Z')
-            .build();
-        const petriNet: PetriNet = new PetriNet(dfg);
-
-        this.pnCalculationService.calculatePetriNet(petriNet);
     }
 }
