@@ -82,7 +82,7 @@ export class Dfg implements PetriNetTransition {
     thus same behavior as the arc is clicked in petrinet
     */
     getArc(start: string, end: string): DfgArc {
-        return this.arcs.getArcByStartNameAndEndName(start, end);
+        return this.arcs.getArcByStartNameAndEndName(start, end)!;
     }
 
     get activities(): Activities {

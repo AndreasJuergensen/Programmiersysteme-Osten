@@ -53,4 +53,14 @@ export class PetriNetTransitions {
         }
         throw new Error('Transition not found');
     }
+
+    getAllDFGs(): Array<Dfg> {
+        const dfgs: Array<Dfg> = new Array<Dfg>();
+        for (const transition of this._transitions) {
+            if (transition instanceof Dfg) {
+                dfgs.push(transition);
+            }
+        }
+        return dfgs;
+    }
 }

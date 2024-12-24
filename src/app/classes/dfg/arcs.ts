@@ -170,7 +170,6 @@ export class Arcs {
         return this;
     }
 
-
     getArcs(): Array<DfgArc> {
         return this.arcs;
     }
@@ -188,7 +187,10 @@ export class Arcs {
         return false;
     }
 
-    getArcByStartNameAndEndName(start: string, end: string): DfgArc {
+    getArcByStartNameAndEndName(
+        start: string,
+        end: string,
+    ): DfgArc | undefined {
         for (const arc of this.arcs) {
             if (
                 arc.getStart().asJson() === start &&

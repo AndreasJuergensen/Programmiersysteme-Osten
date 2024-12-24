@@ -9,60 +9,117 @@ import { PetriNet } from '../classes/petrinet/petri-net';
 import { Dfg, DfgBuilder } from '../classes/dfg/dfg';
 import { Subscription } from 'rxjs';
 import { Arc } from '../components/drawing-area/models';
+import { PetriNetManagementService } from './petri-net-management.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class CollectArcsService {
-    constructor() {}
     private petriNet!: PetriNet;
     private _collectedArcs: Arcs = new Arcs();
-    private _acutalDFG = undefined;
+    private _acutalDFG: Dfg | undefined;
 
-    // private petriNetManagementService: PetriNetManagementService =
-    //     new PetriNetManagementService();
-    // private _sub = this.petriNetManagementService.petriNet$.subscribe(
-    //     (petriNetSub) => {
-    //         this.petriNet = petriNetSub;
-    //     },
-    // );
-
-    // const petriNet =
-    //dfg = new DfgBuilder().build();
-    //petriNet = new PetriNet(this.dfg);
-
-    //
+    constructor(private petriNetManagementService: PetriNetManagementService) {
+        this.petriNetManagementService.petriNet$.subscribe((petriNetSub) => {
+            this.petriNet = petriNetSub;
+        });
+    }
 
     get collectedArcs(): Arcs {
         return this._collectedArcs;
     }
 
-    public isValidArc(arc: Arc): boolean {
-        if (this._acutalDFG === undefined) {
-            //setze actualDFG auf DFG
-        }
+    private getDFGArcsFromPetriNet(): Array<DfgArc> {
+        const dfgArcs = new Array<DfgArc>();
+        const dfgs = this.petriNet.transitions.getAllDFGs();
 
-        if (true) {
-            //wenn Arc in actualDFG
-            return true;
+        for (const dfg of dfgs) {
+            for (const dfgarc of dfg.arcs.getArcs()) {
+                dfgArcs.push(dfgarc);
+            }
         }
-
-        return false;
+        return dfgArcs;
     }
 
-    //Arcs von DFG holen und nicht von Petri-Netz
+    public isDFGArc(arc: Arc): boolean {
+        const dfgArcToCheck = this.getDFGArc(arc);
+        if (dfgArcToCheck === undefined) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public isArcinSameDFG(arc: Arc): boolean {
+        const dfgArcToCheck = this.getDFGArc(arc);
+        if (this._acutalDFG !== undefined) {
+            const arcInDFG: DfgArc | undefined =
+                this._acutalDFG.arcs.getArcByStartNameAndEndName(
+                    arc.start.id,
+                    arc.end.id,
+                );
+
+            if (arcInDFG !== undefined) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private getDFGArc(arc: Arc): DfgArc | undefined {
+        return this.getDFGArcsFromPetriNet().find(
+            (dfgarc) =>
+                dfgarc.getStart().name === arc.start.id &&
+                dfgarc.getEnd().name === arc.end.id,
+        );
+    }
+
     public updateCollectedArcs(arc: Arc): void {
-        let dfgArc: DfgArc; //getDFGArc(arc)
+        const dfgArc: DfgArc = this.getDFGArc(arc)!;
 
         if (this._collectedArcs.getArcs().includes(dfgArc)) {
             const indexArcInCollectedArcs = this._collectedArcs
                 .getArcs()
                 .indexOf(dfgArc);
-            this._collectedArcs.getArcs().splice(indexArcInCollectedArcs);
+
+            this._collectedArcs.getArcs().splice(indexArcInCollectedArcs, 1);
+        } else {
+            this._collectedArcs.addArc(dfgArc);
         }
 
         if (this._collectedArcs.isEmpty()) {
             this._acutalDFG = undefined;
+        } else {
+            this._acutalDFG = this.getDFG(arc);
         }
+
+        console.log(this._collectedArcs);
+    }
+
+    private getDFG(arc: Arc) {
+        const dfgs = this.petriNet.transitions.getAllDFGs();
+
+        for (const dfg of dfgs) {
+            if (this.isArcinDFG(arc, dfg)) {
+                return dfg;
+            }
+        }
+
+        return undefined;
+    }
+
+    public isArcinDFG(arc: Arc, dfg: Dfg | undefined): boolean {
+        const dfgArcToCheck = this.getDFGArc(arc);
+        if (dfg !== undefined) {
+            const arcInDFG: DfgArc | undefined =
+                dfg.arcs.getArcByStartNameAndEndName(arc.start.id, arc.end.id);
+
+            if (arcInDFG !== undefined) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -76,7 +76,7 @@ import { CollectArcsService } from 'src/app/services/collect-arcs.service';
 export class DrawingArcComponent {
     @Input({ required: true }) arc!: Arc;
 
-    collectArcsService: CollectArcsService = new CollectArcsService();
+    constructor(private collectArcsService: CollectArcsService) {}
 
     readonly width: number = environment.drawingElements.arcs.width;
     color: string = environment.drawingElements.arcs.color;
@@ -91,30 +91,39 @@ export class DrawingArcComponent {
     changeLineColorOut(color: string): void {
         this.arrow = '#arrowhead';
         this.color = color;
-        console.log('isActive: ' + this.isActive);
+
         if (this.isActive === true) {
             this.markerColor = 'red';
-            console.log('markerColor: ' + this.markerColor);
         }
+
+        console.log(this.markerColor);
     }
 
     onLineClick(arc: Arc): void {
-        if (this.isActive === true) {
-            this.markerColor = environment.drawingElements.arcs.color;
-            console.log(this.markerColor);
-            this.isActive = false;
-        } else {
-            this.markerColor = 'red';
-            console.log(this.markerColor);
-            this.isActive = true;
-        }
+        if (this.collectArcsService.isDFGArc(arc)) {
+            console.log('Arc ist DFFGArc');
 
-        console.log(arc);
+            if (this.collectArcsService.isArcinSameDFG(arc)) {
+                console.log('Arc in same DFG');
+                this.collectArcsService.updateCollectedArcs(arc);
 
-        if (this.collectArcsService.isValidArc(arc)) {
-            this.collectArcsService.updateCollectedArcs(arc);
+                if (this.isActive === true) {
+                    console.log('alte MarkerColor: ' + this.markerColor);
+                    this.markerColor = environment.drawingElements.arcs.color;
+                    console.log('neue MarkerColor: ' + this.markerColor);
+
+                    this.isActive = false;
+                } else {
+                    console.log('alte MarkerColor: ' + this.markerColor);
+                    this.markerColor = 'red';
+                    console.log('neue MarkerColor: ' + this.markerColor);
+                    this.isActive = true;
+                }
+            } else {
+                console.log('Arc not in same DFG');
+            }
         } else {
-            //werfe Fehlermeldung mit Feedback-Service
+            console.log('Arc ist keine DFGArc');
         }
     }
 

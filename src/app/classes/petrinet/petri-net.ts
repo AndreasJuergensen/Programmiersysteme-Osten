@@ -170,4 +170,8 @@ export class PetriNet {
     get arcs(): PetriNetArcs {
         return this._arcs;
     }
+
+    public getDFGs(): Array<Dfg> {
+        return this._transitions.getAllDFGs();
+    }
 }
