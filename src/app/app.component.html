@@ -14,8 +14,12 @@
     <app-drawing-area></app-drawing-area>
 
     <div class="flexRowAlignSpaceEvenlyStart">
-        <button mat-flat-button (click)="openDialog()">Input Event Log</button>
-        <button mat-flat-button (click)="createTestPN()">Create Test PN</button>
+        <app-example-event-logs></app-example-event-logs>
+
+        <button mat-fab extended (click)="openDialog()">
+            <mat-icon>playlist_add</mat-icon>
+            Input Event Log
+        </button>
     </div>
     <hr />
     <div class="flexRowAlignSpaceEvenlyStart">
