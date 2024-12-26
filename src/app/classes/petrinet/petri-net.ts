@@ -12,14 +12,14 @@ export class PetriNet {
     private readonly _transitions: PetriNetTransitions =
         new PetriNetTransitions();
     private readonly _arcs: PetriNetArcs = new PetriNetArcs();
-    private _isInitialized: boolean = false;
+    // private _isInitialized: boolean = false;
 
     constructor(dfg?: Dfg) {
         dfg ? this.initializeOriginDFG(dfg) : undefined;
     }
 
     private initializeOriginDFG(dfg: Dfg): PetriNet {
-        this._isInitialized = true;
+        // this._isInitialized = true;
         this._places.addInputPlace().addOutputPlace();
         this._transitions.createTransition('play').createTransition('stop');
 
@@ -197,7 +197,7 @@ export class PetriNet {
     }
 
     cutCanBeExecuted(): boolean {
-        const petriNetDFGs: Dfg[] = this.getAllTransitionsThatAreDFGs();
+        const petriNetDFGs: Dfg[] = this.getDFGs();
         for (const dfg of petriNetDFGs) {
             if (dfg.canBeCutByAnyPartitions()) {
                 return true;
@@ -207,7 +207,7 @@ export class PetriNet {
     }
 
     acitivityOncePerTraceIsFeasible(): boolean {
-        const petriNetDFGs: Dfg[] = this.getAllTransitionsThatAreDFGs();
+        const petriNetDFGs: Dfg[] = this.getDFGs();
         for (const dfg of petriNetDFGs) {
             const eventLog: EventLog = dfg.eventLog;
             for (const activity of dfg.activities.getAllActivites()) {
@@ -219,13 +219,14 @@ export class PetriNet {
         return false;
     }
 
-    getAllTransitionsThatAreDFGs(): Dfg[] {
-        return this.transitions.getAllDFGs();
+    getDFGs(): Dfg[] {
+        return this._transitions.getAllDFGs();
     }
 
-    get isInitialized(): boolean {
-        return this._isInitialized;
-    }
+    // get isInitialized(): boolean {
+    //     return this._isInitialized;
+    // }
+
     get inputPlace(): Place {
         return this._places.input;
     }
