@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension name="Concept" prefix="concept" uri="http://.../concept.xesext" />
+<extension name="Time" prefix="time" uri="http://.../time.xesext" />
+<extension name="Organizational" prefix="org" uri="http://.../org.xesext" />
+<global scope="trace">
+	<string key="concept:name" value="name" />
+</global>
+<global scope="event">
+	<date key="time:timestamp" value="2010-12-17T20:01:02.229+02:00" />
+	<string key="concept:name" value="name" />
+	<string key="org:resource" value="resource" />
+</global>
+<classifier name="Activity" keys="concept:name" />
+<classifier name="Resource" keys="org:resource" />
+<classifier name="Both" keys="concept:name org:resource" />
+<trace>
+	<string key="concept:name" value="ataed2020" />
+	<event>
+		<string key="concept:name" value="𝑆𝑢𝑔𝑔𝑒𝑠𝑡𝑃𝑐" />
+		<string key="org:resource" value="Josep" />
+		<date key="time:timestamp" value="2019-11-23T09:21:00.000+01:00" />
+	</event>
+	<event>
+		<string key="concept:name" value="𝑆𝑒𝑛𝑑𝐼𝑛𝑣𝑖𝑡𝑒𝑠" />
+		<string key="org:resource" value="Josep" />
+		<date key="time:timestamp" value="2019-11-23T09:55:00.000+01:00" />
+	</event>
+	<event>
+		<string key="concept:name" value="𝑅𝑒𝑐𝑒𝑖𝑣𝑒𝐴𝑛𝑠𝑤𝑒𝑟𝑠" />
+		<string key="org:resource" value="Josep" />
+		<date key="time:timestamp" value="2019-11-30T15:15:00.000+01:00" />
+	</event>
+</trace>
+<trace>
+	<string key="concept:name" value=" pnse2020" />
+	<event>
+		<string key="concept:name" value="𝑆𝑢𝑔𝑔𝑒𝑠𝑡𝑃𝑐" />
+		<string key="org:resource" value="Daniel" />
+		<date key="time:timestamp" value="2019-11-25T15:23:00.000+01:00" />
+	</event>
+	<event>
+		<string key="concept:name" value="𝑆𝑒𝑡𝑈𝑝𝐶𝑓𝑝" />
+		<string key="org:resource" value="Daniel" />
+		<date key="time:timestamp" value="2019-11-25T15:51:00.000+01:00" />
+	</event>
+	<event>
+		<string key="concept:name" value="𝑆𝑒𝑛𝑑𝐼𝑛𝑣𝑖𝑡𝑒𝑠" />
+		<string key="org:resource" value="Daniel" />
+		<date key="time:timestamp" value="2019-11-25T16:42:00.000+01:00" />
+	</event>
+</trace>

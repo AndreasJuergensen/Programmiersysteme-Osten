@@ -9,11 +9,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { EventLog } from 'src/app/classes/event-log';
 import { EventLogParserService } from 'src/app/services/event-log-parser.service';
 import { CommonModule } from '@angular/common';
 import { EventLogValidationService } from 'src/app/services/event-log-validation.service';
+import { ParseXesService } from 'src/app/services/parse-xes.service';
 
 @Component({
     selector: 'app-event-log-dialog',
@@ -27,7 +29,9 @@ import { EventLogValidationService } from 'src/app/services/event-log-validation
         ReactiveFormsModule,
         CommonModule,
         MatTooltipModule,
+        MatIcon,
     ],
+    providers: [],
     templateUrl: './event-log-dialog.component.html',
     styleUrl: './event-log-dialog.component.css',
 })
@@ -44,7 +48,11 @@ export class EventLogDialogComponent implements OnInit {
         private dialogRef: MatDialogRef<EventLogDialogComponent, EventLog>,
         private eventLogParserService: EventLogParserService,
         private eventLogValidationService: EventLogValidationService,
+        private parseXesService: ParseXesService,
     ) {}
+
+    public eventLogInput: string = '';
+    public fileName: string = '';
 
     ngOnInit(): void {
         this.eventLogControl.markAsTouched();
@@ -99,5 +107,15 @@ export class EventLogDialogComponent implements OnInit {
         this.eventLogControl.updateValueAndValidity();
 
         textarea.focus();
+    }
+    public onFileSelected(event: any): void {
+        const file: File = event.target.files[0];
+
+        if (file) {
+            this.fileName = file.name;
+            file.text().then((content) => {
+                this.eventLogControl.setValue(this.parseXesService.parse(content));
+            });
+        }
     }
 }

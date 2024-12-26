@@ -69,3 +69,28 @@
         </mat-dialog-actions>
     </form>
 </mat-dialog-content>
+<mat-dialog-actions>
+    <input
+        type="file"
+        class="file-input"
+        (change)="onFileSelected($event)"
+        #fileUpload
+    />
+    <div class="file-upload-wrapper">
+        <div class="file-upload">
+            <button
+                mat-mini-fab
+                color="primary"
+                class="upload-btn"
+                (click)="fileUpload.click()"
+            >
+                <mat-icon>attach_file</mat-icon>
+            </button>
+            <div class="filename">
+                {{ fileName || "Upload XES-File to import Event Log" }}
+            </div>
+        </div>
+    </div>
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button (click)="onOkClick()" cdkFocusInitial>Ok</button>
+</mat-dialog-actions>
