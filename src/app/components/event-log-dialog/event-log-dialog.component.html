@@ -1,8 +1,8 @@
-<h2 mat-dialog-title>Event-Log-Eingabe</h2>
+<h2 mat-dialog-title>Event-Log Input</h2>
 <mat-dialog-content class="mat-typography">
     <form (ngSubmit)="onOkClick()">
         <mat-form-field style="width: 100%">
-            <mat-label>Bitte hier EventLog eingeben.</mat-label>
+            <mat-label>Enter Event-Log here!</mat-label>
             <input
                 matInput
                 cdkTextareaAutosize
@@ -17,7 +17,7 @@
                     eventLogControl.dirty
                 "
             >
-                keine leere Eingabe möglich
+                There ist no empty input allowed!
             </mat-error>
             <mat-error
                 *ngIf="
@@ -25,14 +25,13 @@
                     eventLogControl.dirty
                 "
             >
-                Ungültige Eingabe. Ursache: Ein führendes Plus zu Beginn oder zu
-                viele Leerzeichen hintereinander oder zu viele Pluszeichen
+                Invalid Input Reason: A leading plus at the beginning, too many
+                whitespaces in a row or too many plus signs
             </mat-error>
             <mat-hint
-                >Aktivitäten pro Trace verkettet durch genau ein Leerzeichen
-                eingeben. Die Traces durch ein Plus (+) verkettet eingeben. Die
-                Leerzeichen vor und nach dem Plus sind optional. Es ist keine
-                leere Eingabe möglich.
+                >Activities per trace concatenated by exactly one whitespace.
+                The traces concatenated by a plus (+). The whitespaces before
+                and after the plus are optional. No empty input is allowed.
             </mat-hint>
         </mat-form-field>
         <mat-dialog-actions align="end">
