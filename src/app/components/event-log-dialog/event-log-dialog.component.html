@@ -1,16 +1,16 @@
 <h2 mat-dialog-title>Event-Log-Eingabe</h2>
 <mat-dialog-content class="mat-typography">
-    <form>
+    <form (ngSubmit)="onOkClick()">
         <mat-form-field style="width: 100%">
             <mat-label>Bitte hier EventLog eingeben.</mat-label>
-            <textarea
+            <input
                 matInput
                 cdkTextareaAutosize
                 cdkAutosizeMinRows="4"
-                placeholder="A B C + D
-                ..."
+                placeholder="A B C + D+F + Y Z ..."
                 [formControl]="eventLogControl"
-            ></textarea>
+                cdkFocusInitial
+            />
             <mat-error
                 *ngIf="
                     eventLogControl.hasError('required') &&
@@ -25,23 +25,26 @@
                     eventLogControl.dirty
                 "
             >
-                Ungültige Eingabe. > A B C + C + A Z ...
+                Ungültige Eingabe. Ursache: Ein führendes Plus zu Beginn oder zu
+                viele Leerzeichen hintereinander oder zu viele Pluszeichen
             </mat-error>
             <mat-hint
-                >Aktivitäten pro Trace verkettet durch ein Leerzeichen eingeben.
-                Die Traces durch ein Plus (+) verkettet eingeben.
+                >Aktivitäten pro Trace verkettet durch genau ein Leerzeichen
+                eingeben. Die Traces durch ein Plus (+) verkettet eingeben. Die
+                Leerzeichen vor und nach dem Plus sind optional. Es ist keine
+                leere Eingabe möglich.
             </mat-hint>
         </mat-form-field>
+        <mat-dialog-actions align="end">
+            <button mat-button mat-dialog-close>Cancel</button>
+            <button
+                mat-button
+                type="submit"
+                cdkFocusInitial
+                [disabled]="eventLogControl.invalid"
+            >
+                Ok
+            </button>
+        </mat-dialog-actions>
     </form>
 </mat-dialog-content>
-<mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close>Cancel</button>
-    <button
-        mat-button
-        (click)="onOkClick()"
-        cdkFocusInitial
-        [disabled]="eventLogControl.invalid"
-    >
-        Ok
-    </button>
-</mat-dialog-actions>
