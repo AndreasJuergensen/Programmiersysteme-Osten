@@ -7,10 +7,14 @@ export interface PetriNetTransition {
 export class Transition implements PetriNetTransition {
     readonly id: string;
     constructor(
-        private readonly name: string,
+        private readonly _name: string,
         idCount: number,
     ) {
         this.id = 't' + idCount;
+    }
+
+    get name(): string {
+        return this._name;
     }
 }
 
