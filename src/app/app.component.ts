@@ -7,8 +7,6 @@ import { CalculateDfgService } from './services/calculate-dfg.service';
 import { Dfg } from './classes/dfg/dfg';
 import { PetriNetManagementService } from './services/petri-net-management.service';
 import { ShowFeedbackService } from './services/show-feedback.service';
-import { CalculatePetriNetService } from './services/calculate-petri-net.service';
-import { PetriNet } from './classes/petrinet/petri-net';
 
 @Component({
     selector: 'app-root',
@@ -56,5 +54,9 @@ export class AppComponent {
     `;
 
         this.feedbackService.openHelpDialog(helpMessage);
+    }
+
+    get actionButtonsAreDisabled(): boolean {
+        return !this._petriNetManagementService.isModifiable;
     }
 }
