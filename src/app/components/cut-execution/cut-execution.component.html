@@ -1,4 +1,4 @@
-<h3>1. Kanten wählen -> 2. Cut wählen -> 3. Cut durchführen!</h3>
+<h3>1. Choose Arcs -> 2. Select the correct Cut -> 3. Execute the Cut!</h3>
 <div [ngClass]="{ 'disabled-component': actionButtonsAreDisabled }">
     <form [formGroup]="radioForm">
         <mat-radio-group formControlName="selectedCut">
@@ -11,7 +11,7 @@
         </mat-radio-group>
     </form>
     <button mat-raised-button="primary" (click)="onCutClick()">
-        Cut durchfuehren
+        Execute Cut
     </button>
     <!-- Abstand einfuegen? Wie? -->
     <button mat-stroked-button (click)="onCancelClick()">Cancel</button>

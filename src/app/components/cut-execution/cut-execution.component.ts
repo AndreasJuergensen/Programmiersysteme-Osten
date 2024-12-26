@@ -70,9 +70,9 @@ export class CutExecutionComponent implements OnInit {
             this.resetRadioSelection();
         } else {
             this._feedbackService.showMessage(
-                'Es wurde kein Cut ausgewählt!',
+                'No cut selected via radio buttons!',
                 true,
-                'Sie müssen einen Cut über die Radio-Buttons auswählen, um einen Cut durchführen zu können.',
+                'You have to choose a Cut via the radio buttons, which you want to perform on one of the DFGs.',
             );
         }
     }
@@ -80,7 +80,7 @@ export class CutExecutionComponent implements OnInit {
     onCancelClick(): void {
         if (this.radioForm.get('selectedCut')?.value !== null) {
             this.resetRadioSelection();
-            this._feedbackService.showMessage('Cutauswahl abgebrochen.', false);
+            this._feedbackService.showMessage('Canceled cut-selection!', false);
         }
     }
 
