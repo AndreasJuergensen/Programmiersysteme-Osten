@@ -199,7 +199,8 @@ export class Arcs {
                 return arc;
             }
         }
-        throw new Error('Arc not found');
+        return undefined;
+        // throw new Error('Arc not found');
     }
 
     asJson(): ArcJson[] {

@@ -17,7 +17,9 @@ import { PetriNetManagementService } from './petri-net-management.service';
 export class CollectArcsService {
     private petriNet!: PetriNet;
     private _collectedArcs: Arcs = new Arcs();
-    private _acutalDFG: Dfg | undefined;
+    private _currentDFG: Dfg | undefined;
+
+    // arcIsActive: boolean = false;
 
     constructor(private petriNetManagementService: PetriNetManagementService) {
         this.petriNetManagementService.petriNet$.subscribe((petriNetSub) => {
@@ -28,6 +30,27 @@ export class CollectArcsService {
     get collectedArcs(): Arcs {
         return this._collectedArcs;
     }
+
+    get currentDFG(): Dfg | undefined {
+        return this._currentDFG;
+    }
+
+    // public resetCollectArcs(): void {
+    //     this._collectedArcs = new Arcs();
+    //     this._currentDFG = undefined;
+
+    //     // this.resetClickedElements();
+    // }
+
+    // private resetClickedElements(): void {
+    //     const elements = document.getElementsByTagName('line');
+    //     Array.from(elements).forEach((element) => {
+    //         element.style.stroke = '';
+    //     });
+    //     // this.arcIsActive = false;
+
+    //     //document.getElementById("mySvg") as SVGSVGElement;
+    // }
 
     private getDFGArcsFromPetriNet(): Array<DfgArc> {
         const dfgArcs = new Array<DfgArc>();
@@ -52,16 +75,18 @@ export class CollectArcsService {
 
     public isArcinSameDFG(arc: Arc): boolean {
         const dfgArcToCheck = this.getDFGArc(arc);
-        if (this._acutalDFG !== undefined) {
+        if (this._currentDFG !== undefined) {
             const arcInDFG: DfgArc | undefined =
-                this._acutalDFG.arcs.getArcByStartNameAndEndName(
+                this._currentDFG.arcs.getArcByStartNameAndEndName(
                     arc.start.id,
                     arc.end.id,
                 );
 
             if (arcInDFG !== undefined) {
-                return false;
+                return true;
             }
+
+            return false;
         }
 
         return true;
@@ -77,6 +102,8 @@ export class CollectArcsService {
 
     public updateCollectedArcs(arc: Arc): void {
         const dfgArc: DfgArc = this.getDFGArc(arc)!;
+        // console.log('dfgarc: ');
+        // console.log(dfgArc);
 
         if (this._collectedArcs.getArcs().includes(dfgArc)) {
             const indexArcInCollectedArcs = this._collectedArcs
@@ -89,19 +116,25 @@ export class CollectArcsService {
         }
 
         if (this._collectedArcs.isEmpty()) {
-            this._acutalDFG = undefined;
+            // console.log('CollectedArcsIsEmpty');
+
+            this._currentDFG = undefined;
         } else {
-            this._acutalDFG = this.getDFG(arc);
+            this._currentDFG = this.getDFG(arc);
         }
 
-        console.log(this._collectedArcs);
+        // console.log(this._collectedArcs);
+        // console.log(this._currentDFG);
     }
 
-    private getDFG(arc: Arc) {
+    private getDFG(arc: Arc): Dfg | undefined {
         const dfgs = this.petriNet.transitions.getAllDFGs();
+        // console.log(dfgs);
 
         for (const dfg of dfgs) {
             if (this.isArcinDFG(arc, dfg)) {
+                // console.log('ArcInDFG');
+
                 return dfg;
             }
         }
@@ -111,15 +144,24 @@ export class CollectArcsService {
 
     public isArcinDFG(arc: Arc, dfg: Dfg | undefined): boolean {
         const dfgArcToCheck = this.getDFGArc(arc);
+        // console.log('DfgArcToCheck:');
+        // console.log(dfgArcToCheck);
+
+        // console.log('DFG: ');
+        // console.log(dfg);
+
         if (dfg !== undefined) {
             const arcInDFG: DfgArc | undefined =
                 dfg.arcs.getArcByStartNameAndEndName(arc.start.id, arc.end.id);
 
+            // console.log('ArcFromDFG');
+            // console.log(arcInDFG);
+
             if (arcInDFG !== undefined) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 }

@@ -82,9 +82,50 @@ export class DrawingArcComponent {
     color: string = environment.drawingElements.arcs.color;
     markerColor = environment.drawingElements.arcs.color;
     arrow = '#arrowhead';
+    //isActive = this.collectArcsService.arcIsActive;
     isActive = false;
 
+    // lines.forEach((line) => {
+    //     line.addEventListener("mouseenter", () => handleMouseEnter(line, "red"));
+    //     line.addEventListener("mouseleave", () => handleMouseLeave(line));
+    // });
+
+    // ngOnInit() {
+    //     const elements = document.getElementsByTagName('line');
+    //     Array.from(elements).forEach((element) => {
+    //         console.log(element);
+    //     });
+    // }
+
+    // ngAfterViewInit(): void {
+    //     this.initializeHoverEffects();
+    // }
+
+    // private initializeHoverEffects(): void {
+    //     const lines = document.querySelectorAll('rect');
+
+    //     lines.forEach((line: Element) => {
+    //         line.addEventListener('mouseenter', () =>
+    //             this.handleMouseOver(line, 'red'),
+    //         );
+    //         line.addEventListener('mouseleave', () =>
+    //             this.handleMouseLeave(line),
+    //         );
+    //     });
+    // }
+
+    // private handleMouseOver = (element: any, color: string) => {
+    //     element.style.setProperty('--color', color);
+    // };
+
+    // private handleMouseLeave = (element: any) => {
+    //     element.style.removeProperty('--color');
+    // };
+
     changeLineColorOver(color: string): void {
+        // console.log('Im Mouseover - Farbe: ' + color);
+
+        // document.documentElement.style.setProperty('--color', color);
         this.color = color;
         this.arrow = '#arrowhead-hover' + this.arc.x1 + this.arc.y1;
     }
@@ -95,8 +136,6 @@ export class DrawingArcComponent {
         if (this.isActive === true) {
             this.markerColor = 'red';
         }
-
-        console.log(this.markerColor);
     }
 
     onLineClick(arc: Arc): void {
@@ -108,15 +147,15 @@ export class DrawingArcComponent {
                 this.collectArcsService.updateCollectedArcs(arc);
 
                 if (this.isActive === true) {
-                    console.log('alte MarkerColor: ' + this.markerColor);
+                    // console.log('alte MarkerColor: ' + this.markerColor);
                     this.markerColor = environment.drawingElements.arcs.color;
-                    console.log('neue MarkerColor: ' + this.markerColor);
+                    // console.log('neue MarkerColor: ' + this.markerColor);
 
                     this.isActive = false;
                 } else {
-                    console.log('alte MarkerColor: ' + this.markerColor);
+                    // console.log('alte MarkerColor: ' + this.markerColor);
                     this.markerColor = 'red';
-                    console.log('neue MarkerColor: ' + this.markerColor);
+                    // console.log('neue MarkerColor: ' + this.markerColor);
                     this.isActive = true;
                 }
             } else {
