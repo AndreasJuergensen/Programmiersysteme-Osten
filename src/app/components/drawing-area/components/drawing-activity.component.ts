@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Activity } from '../models';
 import { environment } from 'src/environments/environment';
 import { FallThroughHandlingService } from 'src/app/services/fall-through-handling.service';

@@ -12,6 +12,7 @@ import { Activity } from '../classes/dfg/activities';
 })
 export class FallThroughHandlingService {
     private _petriNet!: PetriNet;
+    private _timeoutID: any;
     private _resolvePromise: (value: string) => void = () => {};
 
     constructor(
@@ -33,10 +34,29 @@ export class FallThroughHandlingService {
             return;
         }
         this._showFeedbackService.showMessage(
-            'Choose the activity you want to detach',
+            'Choose the activity you want to detach from the event log',
             false,
         );
         this.startWaitingForActivityClick();
+    }
+
+    private startWaitingForActivityClick(): void {
+        this.waitForActivityClick()
+            .then((response) => {
+                this.continueAOPTExecution(response);
+            })
+            .catch((error) => {
+                this._showFeedbackService.showMessage(error, true);
+            });
+    }
+
+    private waitForActivityClick(): Promise<string> {
+        return new Promise((resolve, reject) => {
+            this._resolvePromise = resolve;
+            this._timeoutID = setTimeout(() => {
+                reject('Timeout, no activity clicked');
+            }, 5000);
+        });
     }
 
     private continueAOPTExecution(activityName: string) {
@@ -68,23 +88,6 @@ export class FallThroughHandlingService {
         );
     }
 
-    private async startWaitingForActivityClick() {
-        const response = await this.waitForActivityClick();
-        this.continueAOPTExecution(response);
-    }
-
-    private waitForActivityClick(): Promise<string> {
-        return new Promise((resolve) => {
-            this._resolvePromise = resolve;
-        });
-    }
-
-    processActivityClick(activityName: string) {
-        if (this._resolvePromise) {
-            this._resolvePromise(activityName);
-        }
-    }
-
     executeFlowerFallThrough(): void {
         if (
             this._petriNet.cutCanBeExecuted() ||
@@ -109,5 +112,10 @@ export class FallThroughHandlingService {
             );
             return;
         }
+    }
+
+    processActivityClick(activityName: string) {
+        clearTimeout(this._timeoutID);
+        this._resolvePromise(activityName);
     }
 }
