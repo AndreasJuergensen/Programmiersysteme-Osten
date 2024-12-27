@@ -6,6 +6,7 @@ import {
     Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -25,6 +26,7 @@ import { EventLogValidationService } from 'src/app/services/event-log-validation
         MatInputModule,
         ReactiveFormsModule,
         CommonModule,
+        MatTooltipModule,
     ],
     templateUrl: './event-log-dialog.component.html',
     styleUrl: './event-log-dialog.component.css',
@@ -69,5 +71,33 @@ export class EventLogDialogComponent implements OnInit {
         );
 
         this.dialogRef.close(eventLog);
+    }
+
+    onKeyDown(event: KeyboardEvent): void {
+        if (event.ctrlKey && event.key === 'Enter') {
+            event.preventDefault();
+            if (this.eventLogControl.valid) {
+                this.onOkClick();
+            }
+        } else if (event.key === 'Enter') {
+            event.preventDefault();
+            const textarea = event.target as HTMLTextAreaElement;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+
+            const value = textarea.value;
+            textarea.value =
+                value.substring(0, start) + '\n' + value.substring(end);
+
+            textarea.selectionStart = textarea.selectionEnd = start + 1;
+        }
+    }
+
+    clearTextarea(textarea: HTMLTextAreaElement): void {
+        this.eventLogControl.setValue('');
+        this.eventLogControl.markAsTouched();
+        this.eventLogControl.updateValueAndValidity();
+
+        textarea.focus();
     }
 }

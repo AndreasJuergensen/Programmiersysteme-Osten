@@ -20,6 +20,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { CutExecutionComponent } from './components/cut-execution/cut-execution.component';
 import { ExampleEventLogsComponent } from './components/example-event-logs/example-event-logs.component';
 import { TextFieldModule } from '@angular/cdk/text-field';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
     declarations: [AppComponent, FooterComponent],
@@ -39,6 +40,7 @@ import { TextFieldModule } from '@angular/cdk/text-field';
         CutExecutionComponent,
         ExampleEventLogsComponent,
         TextFieldModule,
+        MatTooltipModule,
     ],
     providers: [
         {
