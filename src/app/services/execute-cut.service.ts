@@ -82,7 +82,7 @@ export class ExecuteCutService {
             'Cut was executed successfully! ' + '(' + selectedCut + ')',
             false,
         );
-        this._feedbackService.showMessage('The petri net was updated.', true);
+        this._feedbackService.showMessage('The petri net was updated.', false);
     }
 
     private createSubDfgs(eventLogs: [EventLog, EventLog]): [Dfg, Dfg] {

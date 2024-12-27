@@ -11,6 +11,7 @@ import { Arcs } from 'src/app/classes/dfg/arcs';
 import { EventLog } from 'src/app/classes/event-log';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
+import { CollectArcsService } from 'src/app/services/collect-arcs.service';
 
 export enum CutType {
     ExclusiveCut = 'ExclusiveCut',
@@ -40,15 +41,12 @@ export class CutExecutionComponent implements OnInit {
         CutType.LoopCut,
     ];
 
-    dfgDummy: Dfg = new Dfg(new Activities(), new Arcs(), new EventLog());
-    arcsSelectedDummy: Arcs = new Arcs();
-
     constructor(
         private _fb: FormBuilder,
         private _executeCutService: ExecuteCutService,
         private _feedbackService: ShowFeedbackService,
         private _petriNetManagementService: PetriNetManagementService,
-        // private kantenSammelService: KantenSammelService
+        private _collectArcsService: CollectArcsService,
     ) {
         this.radioForm = this._fb.group({
             selectedCut: null,
@@ -61,18 +59,34 @@ export class CutExecutionComponent implements OnInit {
 
     onCutClick(): void {
         const selectedValue = this.radioForm.get('selectedCut')?.value;
-        if (selectedValue) {
+        if (selectedValue && this._collectArcsService.currentDFG) {
             this._executeCutService.execute(
-                this.dfgDummy,
-                this.arcsSelectedDummy,
+                this._collectArcsService.currentDFG,
+                this._collectArcsService.collectedArcs,
                 selectedValue,
             );
             this.resetRadioSelection();
-        } else {
+            // this._collectArcsService.resetCollectArcs();
+        } else if (!selectedValue && this._collectArcsService.currentDFG) {
             this._feedbackService.showMessage(
                 'No cut selected via radio buttons!',
                 true,
                 'You have to choose a Cut via the radio buttons, which you want to perform on one of the DFGs.',
+            );
+        } else if (
+            selectedValue &&
+            this._collectArcsService.currentDFG == undefined
+        ) {
+            this._feedbackService.showMessage(
+                'No arc selected via the drawing area!',
+                true,
+                'You have to choose at least one arc the perform a cut on a dfg.',
+            );
+        } else {
+            this._feedbackService.showMessage(
+                'No cut and no arc selected!',
+                true,
+                'You have to choose a Cut via the radio buttons and at least one arc via the drawing area to perform a cut on a dfg.',
             );
         }
     }
@@ -80,6 +94,7 @@ export class CutExecutionComponent implements OnInit {
     onCancelClick(): void {
         if (this.radioForm.get('selectedCut')?.value !== null) {
             this.resetRadioSelection();
+            // this._collectArcsService.resetCollectArcs();
             this._feedbackService.showMessage('Canceled cut-selection!', false);
         }
     }
