@@ -48,4 +48,8 @@ export class Places {
     get output(): Place {
         return this._places[1];
     }
+
+    get isEmpty(): boolean {
+        return this._places.length === 0;
+    }
 }

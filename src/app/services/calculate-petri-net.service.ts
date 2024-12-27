@@ -191,8 +191,12 @@ export class CalculatePetriNetService {
         let yCoordinate: number = 100;
         let xOfLastModeledNode: number = 100;
 
+        if (petriNet.places.isEmpty) {
+            return nodes;
+        }
+
         const inputPlace: Place = petriNet.places.input;
-        nodes.push(new PlaceNode('input', 100, 100));
+        nodes.push(new PlaceNode(inputPlace.id, 100, 100));
 
         const neighbours: Array<PetriNetTransition> =
             petriNet.arcs.getNextTransitions(inputPlace);
@@ -443,7 +447,6 @@ export class CalculatePetriNetService {
      */
     private checkEdgeOverlap(node: Node, edges: Array<Edge>): boolean {
         if (node instanceof BoxNode) {
-            console.log(node.id);
             for (const edge of edges) {
                 if (edge.isNodeStartOrEndNode(node)) {
                     continue;
