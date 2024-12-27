@@ -7,6 +7,10 @@ import { CalculateDfgService } from './services/calculate-dfg.service';
 import { Dfg } from './classes/dfg/dfg';
 import { PetriNetManagementService } from './services/petri-net-management.service';
 import { ShowFeedbackService } from './services/show-feedback.service';
+import { CalculatePetriNetService } from './services/calculate-petri-net.service';
+import { PetriNet } from './classes/petrinet/petri-net';
+import { DfgBuilder } from './classes/dfg/dfg';
+import { FallThroughHandlingService } from './services/fall-through-handling.service';
 
 @Component({
     selector: 'app-root',
@@ -18,7 +22,9 @@ export class AppComponent {
         private _matDialog: MatDialog,
         private _calculateDfgService: CalculateDfgService,
         private _petriNetManagementService: PetriNetManagementService,
-        private feedbackService: ShowFeedbackService,
+        private _feedbackService: ShowFeedbackService,
+        private _pnCalculationService: CalculatePetriNetService,
+        private _fallThroughHandlingService: FallThroughHandlingService,
     ) {}
 
     public openDialog(): void {
@@ -53,9 +59,17 @@ export class AppComponent {
       Wenn Sie weitere Fragen haben, kontaktieren Sie bitte unseren Support.
     `;
 
-        this.feedbackService.openHelpDialog(helpMessage);
+        this._feedbackService.openHelpDialog(helpMessage);
     }
 
+    activityOncePerTraceExecution(): void {
+        this._fallThroughHandlingService.executeActivityOncePerTraceFallThrough();
+    }
+    
+    flowerExecution() {
+        this._fallThroughHandlingService.executeFlowerFallThrough();
+    }
+    
     get actionButtonsAreDisabled(): boolean {
         return !this._petriNetManagementService.isModifiable;
     }

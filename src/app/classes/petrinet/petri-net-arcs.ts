@@ -60,6 +60,19 @@ export class PetriNetArcs {
         return this;
     }
 
+    removeArc(
+        start: PetriNetTransition | Place,
+        end: PetriNetTransition | Place,
+    ): PetriNetArcs {
+        for (const [index, arc] of this.arcs.entries()) {
+            if (arc.start === start && arc.end === end) {
+                this.arcs.splice(index, 1);
+                return this;
+            }
+        }
+        throw new Error('Arc not found');
+    }
+
     getNextTransition(place: Place): PetriNetTransition {
         for (const arc of this._arcs) {
             if (arc.start === place) {

@@ -229,3 +229,107 @@ describe('Partition a Dfg by cutted arcs', () => {
         expect(result).toEqual([expectedA1, expectedA2]);
     });
 });
+
+describe('Cut a DFG by any partitions', () => {
+    it('is possible by exclusive cut ', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .addFromPlayArc('A')
+            .addFromPlayArc('B')
+            .addToStopArc('A')
+            .addToStopArc('B')
+            .build();
+
+        const result: boolean = sut.canBeCutByAnyPartitions();
+
+        expect(result).toBeTrue();
+    });
+
+    it('is possible by sequence cut', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .addFromPlayArc('A')
+            .addArc('A', 'B')
+            .addArc('A', 'C')
+            .addToStopArc('B')
+            .addToStopArc('C')
+            .build();
+
+        const result: boolean = sut.canBeCutByAnyPartitions();
+
+        expect(result).toBeTrue();
+    });
+
+    it('is not possible by sequence cut if play is connected to a2', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .addFromPlayArc('A')
+            .addFromPlayArc('C')
+            .addArc('A', 'B')
+            .addArc('A', 'C')
+            .addToStopArc('B')
+            .addToStopArc('C')
+            .build();
+
+        const result: boolean = sut.canBeCutByAnyPartitions();
+
+        expect(result).toBeFalse();
+    });
+
+    it('is not possible by sequence cut if stop is connected to a1', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .addFromPlayArc('A')
+            .addArc('A', 'B')
+            .addArc('A', 'C')
+            .addToStopArc('A')
+            .addToStopArc('B')
+            .addToStopArc('C')
+            .build();
+
+        const result: boolean = sut.canBeCutByAnyPartitions();
+
+        expect(result).toBeFalse();
+    });
+
+    it('is possible by parallel cut', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .addFromPlayArc('A')
+            .addFromPlayArc('B')
+            .addArc('A', 'B')
+            .addArc('B', 'A')
+            .addToStopArc('A')
+            .addToStopArc('B')
+            .build();
+
+        const result: boolean = sut.canBeCutByAnyPartitions();
+
+        expect(result).toBeTrue();
+    });
+
+    it('is possible by loop cut', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .addFromPlayArc('A')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addArc('C', 'A')
+            .addToStopArc('B')
+            .build();
+
+        const result: boolean = sut.canBeCutByAnyPartitions();
+
+        expect(result).toBeTrue();
+    });
+});
