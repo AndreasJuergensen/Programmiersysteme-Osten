@@ -35,8 +35,16 @@ export class Activity extends Node {
 }
 
 export class Transition extends Node {
+    private readonly _name: string;
+
     constructor(node: TransitionNode) {
         super(node);
+
+        this._name = node.name;
+    }
+
+    get name(): string {
+        return this._name;
     }
 }
 

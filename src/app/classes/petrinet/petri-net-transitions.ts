@@ -7,10 +7,14 @@ export interface PetriNetTransition {
 export class Transition implements PetriNetTransition {
     readonly id: string;
     constructor(
-        private readonly name: string,
+        private readonly _name: string,
         idCount: number,
     ) {
         this.id = 't' + idCount;
+    }
+
+    get name(): string {
+        return this._name;
     }
 }
 
@@ -36,7 +40,7 @@ export class PetriNetTransitions {
         return this;
     }
 
-    deleteDFG(dfg: Dfg): PetriNetTransitions {
+    removeDFG(dfg: Dfg): PetriNetTransitions {
         this._transitions.splice(this._transitions.indexOf(dfg), 1);
         return this;
     }
@@ -48,6 +52,16 @@ export class PetriNetTransitions {
             }
         }
         return true;
+    }
+
+    getAllDFGs(): Dfg[] {
+        const dfgs: Dfg[] = [];
+        for (const transition of this.transitions) {
+            if (transition instanceof Dfg) {
+                dfgs.push(transition);
+            }
+        }
+        return dfgs;
     }
 
     getLastTransition(): PetriNetTransition {
