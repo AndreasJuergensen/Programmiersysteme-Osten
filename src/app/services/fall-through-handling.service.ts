@@ -28,7 +28,7 @@ export class FallThroughHandlingService {
     executeActivityOncePerTraceFallThrough(): void {
         if (this._petriNet.cutCanBeExecuted()) {
             this._showFeedbackService.showMessage(
-                'Another Cut can be performed on this PetriNet',
+                'Another Cut can be performed on this PetriNet, try this first.',
                 true,
             );
             return;
@@ -54,8 +54,10 @@ export class FallThroughHandlingService {
         return new Promise((resolve, reject) => {
             this._resolvePromise = resolve;
             this._timeoutID = setTimeout(() => {
-                reject('Timeout, no activity clicked');
-            }, 5000);
+                reject(
+                    'No activity clicked, Activity Once Per Trace Fall-Through aborted.',
+                );
+            }, 10000);
         });
     }
 
