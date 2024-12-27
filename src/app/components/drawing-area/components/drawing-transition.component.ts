@@ -18,11 +18,9 @@ import { environment } from 'src/environments/environment';
         />
         <svg:text
             [attr.x]="transition.x"
-            [attr.y]="
-                transition.y + (height + strokeWidth) / 2 + 20
-            "
+            [attr.y]="transition.y + (height + strokeWidth) / 2 + 20"
         >
-            {{ transition.id }}
+            {{ transition.name }}
         </svg:text>
     `,
     styles: ``,

@@ -301,6 +301,7 @@ export class CalculatePetriNetService {
                 transition.id,
                 stackElement.source_x + gapX + stackElement.additionalXOffset,
                 yCoordinate,
+                transition.name,
             );
         }
 
