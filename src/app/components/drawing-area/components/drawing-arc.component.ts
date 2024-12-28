@@ -19,13 +19,13 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
             >
                 <svg:path
                     d="M 1,1 L 9,5 L 1,9 Z"
-                    [attr.fill]="markerColor"
-                    [attr.stroke]="markerColor"
+                    [attr.fill]="'black'"
+                    [attr.stroke]="'black'"
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>
             <svg:marker
-                [attr.id]="'arrowhead-hover' + arc.x1 + arc.y1"
+                id="arrowhead-red"
                 viewBox="0 0 10 10"
                 markerWidth="10"
                 markerHeight="10"
@@ -63,7 +63,7 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
             [attr.y2]="arc.y2"
             [attr.stroke]="'black'"
             [attr.stroke-width]="width"
-            [attr.marker-end]="'url(' + arrow + ')'"
+            marker-end="url(#arrowhead)"
         />
     `,
     styles: `
@@ -147,7 +147,8 @@ export class DrawingArcComponent {
 
         if (line && !line.classList.contains('active')) {
             line.classList.add('hovered');
-            this.arrow = '#arrowhead-hover' + this.arc.x1 + this.arc.y1;
+            // this.arrow = '#arrowhead-hover' + this.arc.x1 + this.arc.y1;
+            line.setAttribute('marker-end', 'url(#arrowhead-red)');
         }
 
         // console.log('Im Mouseover - Farbe: ' + color);
@@ -168,7 +169,7 @@ export class DrawingArcComponent {
 
         if (line && !line.classList.contains('active')) {
             line.classList.remove('hovered');
-            this.arrow = '#arrowhead';
+            line.setAttribute('marker-end', 'url(#arrowhead)');
         }
 
         // this.arrow = '#arrowhead';

@@ -24,8 +24,7 @@ export class CollectArcsService {
     constructor(private petriNetManagementService: PetriNetManagementService) {
         this.petriNetManagementService.petriNet$.subscribe((petriNetSub) => {
             this.petriNet = petriNetSub;
-
-            // this.resetCollectedArcs();
+            this.resetCollectedArcs();
         });
     }
 
@@ -38,10 +37,17 @@ export class CollectArcsService {
     }
 
     public resetCollectedArcs(): void {
+        // console.log('Vor Reset:');
+        // console.log(this._collectedArcs);
+        // console.log(this._currentDFG);
         this._collectedArcs = new Arcs();
         this._currentDFG = undefined;
 
         this.resetClickedElements();
+
+        // console.log('Nach Reset:');
+        // console.log(this._collectedArcs);
+        // console.log(this._currentDFG);
     }
 
     private resetClickedElements(): void {
@@ -49,11 +55,14 @@ export class CollectArcsService {
             'svg',
         )[0] as SVGSVGElement;
 
-        const lines = svg.querySelectorAll('line');
-        lines.forEach((line) => {
-            line.classList.remove('active');
-            line.classList.remove('hovered');
-        });
+        if (svg) {
+            const lines = svg.querySelectorAll('line');
+            lines.forEach((line) => {
+                line.classList.remove('active');
+                line.classList.remove('hovered');
+                line.setAttribute('marker-end', 'url(#arrowhead)');
+            });
+        }
         // const elements = document.getElementsByTagName('line');
         // Array.from(elements).forEach((element) => {
         //     element.style.stroke = '';
