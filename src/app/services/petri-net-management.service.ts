@@ -75,6 +75,11 @@ export class PetriNetManagementService {
         this.updatePn();
     }
 
+    public updatePnByFlowerFallThrough(dfg: Dfg, subDFGs: Dfg[]) {
+        this._petriNet.updateByFlowerFallThrough(dfg, subDFGs);
+        this.updatePn();
+    }
+
     private updatePn(): void {
         if (this._petriNet.isBasicPetriNet()) {
             this._isModifiable = false;

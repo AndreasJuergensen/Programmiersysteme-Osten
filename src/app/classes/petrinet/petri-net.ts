@@ -5,18 +5,21 @@ import {
     PetriNetTransition,
     PetriNetTransitions,
 } from './petri-net-transitions';
+import { EventLog } from '../event-log';
 
 export class PetriNet {
     private readonly _places: Places = new Places();
     private readonly _transitions: PetriNetTransitions =
         new PetriNetTransitions();
     private readonly _arcs: PetriNetArcs = new PetriNetArcs();
+    // private _isInitialized: boolean = false;
 
     constructor(dfg?: Dfg) {
         dfg ? this.initializeOriginDFG(dfg) : undefined;
     }
 
     private initializeOriginDFG(dfg: Dfg): PetriNet {
+        // this._isInitialized = true;
         this._places.addInputPlace().addOutputPlace();
         this._transitions.createTransition('play').createTransition('stop');
 
@@ -86,7 +89,7 @@ export class PetriNet {
                 secondReplacingTransition,
             )
             .redirectArcStart(originDFG, secondReplacingTransition);
-        this._transitions.deleteDFG(originDFG);
+        this._transitions.removeDFG(originDFG);
         return this;
     }
 
@@ -147,13 +150,82 @@ export class PetriNet {
         this._arcs
             .redirectArcEnd(originDFG, replacingTransition)
             .redirectArcStart(originDFG, replacingTransition);
-        this._transitions.deleteDFG(originDFG);
+        this._transitions.removeDFG(originDFG);
         return replacingTransition;
     }
 
     isBasicPetriNet(): boolean {
         return this.transitions.eachTransitionIsBaseCase();
     }
+
+    updateByFlowerFallThrough(originDFG: Dfg, flowerDFGs: Dfg[]): PetriNet {
+        const flowerCentre: Place = this.replaceOriginByFlowerCentre(originDFG);
+        for (const dfg of flowerDFGs) {
+            this.insertFlowerDFG(dfg, flowerCentre);
+        }
+        return this;
+    }
+
+    private insertFlowerDFG(dfg: Dfg, centre: Place): PetriNet {
+        this.transitions.addDFG(dfg);
+        this.arcs
+            .addPlaceToTransitionArc(
+                centre,
+                this.transitions.getLastTransition(),
+            )
+            .addTransitionToPlaceArc(
+                this.transitions.getLastTransition(),
+                centre,
+            );
+        return this;
+    }
+
+    private replaceOriginByFlowerCentre(origin: Dfg): Place {
+        const flowerCentre: Place = this.arcs.getPrevPlace(origin);
+        this.arcs.redirectArcEnd(
+            origin,
+            this.arcs.getNextTransition(this.arcs.getNextPlace(origin)),
+        );
+        this.arcs.removeArc(
+            this.arcs.getNextPlace(origin),
+            this.arcs.getNextTransition(flowerCentre),
+        );
+        this.places.removePlace(this.arcs.getNextPlace(origin));
+        this.arcs.removeArc(origin, this.arcs.getNextPlace(origin));
+        this.transitions.removeDFG(origin);
+        return flowerCentre;
+    }
+
+    cutCanBeExecuted(): boolean {
+        const petriNetDFGs: Dfg[] = this.getDFGs();
+        for (const dfg of petriNetDFGs) {
+            if (dfg.canBeCutByAnyPartitions()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    acitivityOncePerTraceIsFeasible(): boolean {
+        const petriNetDFGs: Dfg[] = this.getDFGs();
+        for (const dfg of petriNetDFGs) {
+            const eventLog: EventLog = dfg.eventLog;
+            for (const activity of dfg.activities.getAllActivites()) {
+                if (eventLog.activityOncePerTraceIsPossibleBy(activity)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    getDFGs(): Dfg[] {
+        return this._transitions.getAllDFGs();
+    }
+
+    // get isInitialized(): boolean {
+    //     return this._isInitialized;
+    // }
 
     get inputPlace(): Place {
         return this._places.input;
