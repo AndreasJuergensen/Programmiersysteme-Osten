@@ -28,6 +28,16 @@ export class Places {
         return this;
     }
 
+    removePlace(placeToRemove: Place): Places {
+        for (const [index, place] of this._places.entries()) {
+            if (place === placeToRemove) {
+                this._places.splice(index, 1);
+                return this;
+            }
+        }
+        throw new Error('Place not found');
+    }
+
     getLastPlace(): Place {
         return this._places[this._places.length - 1];
     }
@@ -47,5 +57,13 @@ export class Places {
 
     get output(): Place {
         return this._places[1];
+    }
+
+    get places(): Array<Place> {
+        return this._places;
+    }
+
+    get isEmpty(): boolean {
+        return this._places.length === 0;
     }
 }

@@ -170,7 +170,6 @@ export class Arcs {
         return this;
     }
 
-
     getArcs(): Array<DfgArc> {
         return this.arcs;
     }

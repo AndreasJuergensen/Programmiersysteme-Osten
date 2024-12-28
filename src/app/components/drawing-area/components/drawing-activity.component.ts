@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Activity } from '../models';
 import { environment } from 'src/environments/environment';
+import { FallThroughHandlingService } from 'src/app/services/fall-through-handling.service';
 
 @Component({
     selector: 'svg:g[app-drawing-activity]',
@@ -15,6 +16,7 @@ import { environment } from 'src/environments/environment';
             [attr.stroke]="strokeColor"
             [attr.stroke-opacity]="strokeOpacity"
             [attr.stroke-width]="strokeWidth"
+            (click)="onActivityClick(activity)"
         />
         <svg:text
             [attr.x]="activity.x"
@@ -23,10 +25,19 @@ import { environment } from 'src/environments/environment';
             {{ activity.id }}
         </svg:text>
     `,
-    styles: ``,
+    styles: `
+        rect:hover {
+            cursor: pointer;
+            stroke-width: 5;
+        }
+    `,
 })
 export class DrawingActivityComponent {
     @Input({ required: true }) activity!: Activity;
+
+    constructor(
+        private _fallThroughHandlingService: FallThroughHandlingService,
+    ) {}
 
     readonly width: number = environment.drawingElements.activities.height;
     readonly height: number = environment.drawingElements.activities.height;
@@ -41,4 +52,8 @@ export class DrawingActivityComponent {
         environment.drawingElements.activities.strokeOpacity;
     readonly strokeWidth: number =
         environment.drawingElements.activities.strokeWidth;
+
+    onActivityClick(activity: Activity): void {
+        this._fallThroughHandlingService.processActivityClick(activity.id);
+    }
 }

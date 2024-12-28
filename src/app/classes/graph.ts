@@ -89,7 +89,20 @@ export class ActivityNode extends Node {}
 
 export class PlaceNode extends Node {}
 
-export class TransitionNode extends Node {}
+export class TransitionNode extends Node {
+    constructor(
+        _id: string,
+        _x: number,
+        _y: number,
+        private _name: string,
+    ) {
+        super(_id, _x, _y);
+    }
+
+    get name(): string {
+        return this._name;
+    }
+}
 
 export class BoxNode extends Node {
     constructor(

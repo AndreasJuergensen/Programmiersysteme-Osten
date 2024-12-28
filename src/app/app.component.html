@@ -24,6 +24,20 @@
     <hr />
     <div class="flexRowAlignSpaceEvenlyStart">
         <app-cut-execution></app-cut-execution>
+        <button
+            mat-flat-button
+            [disabled]="actionButtonsAreDisabled"
+            (click)="activityOncePerTraceExecution()"
+        >
+            Activity Once Per Trace Fall Through
+        </button>
+        <button
+            mat-flat-button
+            [disabled]="actionButtonsAreDisabled"
+            (click)="flowerExecution()"
+        >
+            Flower Model Fall Through
+        </button>
     </div>
     <hr />
     <div class="flexRowAlignSpaceEvenlyStart">
