@@ -219,9 +219,9 @@ export class PetriNet {
         return false;
     }
 
-    getDFGs(): Dfg[] {
-        return this._transitions.getAllDFGs();
-    }
+    // getDFGs(): Dfg[] {
+    //     return this._transitions.getAllDFGs();
+    // }
 
     // get isInitialized(): boolean {
     //     return this._isInitialized;
