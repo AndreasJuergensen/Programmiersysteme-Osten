@@ -24,6 +24,8 @@ export class CollectArcsService {
     constructor(private petriNetManagementService: PetriNetManagementService) {
         this.petriNetManagementService.petriNet$.subscribe((petriNetSub) => {
             this.petriNet = petriNetSub;
+
+            // this.resetCollectedArcs();
         });
     }
 
@@ -35,22 +37,30 @@ export class CollectArcsService {
         return this._currentDFG;
     }
 
-    // public resetCollectArcs(): void {
-    //     this._collectedArcs = new Arcs();
-    //     this._currentDFG = undefined;
+    public resetCollectedArcs(): void {
+        this._collectedArcs = new Arcs();
+        this._currentDFG = undefined;
 
-    //     // this.resetClickedElements();
-    // }
+        this.resetClickedElements();
+    }
 
-    // private resetClickedElements(): void {
-    //     const elements = document.getElementsByTagName('line');
-    //     Array.from(elements).forEach((element) => {
-    //         element.style.stroke = '';
-    //     });
-    //     // this.arcIsActive = false;
+    private resetClickedElements(): void {
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
 
-    //     //document.getElementById("mySvg") as SVGSVGElement;
-    // }
+        const lines = svg.querySelectorAll('line');
+        lines.forEach((line) => {
+            line.classList.remove('active');
+            line.classList.remove('hovered');
+        });
+        // const elements = document.getElementsByTagName('line');
+        // Array.from(elements).forEach((element) => {
+        //     element.style.stroke = '';
+        // });
+        // this.arcIsActive = false;
+        // document.getElementById("mySvg") as SVGSVGElement;
+    }
 
     private getDFGArcsFromPetriNet(): Array<DfgArc> {
         const dfgArcs = new Array<DfgArc>();

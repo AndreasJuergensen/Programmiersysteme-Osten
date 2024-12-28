@@ -3,6 +3,7 @@ import { PetriNet } from '../classes/petrinet/petri-net';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Dfg } from '../classes/dfg/dfg';
 import { ShowFeedbackService } from './show-feedback.service';
+import { CollectArcsService } from './collect-arcs.service';
 
 @Injectable({
     providedIn: 'root',
@@ -22,7 +23,10 @@ export class PetriNetManagementService {
         return this._isModifiable;
     }
 
-    constructor(private _showFeedbackService: ShowFeedbackService) {}
+    constructor(
+        private _showFeedbackService: ShowFeedbackService,
+        // private _collectArcService: CollectArcsService,
+    ) {}
 
     public initialize(dfg: Dfg): void {
         this._petriNet = new PetriNet(dfg);
@@ -36,6 +40,7 @@ export class PetriNetManagementService {
             this._isModifiable = true;
         }
         this._petriNet$.next(this._petriNet);
+        // this._collectArcService.resetCollectedArcs();
     }
 
     public updatePnByExclusiveCut(
@@ -81,5 +86,6 @@ export class PetriNetManagementService {
             this._isModifiable = true;
         }
         this._petriNet$.next(this._petriNet);
+        // this._collectArcService.resetCollectedArcs();
     }
 }

@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Arc } from '../models';
 import { environment } from 'src/environments/environment';
 import { CollectArcsService } from 'src/app/services/collect-arcs.service';
+import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 
 @Component({
     selector: 'svg:g[app-drawing-arc]',
@@ -44,26 +45,25 @@ import { CollectArcsService } from 'src/app/services/collect-arcs.service';
         <svg:rect
             [attr.x]="arc.x1"
             [attr.y]="arc.y1 - 5"
-            [attr.width]="arc.x2 - arc.x1"
+            [attr.width]="this.rectWidth(arc)"
             [attr.height]="rectheight"
             fill="transparent"
             pointer-events="all"
             [attr.transform]="
                 'rotate(' + rotationAngle + ',' + arc.x1 + ',' + arc.y1 + ')'
             "
-            (mouseover)="changeLineColorOver('red')"
-            (mouseout)="changeLineColorOut('black')"
-            (click)="onLineClick(arc)"
+            (mouseover)="changeLineColorOver($event)"
+            (mouseout)="changeLineColorOut($event)"
+            (click)="onLineClick($event, arc)"
         ></svg:rect>
         <svg:line
             [attr.x1]="arc.x1"
             [attr.y1]="arc.y1"
             [attr.x2]="arc.x2"
             [attr.y2]="arc.y2"
-            [attr.stroke]="isActive ? 'red' : color"
+            [attr.stroke]="'black'"
             [attr.stroke-width]="width"
             [attr.marker-end]="'url(' + arrow + ')'"
-            [attr.clicked]="isActive"
         />
     `,
     styles: `
@@ -71,19 +71,33 @@ import { CollectArcsService } from 'src/app/services/collect-arcs.service';
             cursor: pointer;
             /* marker-end: url(arrow);*/
         }
+
+        line.active {
+            stroke: red !important;
+        }
+
+        line.hovered {
+            stroke: red !important;
+        }
     `,
 })
 export class DrawingArcComponent {
     @Input({ required: true }) arc!: Arc;
 
-    constructor(private collectArcsService: CollectArcsService) {}
+    constructor(
+        private collectArcsService: CollectArcsService,
+        private feedbackService: ShowFeedbackService,
+    ) {}
 
     readonly width: number = environment.drawingElements.arcs.width;
     color: string = environment.drawingElements.arcs.color;
     markerColor = environment.drawingElements.arcs.color;
     arrow = '#arrowhead';
     //isActive = this.collectArcsService.arcIsActive;
-    isActive = false;
+    // isActive = false;
+    svg: SVGSVGElement = document.getElementsByTagName(
+        'svg',
+    )[0] as SVGSVGElement;
 
     // lines.forEach((line) => {
     //     line.addEventListener("mouseenter", () => handleMouseEnter(line, "red"));
@@ -122,57 +136,100 @@ export class DrawingArcComponent {
     //     element.style.removeProperty('--color');
     // };
 
-    changeLineColorOver(color: string): void {
+    changeLineColorOver(event: Event): void {
+        const rects = Array.from(this.svg.querySelectorAll('rect'));
+        const lines = Array.from(this.svg.querySelectorAll('line'));
+
+        const rect: SVGRectElement = event.target as SVGRectElement;
+        const rectIndex = rects.indexOf(rect);
+
+        const line = rect.nextElementSibling as SVGLineElement;
+
+        if (line && !line.classList.contains('active')) {
+            line.classList.add('hovered');
+            this.arrow = '#arrowhead-hover' + this.arc.x1 + this.arc.y1;
+        }
+
         // console.log('Im Mouseover - Farbe: ' + color);
 
         // document.documentElement.style.setProperty('--color', color);
-        this.color = color;
-        this.arrow = '#arrowhead-hover' + this.arc.x1 + this.arc.y1;
-    }
-    changeLineColorOut(color: string): void {
-        this.arrow = '#arrowhead';
-        this.color = color;
+        // console.log(event);
 
-        if (this.isActive === true) {
-            this.markerColor = 'red';
+        // this.color = 'red';
+    }
+    changeLineColorOut(event: Event): void {
+        const rects = Array.from(this.svg.querySelectorAll('rect'));
+        const lines = Array.from(this.svg.querySelectorAll('line'));
+
+        const rect = event.target as SVGRectElement;
+        const rectIndex = rects.indexOf(rect);
+
+        const line = rect.nextElementSibling as SVGLineElement;
+
+        if (line && !line.classList.contains('active')) {
+            line.classList.remove('hovered');
+            this.arrow = '#arrowhead';
         }
+
+        // this.arrow = '#arrowhead';
+        // this.color = color;
+
+        // if (this.isActive === true) {
+        //     this.markerColor = 'red';
+        // }
     }
 
-    onLineClick(arc: Arc): void {
+    onLineClick(event: Event, arc: Arc): void {
+        const rects = Array.from(this.svg.querySelectorAll('rect'));
+        const lines = Array.from(this.svg.querySelectorAll('line'));
+
+        const rect = event.target as SVGRectElement;
+        const rectIndex = rects.indexOf(rect);
+
+        const line = rect.nextElementSibling as SVGLineElement;
+
         if (this.collectArcsService.isDFGArc(arc)) {
             console.log('Arc ist DFFGArc');
 
             if (this.collectArcsService.isArcinSameDFG(arc)) {
                 console.log('Arc in same DFG');
+                if (line) {
+                    line.classList.toggle('active');
+                }
+
                 this.collectArcsService.updateCollectedArcs(arc);
 
-                if (this.isActive === true) {
-                    // console.log('alte MarkerColor: ' + this.markerColor);
-                    this.markerColor = environment.drawingElements.arcs.color;
-                    // console.log('neue MarkerColor: ' + this.markerColor);
+                // if (this.isActive === true) {
+                //     // console.log('alte MarkerColor: ' + this.markerColor);
+                //     this.markerColor = environment.drawingElements.arcs.color;
+                //     // console.log('neue MarkerColor: ' + this.markerColor);
 
-                    this.isActive = false;
-                } else {
-                    // console.log('alte MarkerColor: ' + this.markerColor);
-                    this.markerColor = 'red';
-                    // console.log('neue MarkerColor: ' + this.markerColor);
-                    this.isActive = true;
-                }
+                //     this.isActive = false;
+                // } else {
+                //     // console.log('alte MarkerColor: ' + this.markerColor);
+                //     this.markerColor = 'red';
+                //     // console.log('neue MarkerColor: ' + this.markerColor);
+                //     this.isActive = true;
+                // }
             } else {
-                console.log('Arc not in same DFG');
+                this.feedbackService.showMessage('Arc not in same DFG', true);
+                // console.log('Arc not in same DFG');
             }
         } else {
-            console.log('Arc ist keine DFGArc');
+            this.feedbackService.showMessage('Arc is not a DFGArc', true);
+            // console.log('Arc ist keine DFGArc');
         }
     }
 
     rectheight = 10;
 
-    get rectWidth(): number {
-        return Math.sqrt(
+    rectWidth(arc: Arc): number {
+        const width = Math.sqrt(
             Math.pow(this.arc.x2 - this.arc.x1, 2) +
                 Math.pow(this.arc.y2 - this.arc.y1, 2),
         );
+
+        return width;
     }
 
     get rotationAngle(): number {
