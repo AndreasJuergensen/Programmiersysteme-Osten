@@ -1,17 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import {
-    Activity,
-    DfgArc,
-    Arc,
-    Place,
-    Transition,
-    Box,
-    TransitionToPlaceArc,
-    BoxToPlaceArc,
-    PlaceToTransitionArc,
-    PlaceToBoxArc,
-} from './models';
-import { CalculatePetriNetService } from 'src/app/services/calculate-petri-net.service';
+import { Subscription } from 'rxjs';
 import {
     ActivityNode,
     BoxNode,
@@ -19,8 +7,19 @@ import {
     PlaceNode,
     TransitionNode,
 } from 'src/app/classes/graph';
-import { Dfg } from 'src/app/classes/dfg/dfg';
-import { Subscription } from 'rxjs';
+import { CalculatePetriNetService } from 'src/app/services/calculate-petri-net.service';
+import {
+    Activity,
+    Arc,
+    Box,
+    BoxToPlaceArc,
+    DfgArc,
+    Place,
+    PlaceToBoxArc,
+    PlaceToTransitionArc,
+    Transition,
+    TransitionToPlaceArc,
+} from './models';
 
 @Component({
     selector: 'app-drawing-area',
@@ -36,6 +35,8 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     private _places: Array<Place> = new Array<Place>();
     private _arcs: Array<Arc> = new Array<Arc>();
     private _boxArcs: Array<Arc> = new Array<Arc>();
+
+    public showEventLogs: boolean = false;
 
     constructor(private calculatePetriNetService: CalculatePetriNetService) {}
 

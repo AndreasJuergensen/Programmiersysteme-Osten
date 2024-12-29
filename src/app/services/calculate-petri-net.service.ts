@@ -296,6 +296,7 @@ export class CalculatePetriNetService {
                 y,
                 graphWithBoxDimension[1],
                 graphWithBoxDimension[2],
+                dfg.eventLog.toString()
             );
         }
 

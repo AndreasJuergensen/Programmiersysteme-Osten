@@ -8,6 +8,7 @@ import {
     DrawingTransitionsComponent,
 } from './components';
 import { DrawingBoxComponent } from './components/drawing-box.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
     declarations: [
@@ -18,7 +19,7 @@ import { DrawingBoxComponent } from './components/drawing-box.component';
         DrawingPlaceComponent,
         DrawingTransitionsComponent,
     ],
-    imports: [CommonModule],
+    imports: [CommonModule, MatCheckboxModule],
     exports: [DrawingAreaComponent],
 })
 export class DrawingAreaModule {}

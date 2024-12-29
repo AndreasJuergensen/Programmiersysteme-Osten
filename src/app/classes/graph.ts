@@ -111,6 +111,7 @@ export class BoxNode extends Node {
         _y: number,
         private _width: number,
         private _height: number,
+        private _eventLog: string
     ) {
         super(_id, _x, _y);
     }
@@ -121,6 +122,10 @@ export class BoxNode extends Node {
 
     get height(): number {
         return this._height;
+    }
+
+    get eventLog(): string {
+        return this._eventLog;
     }
 
     override getXOffset(): number {

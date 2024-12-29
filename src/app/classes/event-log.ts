@@ -4,6 +4,10 @@ import { ExclusiveCut, LoopCut, ParallelCut, SequenceCut } from './dfg/cut';
 export class EventLog {
     constructor(private readonly _traces: Trace[] = []) {}
 
+    toString(): string {
+        return this._traces.map(trace => trace.toString()).join(" +\n")
+    }
+
     get traces(): Trace[] {
         return this._traces;
     }
@@ -150,6 +154,10 @@ export class EventLog {
 
 export class Trace {
     constructor(private readonly _activities: Activity[] = []) {}
+
+    toString(): string {
+        return this._activities.map(activity => activity.toString()).join(" ")
+    }
 
     addActivity(activity: Activity): void {
         this.activities.push(activity);
