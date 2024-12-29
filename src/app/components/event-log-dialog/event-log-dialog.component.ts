@@ -31,7 +31,6 @@ import { ParseXesService } from 'src/app/services/parse-xes.service';
         MatTooltipModule,
         MatIcon,
     ],
-    providers: [],
     templateUrl: './event-log-dialog.component.html',
     styleUrl: './event-log-dialog.component.css',
 })
@@ -51,7 +50,6 @@ export class EventLogDialogComponent implements OnInit {
         private parseXesService: ParseXesService,
     ) {}
 
-    public eventLogInput: string = '';
     public fileName: string = '';
 
     ngOnInit(): void {
