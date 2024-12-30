@@ -62,12 +62,20 @@ export class AppComponent {
     activityOncePerTraceExecution(): void {
         this._fallThroughHandlingService.executeActivityOncePerTraceFallThrough();
     }
-    
+
     flowerExecution() {
         this._fallThroughHandlingService.executeFlowerFallThrough();
     }
-    
+
+    undoLastUpdate() {
+        this._petriNetManagementService.updateToPreviousPetriNet();
+    }
+
     get actionButtonsAreDisabled(): boolean {
         return !this._petriNetManagementService.isModifiable;
+    }
+
+    get undoButtonIsDisabled(): boolean {
+        return this._petriNetManagementService.isInputPetriNet;
     }
 }
