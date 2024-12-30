@@ -19,8 +19,8 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
             >
                 <svg:path
                     d="M 1,1 L 9,5 L 1,9 Z"
-                    [attr.fill]="'black'"
-                    [attr.stroke]="'black'"
+                    [attr.fill]="color"
+                    [attr.stroke]="color"
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>
@@ -42,41 +42,34 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
             </svg:marker>
         </svg:defs>
 
-        <svg:rect
-            [attr.x]="arc.x1"
-            [attr.y]="arc.y1 - 5"
-            [attr.width]="this.rectWidth(arc)"
-            [attr.height]="rectheight"
+        <svg:path
+            [attr.d]="pathForLine(arc)"
+            [attr.stroke-width]="10"
+            [attr.fill]="'none'"
             fill="transparent"
             pointer-events="all"
-            [attr.transform]="
-                'rotate(' + rotationAngle + ',' + arc.x1 + ',' + arc.y1 + ')'
-            "
             (mouseover)="changeLineColorOver($event)"
             (mouseout)="changeLineColorOut($event)"
             (click)="onLineClick($event, arc)"
-        ></svg:rect>
-        <svg:line
-            [attr.x1]="arc.x1"
-            [attr.y1]="arc.y1"
-            [attr.x2]="arc.x2"
-            [attr.y2]="arc.y2"
+        ></svg:path>
+        <svg:path
+            [attr.d]="pathForLine(arc)"
             [attr.stroke]="'black'"
             [attr.stroke-width]="width"
+            [attr.fill]="'none'"
             marker-end="url(#arrowhead)"
-        />
+        ></svg:path>
     `,
     styles: `
-        rect:hover {
+        path:hover {
             cursor: pointer;
-            /* marker-end: url(arrow);*/
         }
 
-        line.active {
+        path.active {
             stroke: red !important;
         }
 
-        line.hovered {
+        path.hovered {
             stroke: red !important;
         }
     `,
@@ -90,135 +83,49 @@ export class DrawingArcComponent {
     ) {}
 
     readonly width: number = environment.drawingElements.arcs.width;
-    color: string = environment.drawingElements.arcs.color;
-    markerColor = environment.drawingElements.arcs.color;
-    arrow = '#arrowhead';
-    //isActive = this.collectArcsService.arcIsActive;
-    // isActive = false;
-    svg: SVGSVGElement = document.getElementsByTagName(
+    readonly color: string = environment.drawingElements.arcs.color;
+    readonly svg: SVGSVGElement = document.getElementsByTagName(
         'svg',
     )[0] as SVGSVGElement;
 
-    // lines.forEach((line) => {
-    //     line.addEventListener("mouseenter", () => handleMouseEnter(line, "red"));
-    //     line.addEventListener("mouseleave", () => handleMouseLeave(line));
-    // });
-
-    // ngOnInit() {
-    //     const elements = document.getElementsByTagName('line');
-    //     Array.from(elements).forEach((element) => {
-    //         console.log(element);
-    //     });
-    // }
-
-    // ngAfterViewInit(): void {
-    //     this.initializeHoverEffects();
-    // }
-
-    // private initializeHoverEffects(): void {
-    //     const lines = document.querySelectorAll('rect');
-
-    //     lines.forEach((line: Element) => {
-    //         line.addEventListener('mouseenter', () =>
-    //             this.handleMouseOver(line, 'red'),
-    //         );
-    //         line.addEventListener('mouseleave', () =>
-    //             this.handleMouseLeave(line),
-    //         );
-    //     });
-    // }
-
-    // private handleMouseOver = (element: any, color: string) => {
-    //     element.style.setProperty('--color', color);
-    // };
-
-    // private handleMouseLeave = (element: any) => {
-    //     element.style.removeProperty('--color');
-    // };
-
     changeLineColorOver(event: Event): void {
-        const rects = Array.from(this.svg.querySelectorAll('rect'));
-        const lines = Array.from(this.svg.querySelectorAll('line'));
-
         const rect: SVGRectElement = event.target as SVGRectElement;
-        const rectIndex = rects.indexOf(rect);
-
         const line = rect.nextElementSibling as SVGLineElement;
 
         if (line && !line.classList.contains('active')) {
             line.classList.add('hovered');
-            // this.arrow = '#arrowhead-hover' + this.arc.x1 + this.arc.y1;
             line.setAttribute('marker-end', 'url(#arrowhead-red)');
         }
-
-        // console.log('Im Mouseover - Farbe: ' + color);
-
-        // document.documentElement.style.setProperty('--color', color);
-        // console.log(event);
-
-        // this.color = 'red';
     }
     changeLineColorOut(event: Event): void {
-        const rects = Array.from(this.svg.querySelectorAll('rect'));
-        const lines = Array.from(this.svg.querySelectorAll('line'));
-
         const rect = event.target as SVGRectElement;
-        const rectIndex = rects.indexOf(rect);
-
         const line = rect.nextElementSibling as SVGLineElement;
 
         if (line && !line.classList.contains('active')) {
             line.classList.remove('hovered');
             line.setAttribute('marker-end', 'url(#arrowhead)');
         }
-
-        // this.arrow = '#arrowhead';
-        // this.color = color;
-
-        // if (this.isActive === true) {
-        //     this.markerColor = 'red';
-        // }
     }
 
     onLineClick(event: Event, arc: Arc): void {
-        const rects = Array.from(this.svg.querySelectorAll('rect'));
-        const lines = Array.from(this.svg.querySelectorAll('line'));
-
         const rect = event.target as SVGRectElement;
-        const rectIndex = rects.indexOf(rect);
-
         const line = rect.nextElementSibling as SVGLineElement;
 
         if (this.collectArcsService.isDFGArc(arc)) {
-            console.log('Arc ist DFFGArc');
+            // console.log('Arc ist DFFGArc');
 
             if (this.collectArcsService.isArcinSameDFG(arc)) {
-                console.log('Arc in same DFG');
+                // console.log('Arc in same DFG');
                 if (line) {
                     line.classList.toggle('active');
                 }
 
                 this.collectArcsService.updateCollectedArcs(arc);
-
-                // if (this.isActive === true) {
-                //     // console.log('alte MarkerColor: ' + this.markerColor);
-                //     this.markerColor = environment.drawingElements.arcs.color;
-                //     // console.log('neue MarkerColor: ' + this.markerColor);
-
-                //     this.isActive = false;
-                // } else {
-                //     // console.log('alte MarkerColor: ' + this.markerColor);
-                //     this.markerColor = 'red';
-                //     // console.log('neue MarkerColor: ' + this.markerColor);
-                //     this.isActive = true;
-                // }
             } else {
                 this.feedbackService.showMessage('Arc not in same DFG', true);
-                // console.log('Arc not in same DFG');
             }
         } else {
             this.feedbackService.showMessage('Arc is not a DFGArc', true);
-            // console.log('Arc ist keine DFGArc');
         }
     }
 
@@ -238,5 +145,33 @@ export class DrawingArcComponent {
             Math.atan2(this.arc.y2 - this.arc.y1, this.arc.x2 - this.arc.x1) *
             (180 / Math.PI)
         );
+    }
+
+    pathForLine(arc: Arc): string {
+        if (!this.pathNecessary(arc)) {
+            return `M ${arc.x1} ${arc.y1} L ${arc.x2} ${arc.y2}`;
+        }
+
+        let controlPointX = (arc.x1 + arc.x2) / 2;
+        let controlPointY = Math.min(arc.start.y, arc.end.y);
+
+        if (arc.start.y > arc.end.y) {
+            controlPointY = Math.min(arc.start.y, arc.end.y) + 100;
+        }
+
+        if (arc.start.y === arc.end.y) {
+            if (arc.start.x > arc.end.x) {
+                controlPointY = Math.min(arc.start.y, arc.end.y) - 30;
+            }
+            if (arc.start.x <= arc.end.x) {
+                controlPointY = Math.min(arc.start.y, arc.end.y) + 30;
+            }
+        }
+
+        return `M ${arc.x1} ${arc.y1} Q ${controlPointX} ${controlPointY} ${arc.x2} ${arc.y2}`;
+    }
+
+    private pathNecessary(arc: Arc): boolean {
+        return this.collectArcsService.overlayArcsExistsInDFGs(arc);
     }
 }
