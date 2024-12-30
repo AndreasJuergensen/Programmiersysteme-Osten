@@ -12,14 +12,12 @@ export class PetriNet {
     private readonly _transitions: PetriNetTransitions =
         new PetriNetTransitions();
     private readonly _arcs: PetriNetArcs = new PetriNetArcs();
-    // private _isInitialized: boolean = false;
 
     constructor(dfg?: Dfg) {
         dfg ? this.initializeOriginDFG(dfg) : undefined;
     }
 
     private initializeOriginDFG(dfg: Dfg): PetriNet {
-        // this._isInitialized = true;
         this._places.addInputPlace().addOutputPlace();
         this._transitions.createTransition('play').createTransition('stop');
 
@@ -219,9 +217,9 @@ export class PetriNet {
         return false;
     }
 
-    // get isInitialized(): boolean {
-    //     return this._isInitialized;
-    // }
+    getDFGs(): Dfg[] {
+        return this._transitions.getAllDFGs();
+    }
 
     get inputPlace(): Place {
         return this._places.input;
