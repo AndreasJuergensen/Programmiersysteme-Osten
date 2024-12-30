@@ -41,6 +41,9 @@ importers:
       fast-xml-parser:
         specifier: ^4.5.1
         version: 4.5.1
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       rxjs:
         specifier: ~7.8.0
         version: 7.8.1
@@ -69,6 +72,9 @@ importers:
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2
+      '@types/lodash':
+        specifier: ^4.17.13
+        version: 4.17.13
       jasmine-core:
         specifier: ~4.6.0
         version: 4.6.1
@@ -1694,6 +1700,9 @@ packages:
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
+
+  '@types/lodash@4.17.13':
+    resolution: {integrity: sha512-lfx+dftrEZcdBPczf9d0Qv0x+j/rfNCMuC6OcfXmO8gkfeNAY88PgKUbvG56whcN23gc27yenwF6oJZXGFpYxg==}
 
   '@types/mime@1.3.5':
     resolution: {integrity: sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w==}
@@ -6175,6 +6184,8 @@ snapshots:
       pretty-format: 29.7.0
 
   '@types/json-schema@7.0.15': {}
+
+  '@types/lodash@4.17.13': {}
 
   '@types/mime@1.3.5': {}
 
