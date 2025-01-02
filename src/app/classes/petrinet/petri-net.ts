@@ -217,10 +217,6 @@ export class PetriNet {
         return false;
     }
 
-    getDFGs(): Dfg[] {
-        return this._transitions.getAllDFGs();
-    }
-
     get inputPlace(): Place {
         return this._places.input;
     }
