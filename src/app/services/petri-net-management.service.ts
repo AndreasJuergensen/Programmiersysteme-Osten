@@ -3,6 +3,7 @@ import { PetriNet } from '../classes/petrinet/petri-net';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Dfg } from '../classes/dfg/dfg';
 import { ShowFeedbackService } from './show-feedback.service';
+import { CollectArcsService } from './collect-arcs.service';
 
 @Injectable({
     providedIn: 'root',

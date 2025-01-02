@@ -219,10 +219,6 @@ export class PetriNet {
         return false;
     }
 
-    getDFGs(): Dfg[] {
-        return this._transitions.getAllDFGs();
-    }
-
     // get isInitialized(): boolean {
     //     return this._isInitialized;
     // }
@@ -245,5 +241,9 @@ export class PetriNet {
 
     get arcs(): PetriNetArcs {
         return this._arcs;
+    }
+
+    public getDFGs(): Array<Dfg> {
+        return this._transitions.getAllDFGs();
     }
 }
