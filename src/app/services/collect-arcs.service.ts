@@ -47,11 +47,13 @@ export class CollectArcsService {
         )[0] as SVGSVGElement;
 
         if (svg) {
-            const lines = svg.querySelectorAll('line');
-            lines.forEach((line) => {
-                line.classList.remove('active');
-                line.classList.remove('hovered');
-                line.setAttribute('marker-end', 'url(#arrowhead)');
+            const paths = svg.querySelectorAll('path');
+            paths.forEach((path) => {
+                path.classList.remove('active');
+                path.classList.remove('hovered');
+                if (path.classList.contains('visiblePath')) {
+                    path.setAttribute('marker-end', 'url(#arrowhead)');
+                }
             });
         }
     }
