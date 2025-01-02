@@ -180,6 +180,10 @@ export class Activity {
         this._name = name;
     }
 
+    toString(): string {
+        return this._name;
+    }
+
     get name(): string {
         return this._name;
     }

@@ -51,12 +51,14 @@ export class Transition extends Node {
 export class Box extends Node {
     private readonly _width: number;
     private readonly _height: number;
+    private readonly _eventLog: string;
 
     constructor(node: BoxNode) {
         super(node);
 
         this._width = node.width;
         this._height = node.height;
+        this._eventLog = node.eventLog
     }
 
     get width(): number {
@@ -65,5 +67,9 @@ export class Box extends Node {
 
     get height(): number {
         return this._height;
+    }
+
+    get eventLog(): string {
+        return this._eventLog;
     }
 }
