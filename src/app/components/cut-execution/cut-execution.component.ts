@@ -5,10 +5,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonModule } from '@angular/material/button';
-import { Dfg } from 'src/app/classes/dfg/dfg';
-import { Activities } from 'src/app/classes/dfg/activities';
-import { Arcs } from 'src/app/classes/dfg/arcs';
-import { EventLog } from 'src/app/classes/event-log';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
 import { CollectArcsService } from 'src/app/services/collect-arcs.service';
@@ -66,7 +62,7 @@ export class CutExecutionComponent implements OnInit {
                 selectedValue,
             );
             this.resetRadioSelection();
-            // this._collectArcsService.resetCollectArcs();
+            this._collectArcsService.resetCollectedArcs();
         } else if (!selectedValue && this._collectArcsService.currentDFG) {
             this._feedbackService.showMessage(
                 'No cut selected via radio buttons!',
@@ -94,7 +90,7 @@ export class CutExecutionComponent implements OnInit {
     onCancelClick(): void {
         if (this.radioForm.get('selectedCut')?.value !== null) {
             this.resetRadioSelection();
-            // this._collectArcsService.resetCollectArcs();
+            this._collectArcsService.resetCollectedArcs();
             this._feedbackService.showMessage('Canceled cut-selection!', false);
         }
     }
