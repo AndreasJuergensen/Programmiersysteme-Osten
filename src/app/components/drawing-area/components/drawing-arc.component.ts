@@ -53,6 +53,7 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
             (click)="onLineClick($event, arc)"
         ></svg:path>
         <svg:path
+            [attr.class]="'visiblePath'"
             [attr.d]="pathForLine(arc)"
             [attr.stroke]="'black'"
             [attr.stroke-width]="width"
