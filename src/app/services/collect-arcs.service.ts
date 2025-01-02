@@ -19,11 +19,10 @@ export class CollectArcsService {
     private _collectedArcs: Arcs = new Arcs();
     private _currentDFG: Dfg | undefined;
 
-    // arcIsActive: boolean = false;
-
     constructor(private petriNetManagementService: PetriNetManagementService) {
         this.petriNetManagementService.petriNet$.subscribe((petriNetSub) => {
             this.petriNet = petriNetSub;
+            this.resetCollectedArcs();
         });
     }
 
@@ -35,22 +34,27 @@ export class CollectArcsService {
         return this._currentDFG;
     }
 
-    // public resetCollectArcs(): void {
-    //     this._collectedArcs = new Arcs();
-    //     this._currentDFG = undefined;
+    public resetCollectedArcs(): void {
+        this._collectedArcs = new Arcs();
+        this._currentDFG = undefined;
 
-    //     // this.resetClickedElements();
-    // }
+        this.resetClickedElements();
+    }
 
-    // private resetClickedElements(): void {
-    //     const elements = document.getElementsByTagName('line');
-    //     Array.from(elements).forEach((element) => {
-    //         element.style.stroke = '';
-    //     });
-    //     // this.arcIsActive = false;
+    private resetClickedElements(): void {
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
 
-    //     //document.getElementById("mySvg") as SVGSVGElement;
-    // }
+        if (svg) {
+            const lines = svg.querySelectorAll('line');
+            lines.forEach((line) => {
+                line.classList.remove('active');
+                line.classList.remove('hovered');
+                line.setAttribute('marker-end', 'url(#arrowhead)');
+            });
+        }
+    }
 
     private getDFGArcsFromPetriNet(): Array<DfgArc> {
         const dfgArcs = new Array<DfgArc>();
@@ -102,8 +106,6 @@ export class CollectArcsService {
 
     public updateCollectedArcs(arc: Arc): void {
         const dfgArc: DfgArc = this.getDFGArc(arc)!;
-        // console.log('dfgarc: ');
-        // console.log(dfgArc);
 
         if (this._collectedArcs.getArcs().includes(dfgArc)) {
             const indexArcInCollectedArcs = this._collectedArcs
@@ -116,25 +118,17 @@ export class CollectArcsService {
         }
 
         if (this._collectedArcs.isEmpty()) {
-            // console.log('CollectedArcsIsEmpty');
-
             this._currentDFG = undefined;
         } else {
             this._currentDFG = this.getDFG(arc);
         }
-
-        // console.log(this._collectedArcs);
-        // console.log(this._currentDFG);
     }
 
     private getDFG(arc: Arc): Dfg | undefined {
         const dfgs = this.petriNet.transitions.getAllDFGs();
-        // console.log(dfgs);
 
         for (const dfg of dfgs) {
             if (this.isArcinDFG(arc, dfg)) {
-                // console.log('ArcInDFG');
-
                 return dfg;
             }
         }
@@ -144,20 +138,32 @@ export class CollectArcsService {
 
     public isArcinDFG(arc: Arc, dfg: Dfg | undefined): boolean {
         const dfgArcToCheck = this.getDFGArc(arc);
-        // console.log('DfgArcToCheck:');
-        // console.log(dfgArcToCheck);
-
-        // console.log('DFG: ');
-        // console.log(dfg);
 
         if (dfg !== undefined) {
             const arcInDFG: DfgArc | undefined =
                 dfg.arcs.getArcByStartNameAndEndName(arc.start.id, arc.end.id);
 
-            // console.log('ArcFromDFG');
-            // console.log(arcInDFG);
-
             if (arcInDFG !== undefined) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public overlayArcsExistsInDFGs(arc: Arc): boolean {
+        const dfgOfArc = this.getDFG(arc);
+
+        if (dfgOfArc) {
+            const overlayArcs = dfgOfArc.arcs
+                .getArcs()
+                .filter(
+                    (arcInDFG) =>
+                        arcInDFG.getStart().name === arc.end.id &&
+                        arcInDFG.getEnd().name === arc.start.id,
+                );
+
+            if (overlayArcs.length > 0) {
                 return true;
             }
         }
