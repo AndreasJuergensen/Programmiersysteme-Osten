@@ -1,3 +1,4 @@
+import { CutType } from 'src/app/components/cut-execution/cut-execution.component';
 import { Activities } from './activities';
 import { Arcs } from './arcs';
 import { Dfg, DfgBuilder } from './dfg';
@@ -331,5 +332,310 @@ describe('Cut a DFG by any partitions', () => {
         const result: boolean = sut.canBeCutByAnyPartitions();
 
         expect(result).toBeTrue();
+    });
+});
+
+describe('Cuts Test', () => {
+    it('get all cuts - loop cut', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .addFromPlayArc('A')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addArc('C', 'A')
+            .addToStopArc('B')
+            .build();
+
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
+
+        console.log('Result 1:', result);
+
+        expect(result).toEqual([[true, CutType.LoopCut]]);
+    });
+
+    it('get all cuts - parallel cut', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .addFromPlayArc('A')
+            .addFromPlayArc('B')
+            .addArc('A', 'B')
+            .addArc('B', 'A')
+            .addToStopArc('A')
+            .addToStopArc('B')
+            .build();
+
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
+
+        console.log('Result 2:', result);
+
+        expect(result).toEqual([[true, CutType.ParallelCut]]);
+    });
+
+    it('get all cuts - more exclusive cuts', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .createActivity('D')
+            .addFromPlayArc('A')
+            .addFromPlayArc('C')
+            .addFromPlayArc('D')
+            .addArc('A', 'B')
+            .addToStopArc('A')
+            .addToStopArc('C')
+            .addToStopArc('D')
+            .build();
+
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
+
+        console.log('Result 3:', result);
+
+        expect(result).toEqual([
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
+        ]);
+    });
+
+    it('get all cuts - sequence cut possible and loop cut could be possible', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .createActivity('D')
+            .addFromPlayArc('A')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addArc('C', 'D')
+            .addArc('D', 'B')
+            .addToStopArc('C')
+            .build();
+
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
+
+        console.log('Result 4:', result);
+
+        expect(result).toEqual([[true, CutType.SequenceCut]]);
+    });
+
+    it('get all cuts - exclusive cut possible and sequence cut + loop cut could be possible', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .createActivity('D')
+            .createActivity('Z')
+            .addFromPlayArc('A')
+            .addFromPlayArc('Z')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addArc('C', 'D')
+            .addArc('D', 'B')
+            .addToStopArc('C')
+            .addToStopArc('Z')
+            .build();
+
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
+
+        console.log('Result 5:', result);
+
+        expect(result).toEqual([[true, CutType.ExclusiveCut]]);
+    });
+
+    it('get all cuts - 3 exclusive cuts possible and sequence cut + loop cut could be possible', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .createActivity('D')
+            .createActivity('X')
+            .createActivity('Z')
+            .createActivity('H')
+            .createActivity('P')
+            .addFromPlayArc('A')
+            .addFromPlayArc('X')
+            .addFromPlayArc('Z')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addArc('C', 'D')
+            .addArc('D', 'B')
+            .addArc('Z', 'H')
+            .addArc('H', 'P')
+            .addArc('P', 'Z')
+            .addToStopArc('C')
+            .addToStopArc('X')
+            .addToStopArc('Z')
+            .build();
+
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
+
+        console.log('Result 6:', result);
+
+        expect(result).toEqual([
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
+        ]);
+    });
+
+    it('get all cuts - 1 exclusive cut possible and 1 parallel cut could be possible', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .createActivity('H')
+            .createActivity('P')
+            .createActivity('Z')
+            .addFromPlayArc('A')
+            .addFromPlayArc('H')
+            .addFromPlayArc('Z')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addArc('H', 'P')
+            .addArc('A', 'H')
+            .addArc('H', 'A')
+            .addArc('B', 'P')
+            .addArc('P', 'B')
+            .addArc('C', 'P')
+            .addArc('P', 'C')
+            .addToStopArc('C')
+            .addToStopArc('P')
+            .addToStopArc('Z')
+            .build();
+
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
+
+        console.log('Result 7:', result);
+
+        expect(result).toEqual([[true, CutType.ExclusiveCut]]);
+    });
+
+    it('get all cuts - sequence cuts possible', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .createActivity('D')
+            .addFromPlayArc('A')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addArc('C', 'D')
+            .addToStopArc('D')
+            .build();
+
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
+
+        console.log('Result 8:', result);
+
+        expect(result).toEqual([
+            [true, CutType.SequenceCut],
+            [true, CutType.SequenceCut],
+            [true, CutType.SequenceCut],
+        ]);
+    });
+
+    it('get all cuts - 1 sequence cut possible', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .createActivity('H')
+            .createActivity('P')
+            .addFromPlayArc('A')
+            .addFromPlayArc('H')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addArc('H', 'P')
+            .addArc('A', 'H')
+            .addArc('H', 'A')
+            .addArc('B', 'P')
+            .addArc('P', 'B')
+            .addArc('C', 'P')
+            .addArc('P', 'C')
+            .addToStopArc('C')
+            .addToStopArc('P')
+            .build();
+
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
+
+        console.log('Result 9:', result);
+
+        expect(result).toEqual([[true, CutType.SequenceCut]]);
+    });
+
+    it('get all cuts - 1 parallel cut possible', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .createActivity('P')
+            .addFromPlayArc('A')
+            .addFromPlayArc('P')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addArc('A', 'P')
+            .addArc('P', 'A')
+            .addArc('B', 'P')
+            .addArc('P', 'B')
+            .addArc('C', 'P')
+            .addArc('P', 'C')
+            .addToStopArc('C')
+            .addToStopArc('P')
+            .build();
+
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
+
+        console.log('Result 10:', result);
+
+        expect(result).toEqual([[true, CutType.ParallelCut]]);
+    });
+
+    it('get all cuts - 1 parallel cut possible', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .createActivity('H')
+            .createActivity('P')
+            .addFromPlayArc('A')
+            .addFromPlayArc('H')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addArc('H', 'P')
+            .addArc('A', 'H')
+            .addArc('H', 'A')
+            .addArc('B', 'H')
+            .addArc('H', 'B')
+            .addArc('C', 'H')
+            .addArc('H', 'C')
+            .addArc('A', 'P')
+            .addArc('P', 'A')
+            .addArc('B', 'P')
+            .addArc('P', 'B')
+            .addArc('C', 'P')
+            .addArc('P', 'C')
+            .addToStopArc('C')
+            .addToStopArc('P')
+            .build();
+
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
+
+        console.log('Result 11:', result);
+
+        expect(result).toEqual([[true, CutType.ParallelCut]]);
     });
 });
