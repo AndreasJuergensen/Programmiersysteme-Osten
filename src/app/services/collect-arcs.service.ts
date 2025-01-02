@@ -122,8 +122,6 @@ export class CollectArcsService {
         } else {
             this._currentDFG = this.getDFG(arc);
         }
-
-        // console.log(this._collectedArcs);
     }
 
     private getDFG(arc: Arc): Dfg | undefined {

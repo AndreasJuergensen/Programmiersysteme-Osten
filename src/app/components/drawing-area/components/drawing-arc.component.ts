@@ -112,10 +112,7 @@ export class DrawingArcComponent {
         const line = rect.nextElementSibling as SVGLineElement;
 
         if (this.collectArcsService.isDFGArc(arc)) {
-            // console.log('Arc ist DFFGArc');
-
             if (this.collectArcsService.isArcinSameDFG(arc)) {
-                // console.log('Arc in same DFG');
                 if (line) {
                     line.classList.toggle('active');
                 }
