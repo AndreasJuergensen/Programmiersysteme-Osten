@@ -5,12 +5,11 @@
 .mat-mdc-dialog-actions {
     display: flex;
     flex-direction: row;
-    padding: 24px;
-    padding-top: 0;
+    padding: 40px 0 20px 0;
 }
 
 .mat-mdc-dialog-content {
-  padding-bottom: 0;
+    padding-bottom: 0;
 }
 
 .file-upload-wrapper {
@@ -24,5 +23,5 @@
 }
 
 .filename {
-  margin-left: 8px;
+    margin-left: 8px;
 }
