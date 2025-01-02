@@ -54,16 +54,6 @@ export class PetriNetTransitions {
         return true;
     }
 
-    // getAllDFGs(): Dfg[] {
-    //     const dfgs: Dfg[] = [];
-    //     for (const transition of this.transitions) {
-    //         if (transition instanceof Dfg) {
-    //             dfgs.push(transition);
-    //         }
-    //     }
-    //     return dfgs;
-    // }
-
     getLastTransition(): PetriNetTransition {
         return this._transitions[this._transitions.length - 1];
     }
