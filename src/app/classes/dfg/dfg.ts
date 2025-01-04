@@ -41,8 +41,10 @@ export class Dfg implements PetriNetTransition {
         return { result: false, matchingcut: null };
     }
 
-    calculateAllPossibleCuts(): Array<[boolean, CutType]> {
-        let cuts: Array<[boolean, CutType]> = new Array<[boolean, CutType]>();
+    calculateAllPossibleCuts(): Array<[boolean, CutType, Arcs, Arcs]> {
+        let cuts: Array<[boolean, CutType, Arcs, Arcs]> = new Array<
+            [boolean, CutType, Arcs, Arcs]
+        >();
         const allActivities: Activities = new Activities()
             .addAll(this.activities)
             .removePlayAndStop();
@@ -61,25 +63,30 @@ export class Dfg implements PetriNetTransition {
             }
 
             // Sort activities to create a unique key for the combination
-            const a1Key = a1
-                .getAllActivites()
-                .map((act) => act.name)
-                .sort()
-                .join(',');
-            const a2Key = a2
-                .getAllActivites()
-                .map((act) => act.name)
-                .sort()
-                .join(',');
-            const combinationKey = [a1Key, a2Key].sort().join('|');
+            // const a1Key = a1
+            //     .getAllActivites()
+            //     .map((act) => act.name)
+            //     .sort()
+            //     .join(',');
+            // const a2Key = a2
+            //     .getAllActivites()
+            //     .map((act) => act.name)
+            //     .sort()
+            //     .join(',');
+            // const combinationKey = [a1Key, a2Key].sort().join('|');
 
             // Check if this combination has already been tested
-            if (testedCombinations.has(combinationKey)) {
-                continue;
-            }
+            // if (testedCombinations.has(combinationKey)) {
+            //     continue;
+            // }
 
-            testedCombinations.add(combinationKey);
+            // testedCombinations.add(combinationKey);
 
+            //hier sind theoretisch nur die Arcs die komplett in den Partitionen liegen drin
+            //d.h. alle anderen Arcs müssten geschnitten worden sein
+            //und oder sind fromPlay oder toStop Arcs
+            const arcsForA1 = this._arcs.filterArcsCompletelyIn(a1);
+            const arcsForA2 = this._arcs.filterArcsCompletelyIn(a2);
             // console.log('Durchlauf:' + mask);
             // console.log('a1: ' + a1.asJson());
             // console.log('a2: ' + a2.asJson());
@@ -88,6 +95,8 @@ export class Dfg implements PetriNetTransition {
                 cuts.push([
                     this.canBeCutIn(a1, a2).result,
                     this.canBeCutIn(a1, a2).matchingcut!,
+                    arcsForA1,
+                    arcsForA2,
                 ]);
                 // console.log('Durchlauf: ' + mask + ' erfolgreich');
                 // console.log('a1: ' + a1.asJson());
