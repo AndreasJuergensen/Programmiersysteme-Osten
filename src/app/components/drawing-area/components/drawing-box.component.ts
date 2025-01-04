@@ -22,11 +22,20 @@ import { environment } from 'src/environments/environment';
         >
             {{ box.id }}
         </svg:text>
+        <ng-container *ngIf="showEventLogs">
+        <svg:text
+            [attr.x]="box.x - box.width / 2 + 10"
+            [attr.y]="box.y - box.height / 2 + 20"
+        >
+            {{ box.eventLog }}
+        </svg:text>
+        </ng-container>
     `,
     styles: ``,
 })
 export class DrawingBoxComponent {
     @Input({ required: true }) box!: Box;
+    @Input({ required: true }) showEventLogs!: boolean;
 
     readonly bgColor: string = environment.drawingElements.boxes.bgColor;
     readonly bgOpacity: string = environment.drawingElements.boxes.bgOpacity;

@@ -20,6 +20,15 @@
             <mat-icon>playlist_add</mat-icon>
             Input Event Log
         </button>
+        <button
+            mat-fab
+            extended
+            [disabled]="undoButtonIsDisabled"
+            (click)="undoLastUpdate()"
+        >
+            <mat-icon>undo</mat-icon>
+            Undo Last Split
+        </button>
     </div>
     <hr />
     <div class="flexRowAlignSpaceEvenlyStart">
@@ -41,7 +50,7 @@
     </div>
     <hr />
     <div class="flexRowAlignSpaceEvenlyStart">
-        <button mat-flat-button (click)="openHelp()">Hilfe</button>
+        <button mat-flat-button (click)="openHelp()">Help</button>
     </div>
     <!--  Footer  -->
     <hr />

@@ -77,6 +77,7 @@ export class ExampleEventLogsComponent {
     }
 
     private initializePetriNet(eventLog: EventLog): void {
+        Dfg.resetIdCount();
         const dfg: Dfg = this._calculateDfgService.calculate(eventLog);
         this._petriNetManagementService.initialize(dfg);
     }

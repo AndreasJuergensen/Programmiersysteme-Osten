@@ -28,12 +28,10 @@ export class ExecuteCutService {
             dfg.canBeCutIn(a1, a2).matchingcut === selectedCut;
 
         if (!isValidCut) {
-            console.log('kein valider Cut! Bitte nochmal probieren!');
             this._feedbackService.showMessage(
-                'kein valider Cut',
+                'Not a valid Cut! Please try again!',
                 true,
-                'die ausgewhälten Kanten passen nicht zu dem von' +
-                    ' Ihnen ausgewählten Cut. Bitte erneut versuchen. Für Hilfestellungen nutzen Sie den Hilfe-Button.',
+                'The chosen arcs do not fit the selected cut. Please try again. For help use the help-button.',
             );
             return;
         }
@@ -80,16 +78,11 @@ export class ExecuteCutService {
                 break;
         }
 
-        console.log('Cut durchgefuehrt!' + ' selected Cut: ' + selectedCut); // hier spaeter Aufruf des Feedback-Service
         this._feedbackService.showMessage(
-            'Cut erfolgreich! ' + '(' + selectedCut + ')',
+            'Cut was executed successfully! ' + '(' + selectedCut + ')',
             false,
         );
-        console.log('Petri Netz aktualisiert!'); // hier spaeter Aufruf des Feedback-Service
-        this._feedbackService.showMessage(
-            'Das Petri-Netz wurde nun aktualisiert.',
-            true,
-        );
+        this._feedbackService.showMessage('The petri net was updated.', false);
     }
 
     private createSubDfgs(eventLogs: [EventLog, EventLog]): [Dfg, Dfg] {

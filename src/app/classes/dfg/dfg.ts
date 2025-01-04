@@ -18,7 +18,7 @@ export class Dfg implements PetriNetTransition {
         private readonly _arcs: Arcs,
         private readonly _eventLog: EventLog,
     ) {
-        this.id = 'dfg' + ++Dfg.idCount;
+        this.id = 'DFG' + ++Dfg.idCount;
     }
 
     canBeCutIn(
@@ -232,7 +232,7 @@ export class Dfg implements PetriNetTransition {
     thus same behavior as the arc is clicked in petrinet
     */
     getArc(start: string, end: string): DfgArc {
-        return this.arcs.getArcByStartNameAndEndName(start, end);
+        return this.arcs.getArcByStartNameAndEndName(start, end)!;
     }
 
     get activities(): Activities {
@@ -252,6 +252,10 @@ export class Dfg implements PetriNetTransition {
             activities: this._activities.asJson(),
             arcs: this._arcs.asJson(),
         };
+    }
+
+    static resetIdCount(): void {
+        this.idCount = 0;
     }
 }
 

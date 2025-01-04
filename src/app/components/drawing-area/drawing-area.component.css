@@ -4,3 +4,8 @@ svg {
     border-style: dotted;
     border-color: lightgray;
 }
+
+.show-eventlog-checkbox {
+    position: absolute;
+    bottom: 0px;
+}

@@ -187,7 +187,10 @@ export class Arcs {
         return false;
     }
 
-    getArcByStartNameAndEndName(start: string, end: string): DfgArc {
+    getArcByStartNameAndEndName(
+        start: string,
+        end: string,
+    ): DfgArc | undefined {
         for (const arc of this.arcs) {
             if (
                 arc.getStart().asJson() === start &&
@@ -196,7 +199,8 @@ export class Arcs {
                 return arc;
             }
         }
-        throw new Error('Arc not found');
+        return undefined;
+        // throw new Error('Arc not found');
     }
 
     asJson(): ArcJson[] {

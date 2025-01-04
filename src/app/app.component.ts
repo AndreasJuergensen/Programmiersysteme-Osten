@@ -7,9 +7,6 @@ import { CalculateDfgService } from './services/calculate-dfg.service';
 import { Dfg } from './classes/dfg/dfg';
 import { PetriNetManagementService } from './services/petri-net-management.service';
 import { ShowFeedbackService } from './services/show-feedback.service';
-import { CalculatePetriNetService } from './services/calculate-petri-net.service';
-import { PetriNet } from './classes/petrinet/petri-net';
-import { DfgBuilder } from './classes/dfg/dfg';
 import { FallThroughHandlingService } from './services/fall-through-handling.service';
 
 @Component({
@@ -23,7 +20,6 @@ export class AppComponent {
         private _calculateDfgService: CalculateDfgService,
         private _petriNetManagementService: PetriNetManagementService,
         private _feedbackService: ShowFeedbackService,
-        private _pnCalculationService: CalculatePetriNetService,
         private _fallThroughHandlingService: FallThroughHandlingService,
     ) {}
 
@@ -41,6 +37,7 @@ export class AppComponent {
                     return;
                 }
 
+                Dfg.resetIdCount();
                 const dfg: Dfg = this._calculateDfgService.calculate(eventLog);
                 this._petriNetManagementService.initialize(dfg);
             },
@@ -65,12 +62,20 @@ export class AppComponent {
     activityOncePerTraceExecution(): void {
         this._fallThroughHandlingService.executeActivityOncePerTraceFallThrough();
     }
-    
+
     flowerExecution() {
         this._fallThroughHandlingService.executeFlowerFallThrough();
     }
-    
+
+    undoLastUpdate() {
+        this._petriNetManagementService.updateToPreviousPetriNet();
+    }
+
     get actionButtonsAreDisabled(): boolean {
         return !this._petriNetManagementService.isModifiable;
+    }
+
+    get undoButtonIsDisabled(): boolean {
+        return this._petriNetManagementService.isInputPetriNet;
     }
 }
