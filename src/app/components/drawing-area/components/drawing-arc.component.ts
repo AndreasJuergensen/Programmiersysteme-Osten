@@ -40,6 +40,22 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>
+            <svg:marker
+                id="arrowhead-green"
+                viewBox="0 0 10 10"
+                markerWidth="10"
+                markerHeight="10"
+                refX="5"
+                refY="5"
+                orient="auto-start-reverse"
+            >
+                <svg:path
+                    d="M 1,1 L 9,5 L 1,9 Z"
+                    [attr.fill]="'green'"
+                    [attr.stroke]="'green'"
+                    [attr.stroke-width]="width"
+                ></svg:path>
+            </svg:marker>
         </svg:defs>
 
         <svg:path
@@ -53,6 +69,7 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
             (click)="onLineClick($event, arc)"
         ></svg:path>
         <svg:path
+            [attr.id]="getId(arc)"
             [attr.class]="'visiblePath'"
             [attr.d]="pathForLine(arc)"
             [attr.stroke]="'black'"
@@ -73,6 +90,10 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
         path.hovered {
             stroke: red !important;
         }
+
+        path.correct {
+            stroke: green !important;
+        }
     `,
 })
 export class DrawingArcComponent {
@@ -88,6 +109,10 @@ export class DrawingArcComponent {
     readonly svg: SVGSVGElement = document.getElementsByTagName(
         'svg',
     )[0] as SVGSVGElement;
+
+    getId(arc: Arc): string {
+        return `arc_${arc.start.id}_${arc.end.id}`;
+    }
 
     changeLineColorOver(event: Event): void {
         const rect: SVGRectElement = event.target as SVGRectElement;

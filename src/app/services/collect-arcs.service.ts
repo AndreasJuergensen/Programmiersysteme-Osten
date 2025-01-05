@@ -10,6 +10,8 @@ import { Dfg, DfgBuilder } from '../classes/dfg/dfg';
 import { Subscription } from 'rxjs';
 import { Arc } from '../components/drawing-area/models';
 import { PetriNetManagementService } from './petri-net-management.service';
+import { CutType } from '../components/cut-execution/cut-execution.component';
+import { log } from 'console';
 
 @Injectable({
     providedIn: 'root',
@@ -18,6 +20,7 @@ export class CollectArcsService {
     private petriNet!: PetriNet;
     private _collectedArcs: Arcs = new Arcs();
     private _currentDFG: Dfg | undefined;
+    private _correctArcs: Arcs = new Arcs();
 
     constructor(private petriNetManagementService: PetriNetManagementService) {
         this.petriNetManagementService.petriNet$.subscribe((petriNetSub) => {
@@ -41,6 +44,14 @@ export class CollectArcsService {
         this.resetClickedElements();
     }
 
+    public setCorrectArcs(selectedCut: CutType): void {
+        this._correctArcs = this._currentDFG!.getCorrectArcsBasedOnSelectedArcs(
+            this._collectedArcs,
+            selectedCut,
+        );
+        this.markCorrectArcs();
+    }
+
     private resetClickedElements(): void {
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
@@ -51,9 +62,53 @@ export class CollectArcsService {
             paths.forEach((path) => {
                 path.classList.remove('active');
                 path.classList.remove('hovered');
+                path.classList.remove('correct');
                 if (path.classList.contains('visiblePath')) {
                     path.setAttribute('marker-end', 'url(#arrowhead)');
                 }
+            });
+        }
+    }
+
+    private markCorrectArcs(): void {
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
+
+        if (svg) {
+            const paths = svg.querySelectorAll('path');
+            paths.forEach((path) => {
+                const arcId = path.getAttribute('id');
+                const isCollectedArc = this._collectedArcs
+                    .getArcs()
+                    .some(
+                        (arc) =>
+                            `arc_${arc.asJson().start}_${arc.asJson().end}` ===
+                            arcId,
+                    );
+                const isCorrectArc = this._correctArcs
+                    .getArcs()
+                    .some(
+                        (arc) =>
+                            `arc_${arc.asJson().start}_${arc.asJson().end}` ===
+                            arcId,
+                    );
+
+                if (isCollectedArc && isCorrectArc) {
+                    path.classList.add('correct');
+                    if (path.classList.contains('visiblePath')) {
+                        path.setAttribute(
+                            'marker-end',
+                            'url(#arrowhead-green)',
+                        );
+                    } // Füge die 'correct' Klasse hinzu
+                }
+
+                // if (
+                //     this._correctArcs.getArcs().some((arc) => arc.id === arcId)
+                // ) {
+                //     path.classList.add('correct'); // Füge die 'correct' Klasse hinzu
+                // }
             });
         }
     }

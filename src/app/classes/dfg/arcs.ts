@@ -178,7 +178,7 @@ export class Arcs {
         return this.arcs.length === 0;
     }
 
-    private containsArc(arc: DfgArc): boolean {
+    containsArc(arc: DfgArc): boolean {
         for (const a of this.arcs) {
             if (a.equals(arc)) {
                 return true;
@@ -223,6 +223,10 @@ export class DfgArc {
 
     startsAtPlay(): boolean {
         return this.start.isPlay();
+    }
+
+    endsAtStop(): boolean {
+        return this.end.isStop();
     }
 
     getStart(): Activity {

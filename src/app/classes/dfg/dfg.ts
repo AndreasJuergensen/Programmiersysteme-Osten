@@ -41,10 +41,12 @@ export class Dfg implements PetriNetTransition {
         return { result: false, matchingcut: null };
     }
 
-    calculateAllPossibleCuts(): Array<[boolean, CutType, Arcs, Arcs]> {
-        let cuts: Array<[boolean, CutType, Arcs, Arcs]> = new Array<
-            [boolean, CutType, Arcs, Arcs]
-        >();
+    calculateAllPossibleCuts(): Array<
+        [boolean, CutType, Arcs, Arcs, Activities, Activities]
+    > {
+        let cuts: Array<
+            [boolean, CutType, Arcs, Arcs, Activities, Activities]
+        > = new Array<[boolean, CutType, Arcs, Arcs, Activities, Activities]>();
         const allActivities: Activities = new Activities()
             .addAll(this.activities)
             .removePlayAndStop();
@@ -97,6 +99,8 @@ export class Dfg implements PetriNetTransition {
                     this.canBeCutIn(a1, a2).matchingcut!,
                     arcsForA1,
                     arcsForA2,
+                    a1,
+                    a2,
                 ]);
                 // console.log('Durchlauf: ' + mask + ' erfolgreich');
                 // console.log('a1: ' + a1.asJson());
@@ -106,6 +110,170 @@ export class Dfg implements PetriNetTransition {
         return cuts;
     }
 
+    getCorrectArcsBasedOnSelectedArcs(
+        selectedArcs: Arcs,
+        selectedCut: CutType,
+    ): Arcs {
+        const correctArcs = new Arcs();
+
+        switch (selectedCut) {
+            case CutType.ExclusiveCut:
+                if (
+                    !this.calculateAllPossibleCuts().some(
+                        (cut) =>
+                            cut[0] === true && cut[1] === CutType.ExclusiveCut,
+                    )
+                ) {
+                    console.log(
+                        'ExclusiveCut not possible. Deselecting all arcs.',
+                    );
+                }
+                console.log(selectedArcs);
+
+                const selectedPlayArcs = selectedArcs
+                    .getArcs()
+                    .filter((arc) => arc.startsAtPlay());
+                const selectedStopArcs = selectedArcs
+                    .getArcs()
+                    .filter((arc) => arc.endsAtStop());
+
+                const wrongExclusiveArcs = selectedArcs
+                    .getArcs()
+                    .filter((arc) => !arc.startsAtPlay() && !arc.endsAtStop());
+                console.log(wrongExclusiveArcs);
+
+                for (const cut of this.calculateAllPossibleCuts()) {
+                    // gerader Schnitt bzw. play und stop Kanten gehören zu z.B. A1
+                    const selectedPlayArcsEndingInA1 = selectedPlayArcs.filter(
+                        (arc) => arc.endIsIncludedIn(cut[4]),
+                    );
+                    const selectedStopArcsStartingInA1 =
+                        selectedStopArcs.filter((arc) =>
+                            arc.startIsIncludedIn(cut[4]),
+                        );
+                    const selectedPlayArcsEndingInA2 = selectedPlayArcs.filter(
+                        (arc) => arc.endIsIncludedIn(cut[5]),
+                    );
+                    const selectedStopArcsStartingInA2 =
+                        selectedStopArcs.filter((arc) =>
+                            arc.startIsIncludedIn(cut[5]),
+                        );
+
+                    if (
+                        selectedPlayArcsEndingInA1 &&
+                        selectedStopArcsStartingInA1 &&
+                        selectedPlayArcsEndingInA2.length == 0 &&
+                        selectedStopArcsStartingInA2.length == 0
+                    ) {
+                        selectedPlayArcsEndingInA1.forEach((arc) => {
+                            correctArcs.addArc(arc);
+                        });
+                        selectedStopArcsStartingInA1.forEach((arc) => {
+                            correctArcs.addArc(arc);
+                        });
+                        //Kanten die o.g. Bedingungen erfüllen sind richtig
+                        // console.log('1. Variante richtig');
+                        // console.log(cut);
+                    }
+                    //diagonaler Schnitt z.B. playKante zu A1 und stopKante aus A2
+                    else if (
+                        selectedPlayArcsEndingInA1 &&
+                        selectedStopArcsStartingInA2 &&
+                        selectedPlayArcsEndingInA2.length == 0 &&
+                        selectedStopArcsStartingInA1.length == 0
+                    ) {
+                        selectedPlayArcsEndingInA1.forEach((arc) => {
+                            correctArcs.addArc(arc);
+                        });
+                        selectedStopArcsStartingInA2.forEach((arc) => {
+                            correctArcs.addArc(arc);
+                        });
+                        //Kanten die o.g. Bedingungen erfüllen sind richtig
+                        // console.log('2. Variante richtig');
+                        // console.log(cut);
+                    } else {
+                        //korrekte Play Kanten aktiv lassen
+                        if (correctArcs.getArcs().length == 0) {
+                            selectedPlayArcs.forEach((arc) => {
+                                if (arc.endIsIncludedIn(cut[4])) {
+                                    correctArcs.addArc(arc);
+                                }
+                            });
+                        }
+                        // console.log('3. Variante richtig');
+                    }
+                }
+                console.log('Correct Arcs: ');
+
+                console.log(correctArcs);
+
+                // if()
+                // selectedArcs.getArcs().forEach((arc) => {
+                //     const isArcInCuts = dfg
+                //         .calculateAllPossibleCuts()
+                //         .some(
+                //             (cut) =>
+                //                 cut[2].containsArc(arc) ||
+                //                 cut[3].containsArc(arc),
+                //         );
+
+                //     if (!arc.startsAtPlay() || !arc.endsAtStop()) {
+                //         console.log(
+                //             arc.asJson().start +
+                //                 ' ' +
+                //                 arc.asJson().end +
+                //                 ` Arc is not part of a valid cut.`,
+                //         );
+                //     } else {
+                //         console.log(
+                //             arc.asJson().start +
+                //                 ' ' +
+                //                 arc.asJson().end +
+                //                 ` Arc could be part of a valid cut.`,
+                //         );
+                //         if (arc.startsAtPlay()) {
+                //             console.log('Starts at Play');
+                //         }
+                //     }
+                // wurde eine play Arc ausgewählt und führt diese zu einer der richtigen
+                // Partitionen?
+                // wurden mehrere play Arcs ausgewählt --> nur eine als richtig markieren
+                // });
+                break;
+            case CutType.SequenceCut:
+                if (
+                    !this.calculateAllPossibleCuts().some(
+                        (cut) =>
+                            cut[0] === true && cut[1] === CutType.SequenceCut,
+                    )
+                ) {
+                    console.log(
+                        'SequenceCut not possible. Deselecting all arcs.',
+                    );
+                }
+                break;
+            case CutType.ParallelCut:
+                if (
+                    !this.calculateAllPossibleCuts().some(
+                        (cut) =>
+                            cut[0] === true && cut[1] === CutType.ParallelCut,
+                    )
+                ) {
+                    console.log('LoopCut not possible. Deselecting all arcs.');
+                }
+                break;
+            case CutType.LoopCut:
+                if (
+                    !this.calculateAllPossibleCuts().some(
+                        (cut) => cut[0] === true && cut[1] === CutType.LoopCut,
+                    )
+                ) {
+                    console.log('LoopCut not possible. Deselecting all arcs.');
+                }
+                break;
+        }
+        return correctArcs;
+    }
     /*
     calculateAllPossibleCutsDependingOnSelectedCutAndSelectedArcs(
         selectedArcs: Arcs,

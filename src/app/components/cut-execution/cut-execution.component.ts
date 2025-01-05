@@ -56,13 +56,28 @@ export class CutExecutionComponent implements OnInit {
     onCutClick(): void {
         const selectedValue = this.radioForm.get('selectedCut')?.value;
         if (selectedValue && this._collectArcsService.currentDFG) {
-            this._executeCutService.execute(
-                this._collectArcsService.currentDFG,
-                this._collectArcsService.collectedArcs,
-                selectedValue,
-            );
-            this.resetRadioSelection();
-            this._collectArcsService.resetCollectedArcs();
+            if (
+                this._executeCutService.execute(
+                    this._collectArcsService.currentDFG,
+                    this._collectArcsService.collectedArcs,
+                    selectedValue,
+                )
+            ) {
+                this.resetRadioSelection();
+                this._collectArcsService.resetCollectedArcs();
+            } else {
+                // this._collectArcsService.currentDFG.getCorrectArcsBasedOnSelectedArcs(
+                //     this._collectArcsService.collectedArcs,
+                //     selectedValue,
+                // );
+                this.resetRadioSelection();
+                this._collectArcsService.setCorrectArcs(selectedValue);
+                this._feedbackService.showMessage(
+                    'Not a valid Cut! Please try again!',
+                    true,
+                    'The chosen arcs do not fit the selected cut. Please try again. For help use the help-button.',
+                );
+            }
         } else if (!selectedValue && this._collectArcsService.currentDFG) {
             this._feedbackService.showMessage(
                 'No cut selected via radio buttons!',
