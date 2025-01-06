@@ -142,7 +142,9 @@ export class DrawingArcComponent {
                 if (line) {
                     line.classList.toggle('active');
                 }
-
+                if (line.classList.contains('correct')) {
+                    line.classList.remove('correct');
+                }
                 this.collectArcsService.updateCollectedArcs(arc);
             } else {
                 this.feedbackService.showMessage('Arc not in same DFG', true);
