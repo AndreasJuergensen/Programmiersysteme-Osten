@@ -62,7 +62,6 @@ export class CutExecutionComponent implements OnInit {
                 selectedValue,
             );
             this.resetRadioSelection();
-            this._collectArcsService.resetCollectedArcs();
         } else if (!selectedValue && this._collectArcsService.currentDFG) {
             this._feedbackService.showMessage(
                 'No cut selected via radio buttons!',
