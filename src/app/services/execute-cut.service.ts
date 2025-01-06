@@ -7,7 +7,6 @@ import { EventLog } from '../classes/event-log';
 import { PetriNetManagementService } from './petri-net-management.service';
 import { CutType } from '../components/cut-execution/cut-execution.component';
 import { ShowFeedbackService } from './show-feedback.service';
-import { log } from 'console';
 
 @Injectable({
     providedIn: 'root',

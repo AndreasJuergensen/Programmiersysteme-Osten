@@ -11,7 +11,6 @@ import { Subscription } from 'rxjs';
 import { Arc } from '../components/drawing-area/models';
 import { PetriNetManagementService } from './petri-net-management.service';
 import { CutType } from '../components/cut-execution/cut-execution.component';
-import { log } from 'console';
 
 @Injectable({
     providedIn: 'root',

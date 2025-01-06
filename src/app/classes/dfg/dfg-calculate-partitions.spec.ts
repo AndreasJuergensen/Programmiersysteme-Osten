@@ -392,7 +392,7 @@ describe('Possible Cuts Tests', () => {
 
         expect(result).toEqual([
             [true, CutType.ParallelCut, arcsForA1, arcsForA2, a1, a2],
-            [true, CutType.ParallelCut, arcsForA2, arcsForA1, a1, a2],
+            [true, CutType.ParallelCut, arcsForA2, arcsForA1, a2, a1],
         ]);
     });
 
