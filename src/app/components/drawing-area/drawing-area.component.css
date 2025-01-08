@@ -3,6 +3,10 @@ svg {
     height: 800px;
     border-style: dotted;
     border-color: lightgray;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
 }
 
 .show-eventlog-checkbox {
