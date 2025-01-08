@@ -119,9 +119,6 @@ export class PetriNet {
                 secondReplacingTransition,
                 this._arcs.getPrevPlace(firstReplacingTransition),
             );
-        for (const arc of this._arcs.arcs) {
-            console.log('start: ' + arc.start.id + ', end: ' + arc.end.id);
-        }
         return this;
     }
 
