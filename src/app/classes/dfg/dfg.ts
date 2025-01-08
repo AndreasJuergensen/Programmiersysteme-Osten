@@ -4,7 +4,6 @@ import { PetriNetTransition } from '../petrinet/petri-net-transitions';
 import { Activities, Activity } from './activities';
 import { ArcJson, Arcs, DfgArc } from './arcs';
 import { ExclusiveCut, LoopCut, ParallelCut, SequenceCut } from './cut';
-import { Arc } from 'src/app/components/drawing-area';
 
 export interface DfgJson {
     activities: string[];
@@ -50,7 +49,6 @@ export class Dfg implements PetriNetTransition {
         const allActivities: Activities = new Activities()
             .addAll(this.activities)
             .removePlayAndStop();
-        const testedCombinations = new Set<string>();
 
         for (let mask = 1; mask < 1 << allActivities.getLength(); mask++) {
             const a1: Activities = new Activities();
@@ -64,34 +62,8 @@ export class Dfg implements PetriNetTransition {
                 }
             }
 
-            // Sort activities to create a unique key for the combination
-            // const a1Key = a1
-            //     .getAllActivites()
-            //     .map((act) => act.name)
-            //     .sort()
-            //     .join(',');
-            // const a2Key = a2
-            //     .getAllActivites()
-            //     .map((act) => act.name)
-            //     .sort()
-            //     .join(',');
-            // const combinationKey = [a1Key, a2Key].sort().join('|');
-
-            // Check if this combination has already been tested
-            // if (testedCombinations.has(combinationKey)) {
-            //     continue;
-            // }
-
-            // testedCombinations.add(combinationKey);
-
-            //hier sind theoretisch nur die Arcs die komplett in den Partitionen liegen drin
-            //d.h. alle anderen Arcs müssten geschnitten worden sein
-            //und oder sind fromPlay oder toStop Arcs
             const arcsForA1 = this._arcs.filterArcsCompletelyIn(a1);
             const arcsForA2 = this._arcs.filterArcsCompletelyIn(a2);
-            // console.log('Durchlauf:' + mask);
-            // console.log('a1: ' + a1.asJson());
-            // console.log('a2: ' + a2.asJson());
 
             if (this.canBeCutIn(a1, a2).result) {
                 cuts.push([
@@ -102,9 +74,6 @@ export class Dfg implements PetriNetTransition {
                     a1,
                     a2,
                 ]);
-                // console.log('Durchlauf: ' + mask + ' erfolgreich');
-                // console.log('a1: ' + a1.asJson());
-                // console.log('a2: ' + a2.asJson());
             }
         }
         return cuts;
@@ -116,6 +85,7 @@ export class Dfg implements PetriNetTransition {
     ): Arcs {
         const correctArcs = new Arcs();
 
+        // if no cut is possible, returned arcs is empty
         switch (selectedCut) {
             case CutType.ExclusiveCut:
                 if (
@@ -132,7 +102,7 @@ export class Dfg implements PetriNetTransition {
                         .filter((arc) => arc.endsAtStop());
 
                     for (const cut of this.calculateAllPossibleCuts()) {
-                        // gerader Schnitt bzw. play und stop Kanten gehören zu z.B. A1
+                        // straight cut or play and stop arcs belong to e.g. A1
                         const selectedPlayArcsEndingInA1 =
                             selectedPlayArcs.filter((arc) =>
                                 arc.endIsIncludedIn(cut[4]),
@@ -163,7 +133,7 @@ export class Dfg implements PetriNetTransition {
                                 correctArcs.addArc(arc);
                             });
                         }
-                        //diagonaler Schnitt z.B. playKante zu A1 und stopKante aus A2
+                        // diagonal cut e.g. playArc to A1 and stopArc from A2
                         else if (
                             selectedPlayArcsEndingInA1 &&
                             selectedStopArcsStartingInA2 &&
@@ -177,7 +147,7 @@ export class Dfg implements PetriNetTransition {
                                 correctArcs.addArc(arc);
                             });
                         } else {
-                            //korrekte Play Kanten die zu einer Partition führen aktiv lassen
+                            // keep correct play arcs leading to one of the two partitions active
                             if (correctArcs.getArcs().length == 0) {
                                 selectedPlayArcs.forEach((arc) => {
                                     if (arc.endIsIncludedIn(cut[4])) {
