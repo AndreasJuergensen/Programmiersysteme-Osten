@@ -110,41 +110,39 @@ describe('A Petrinet', () => {
             .addOutputPlace();
         const expectedTransitions: PetriNetTransitions =
             new PetriNetTransitions()
-                .createTransition('play')
-                .createTransition('stop');
+                .addDFG(originDFG)
+                .createTransition('')
+                .addDFG(subDFG1)
+                .createTransition('')
+                .addDFG(subDFG2);
         const expectedArcs: PetriNetArcs = new PetriNetArcs()
             .addPlaceToTransitionArc(
                 expectedPlaces.input,
                 expectedTransitions.getTransitionByID('t1'),
             )
             .addTransitionToPlaceArc(
+                expectedTransitions.getTransitionByID('t2'),
+                expectedPlaces.output,
+            )
+            .addTransitionToPlaceArc(
                 expectedTransitions.getTransitionByID('t1'),
                 expectedPlaces.addPlace().getPlaceByID('p1'),
             )
-            .addPlaceToTransitionArc(
-                expectedPlaces.getPlaceByID('p1'),
-                expectedTransitions.addDFG(subDFG1).getLastTransition(),
-            )
+            .addPlaceToTransitionArc(expectedPlaces.getPlaceByID('p1'), subDFG1)
             .addTransitionToPlaceArc(
-                expectedTransitions.getLastTransition(),
+                subDFG1,
                 expectedPlaces.addPlace().getPlaceByID('p2'),
             )
             .addPlaceToTransitionArc(
                 expectedPlaces.getPlaceByID('p2'),
                 expectedTransitions.getTransitionByID('t2'),
             )
+            .addPlaceToTransitionArc(expectedPlaces.getPlaceByID('p1'), subDFG2)
             .addTransitionToPlaceArc(
-                expectedTransitions.getTransitionByID('t2'),
-                expectedPlaces.output,
-            )
-            .addPlaceToTransitionArc(
-                expectedPlaces.getPlaceByID('p1'),
-                expectedTransitions.addDFG(subDFG2).getLastTransition(),
-            )
-            .addTransitionToPlaceArc(
-                expectedTransitions.getLastTransition(),
+                subDFG2,
                 expectedPlaces.getPlaceByID('p2'),
             );
+        expectedTransitions.removeDFG(originDFG);
 
         expect(sut.places).toEqual(expectedPlaces);
         expect(sut.transitions).toEqual(expectedTransitions);
@@ -189,44 +187,21 @@ describe('A Petrinet', () => {
             .addOutputPlace();
         const expectedTransitions: PetriNetTransitions =
             new PetriNetTransitions()
-                .createTransition('play')
-                .createTransition('stop');
+                .addDFG(originDFG)
+                .addDFG(subDFG1)
+                .addDFG(subDFG2);
         const expectedArcs: PetriNetArcs = new PetriNetArcs()
-            .addPlaceToTransitionArc(
-                expectedPlaces.input,
-                expectedTransitions.getTransitionByID('t1'),
-            )
+            .addPlaceToTransitionArc(expectedPlaces.input, subDFG1)
+            .addTransitionToPlaceArc(subDFG2, expectedPlaces.output)
             .addTransitionToPlaceArc(
-                expectedTransitions.getTransitionByID('t1'),
+                subDFG1,
                 expectedPlaces.addPlace().getPlaceByID('p1'),
             )
             .addPlaceToTransitionArc(
                 expectedPlaces.getPlaceByID('p1'),
-                expectedTransitions.addDFG(subDFG1).getLastTransition(),
-            )
-            .addTransitionToPlaceArc(
-                expectedTransitions.addDFG(subDFG2).getLastTransition(),
-                expectedPlaces.addPlace().getPlaceByID('p2'),
-            )
-            .addPlaceToTransitionArc(
-                expectedPlaces.getPlaceByID('p2'),
-                expectedTransitions.getTransitionByID('t2'),
-            )
-            .addTransitionToPlaceArc(
-                expectedTransitions.getTransitionByID('t2'),
-                expectedPlaces.output,
+                subDFG2,
             );
-        expectedArcs
-            .addTransitionToPlaceArc(
-                expectedArcs.getNextTransition(
-                    expectedPlaces.getPlaceByID('p1'),
-                ),
-                expectedPlaces.addPlace().getPlaceByID('p3'),
-            )
-            .addPlaceToTransitionArc(
-                expectedPlaces.getPlaceByID('p3'),
-                expectedTransitions.getLastTransition(),
-            );
+        expectedTransitions.removeDFG(originDFG);
 
         expect(sut.places).toEqual(expectedPlaces);
         expect(sut.transitions).toEqual(expectedTransitions);
@@ -280,50 +255,48 @@ describe('A Petrinet', () => {
             .addOutputPlace();
         const expectedTransitions: PetriNetTransitions =
             new PetriNetTransitions()
-                .createTransition('play')
-                .createTransition('stop');
+                .addDFG(originDFG)
+                .createTransition('')
+                .addDFG(subDFG1)
+                .createTransition('')
+                .addDFG(subDFG2);
         const expectedArcs: PetriNetArcs = new PetriNetArcs()
             .addPlaceToTransitionArc(
                 expectedPlaces.input,
                 expectedTransitions.getTransitionByID('t1'),
             )
             .addTransitionToPlaceArc(
+                expectedTransitions.getTransitionByID('t2'),
+                expectedPlaces.output,
+            )
+            .addTransitionToPlaceArc(
                 expectedTransitions.getTransitionByID('t1'),
                 expectedPlaces.addPlace().getPlaceByID('p1'),
             )
-            .addPlaceToTransitionArc(
-                expectedPlaces.getPlaceByID('p1'),
-                expectedTransitions.addDFG(subDFG1).getLastTransition(),
-            )
+            .addPlaceToTransitionArc(expectedPlaces.getPlaceByID('p1'), subDFG1)
             .addTransitionToPlaceArc(
-                expectedTransitions.getLastTransition(),
+                subDFG1,
                 expectedPlaces.addPlace().getPlaceByID('p2'),
             )
             .addPlaceToTransitionArc(
                 expectedPlaces.getPlaceByID('p2'),
                 expectedTransitions.getTransitionByID('t2'),
-            )
-            .addTransitionToPlaceArc(
-                expectedTransitions.getTransitionByID('t2'),
-                expectedPlaces.output,
             );
         expectedArcs
             .addTransitionToPlaceArc(
                 expectedTransitions.getTransitionByID('t1'),
                 expectedPlaces.addPlace().getPlaceByID('p3'),
             )
-            .addPlaceToTransitionArc(
-                expectedPlaces.getPlaceByID('p3'),
-                expectedTransitions.addDFG(subDFG2).getLastTransition(),
-            )
+            .addPlaceToTransitionArc(expectedPlaces.getPlaceByID('p3'), subDFG2)
             .addTransitionToPlaceArc(
-                expectedTransitions.getLastTransition(),
+                subDFG2,
                 expectedPlaces.addPlace().getPlaceByID('p4'),
             )
             .addPlaceToTransitionArc(
                 expectedPlaces.getPlaceByID('p4'),
                 expectedTransitions.getTransitionByID('t2'),
             );
+        expectedTransitions.removeDFG(originDFG);
 
         expect(sut.places).toEqual(expectedPlaces);
         expect(sut.transitions).toEqual(expectedTransitions);
@@ -366,42 +339,42 @@ describe('A Petrinet', () => {
 
         const expectedTransitions: PetriNetTransitions =
             new PetriNetTransitions()
-                .createTransition('play')
-                .createTransition('stop');
-
+                .addDFG(originDFG)
+                .createTransition('')
+                .addDFG(subDFG1)
+                .createTransition('')
+                .addDFG(subDFG2);
         const expectedArcs: PetriNetArcs = new PetriNetArcs()
             .addPlaceToTransitionArc(
                 expectedPlaces.input,
                 expectedTransitions.getTransitionByID('t1'),
             )
             .addTransitionToPlaceArc(
+                expectedTransitions.getTransitionByID('t2'),
+                expectedPlaces.output,
+            )
+            .addTransitionToPlaceArc(
                 expectedTransitions.getTransitionByID('t1'),
                 expectedPlaces.addPlace().getPlaceByID('p1'),
             )
-            .addPlaceToTransitionArc(
-                expectedPlaces.getPlaceByID('p1'),
-                expectedTransitions.addDFG(subDFG1).getLastTransition(),
-            )
+            .addPlaceToTransitionArc(expectedPlaces.getPlaceByID('p1'), subDFG1)
             .addTransitionToPlaceArc(
-                expectedTransitions.getLastTransition(),
+                subDFG1,
                 expectedPlaces.addPlace().getPlaceByID('p2'),
             )
             .addPlaceToTransitionArc(
                 expectedPlaces.getPlaceByID('p2'),
                 expectedTransitions.getTransitionByID('t2'),
             )
-            .addTransitionToPlaceArc(
-                expectedTransitions.getTransitionByID('t2'),
-                expectedPlaces.output,
-            )
             .addPlaceToTransitionArc(
                 expectedPlaces.getPlaceByID('p2'),
-                expectedTransitions.addDFG(subDFG2).getLastTransition(),
+                expectedTransitions.getTransitionByID('t3'),
             )
             .addTransitionToPlaceArc(
-                expectedTransitions.getLastTransition(),
+                expectedTransitions.getTransitionByID('t3'),
                 expectedPlaces.getPlaceByID('p1'),
             );
+        expectedTransitions.removeDFG(originDFG);
 
         expect(sut.places).toEqual(expectedPlaces);
         expect(sut.transitions).toEqual(expectedTransitions);
@@ -460,72 +433,63 @@ describe('A Petrinet', () => {
             .addOutputPlace();
         const expectedTransitions: PetriNetTransitions =
             new PetriNetTransitions()
-                .createTransition('play')
-                .createTransition('stop');
+                .addDFG(originDFG)
+                .createTransition('')
+                .createTransition('')
+                .addDFG(flowerDFG1)
+                .addDFG(flowerDFG2)
+                .addDFG(flowerDFG3)
+                .addDFG(flowerDFG4);
         const expectedArcs: PetriNetArcs = new PetriNetArcs()
             .addPlaceToTransitionArc(
                 expectedPlaces.input,
                 expectedTransitions.getTransitionByID('t1'),
             )
             .addTransitionToPlaceArc(
-                expectedTransitions.getTransitionByID('t1'),
-                expectedPlaces.addPlace().getPlaceByID('p1'),
-            );
-        expectedTransitions
-            .addDFG(originDFG)
-            .transitions.splice(
-                expectedTransitions.transitions.indexOf(
-                    expectedTransitions.getLastTransition(),
-                ),
-                1,
-            );
-        expectedPlaces
-            .addPlace()
-            .places.splice(
-                expectedPlaces.places.indexOf(expectedPlaces.getLastPlace()),
-                1,
-            );
-        expectedArcs
-            .addPlaceToTransitionArc(
-                expectedPlaces.getPlaceByID('p1'),
-                expectedTransitions.getTransitionByID('t2'),
-            )
-            .addTransitionToPlaceArc(
                 expectedTransitions.getTransitionByID('t2'),
                 expectedPlaces.output,
             )
-            .addPlaceToTransitionArc(
-                expectedPlaces.getPlaceByID('p1'),
-                expectedTransitions.addDFG(flowerDFG1).getLastTransition(),
-            )
             .addTransitionToPlaceArc(
-                expectedTransitions.getLastTransition(),
-                expectedPlaces.getPlaceByID('p1'),
+                expectedTransitions.getTransitionByID('t1'),
+                expectedPlaces.addPlace().getPlaceByID('p1'),
             )
             .addPlaceToTransitionArc(
                 expectedPlaces.getPlaceByID('p1'),
-                expectedTransitions.addDFG(flowerDFG2).getLastTransition(),
-            )
-            .addTransitionToPlaceArc(
-                expectedTransitions.getLastTransition(),
-                expectedPlaces.getPlaceByID('p1'),
+                expectedTransitions.getTransitionByID('t2'),
             )
             .addPlaceToTransitionArc(
                 expectedPlaces.getPlaceByID('p1'),
-                expectedTransitions.addDFG(flowerDFG3).getLastTransition(),
+                expectedTransitions.getTransitionByID('t3'),
             )
             .addTransitionToPlaceArc(
-                expectedTransitions.getLastTransition(),
+                expectedTransitions.getTransitionByID('t3'),
                 expectedPlaces.getPlaceByID('p1'),
             )
             .addPlaceToTransitionArc(
                 expectedPlaces.getPlaceByID('p1'),
-                expectedTransitions.addDFG(flowerDFG4).getLastTransition(),
+                expectedTransitions.getTransitionByID('t4'),
             )
             .addTransitionToPlaceArc(
-                expectedTransitions.getLastTransition(),
+                expectedTransitions.getTransitionByID('t4'),
+                expectedPlaces.getPlaceByID('p1'),
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p1'),
+                expectedTransitions.getTransitionByID('t5'),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getTransitionByID('t5'),
+                expectedPlaces.getPlaceByID('p1'),
+            )
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p1'),
+                expectedTransitions.getTransitionByID('t6'),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getTransitionByID('t6'),
                 expectedPlaces.getPlaceByID('p1'),
             );
+        expectedTransitions.removeDFG(originDFG);
 
         expect(sut.places).toEqual(expectedPlaces);
         expect(sut.transitions).toEqual(expectedTransitions);
