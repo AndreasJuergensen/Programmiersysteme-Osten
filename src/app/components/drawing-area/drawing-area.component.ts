@@ -182,4 +182,26 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this._sub?.unsubscribe();
     }
+
+    mouseDown(): void {
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
+
+        if (svg) {
+            svg.classList.add('mouseDown');
+            console.log('Mouse Down');
+        }
+    }
+
+    mouseUp(): void {
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
+
+        if (svg) {
+            svg.classList.remove('mouseDown');
+            console.log('Mouse Up');
+        }
+    }
 }

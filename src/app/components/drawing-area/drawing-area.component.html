@@ -1,11 +1,15 @@
 <div>
-    <svg>
+    <svg (mousedown)="mouseDown()" (mouseup)="mouseUp()">
         <ng-container *ngFor="let arc of arcs">
             <svg:g app-drawing-arc [arc]="arc"></svg:g>
         </ng-container>
 
         <ng-container *ngFor="let box of boxes">
-            <svg:g app-drawing-box [box]="box" [showEventLogs]="showEventLogs.checked"></svg:g>
+            <svg:g
+                app-drawing-box
+                [box]="box"
+                [showEventLogs]="showEventLogs.checked"
+            ></svg:g>
         </ng-container>
 
         <ng-container *ngIf="!showEventLogs.checked">
@@ -26,7 +30,10 @@
             <svg:g app-drawing-place [place]="place"></svg:g>
         </ng-container>
     </svg>
-    <mat-checkbox class="show-eventlog-checkbox" (checked)="showEventLogs" #showEventLogs
+    <mat-checkbox
+        class="show-eventlog-checkbox"
+        (checked)="(showEventLogs)"
+        #showEventLogs
         >Show Event Logs</mat-checkbox
     >
 </div>
