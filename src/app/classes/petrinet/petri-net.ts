@@ -198,29 +198,6 @@ export class PetriNet {
         return this;
     }
 
-    cutCanBeExecuted(): boolean {
-        const petriNetDFGs: Dfg[] = this.getDFGs();
-        for (const dfg of petriNetDFGs) {
-            if (dfg.canBeCutByAnyPartitions()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    acitivityOncePerTraceIsFeasible(): boolean {
-        const petriNetDFGs: Dfg[] = this.getDFGs();
-        for (const dfg of petriNetDFGs) {
-            const eventLog: EventLog = dfg.eventLog;
-            for (const activity of dfg.activities.getAllActivites()) {
-                if (eventLog.activityOncePerTraceIsPossibleBy(activity)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     isBasicPetriNet(): boolean {
         return this.transitions.eachTransitionIsBaseCase();
     }

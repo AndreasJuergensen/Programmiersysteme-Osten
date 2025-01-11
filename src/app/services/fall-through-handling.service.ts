@@ -73,9 +73,7 @@ export class FallThroughHandlingService {
 
     private continueAOPTExecution(activityName: string): void {
         for (const dfg of this._petriNet.getDFGs()) {
-            try {
-                const activity: Activity =
-                    dfg.activities.getActivityByName(activityName);
+            if (dfg.activities.containsActivityWithName(activityName)) {
                 if (dfg.canBeCutByAnyPartitions()) {
                     this._showFeedbackService.showMessage(
                         'Another cut can be performed in this DFG, try this first.',
@@ -83,6 +81,8 @@ export class FallThroughHandlingService {
                     );
                     return;
                 }
+                const activity: Activity =
+                    dfg.activities.getActivityByName(activityName);
                 if (dfg.eventLog.activityOncePerTraceIsPossibleBy(activity)) {
                     const eventLogs: [EventLog, EventLog] =
                         dfg.eventLog.splitByActivityOncePerTrace(activity);
@@ -97,52 +97,52 @@ export class FallThroughHandlingService {
                     );
                     return;
                 }
-            } catch {
-                continue;
-            }
-        }
-        this._showFeedbackService.showMessage(
-            'Activity-Once-Per-Trace Fall-Through is not valid for the selected activity',
-            true,
-        );
-    }
-
-    continueFlowerExecution(activityName: string): void {
-        for (const dfg of this._petriNet.getDFGs()) {
-            if (dfg.canBeCutByAnyPartitions()) {
                 this._showFeedbackService.showMessage(
-                    'Another cut can be performed in this DFG, try this first.',
+                    'Activity-Once-Per-Trace Fall-Through is not valid for the selected activity',
                     true,
                 );
                 return;
             }
-            const eventLog: EventLog = dfg.eventLog;
-            for (const trace of eventLog.getAllTraces()) {
-                for (const activity of trace.getAllActivities()) {
-                    if (eventLog.activityOncePerTraceIsPossibleBy(activity)) {
-                        this._showFeedbackService.showMessage(
-                            'Another Fall-Through can be performed in this Petri Net, try this first.',
-                            true,
-                        );
-                        return;
+        }
+    }
+
+    continueFlowerExecution(activityName: string): void {
+        for (const dfg of this._petriNet.getDFGs()) {
+            if (dfg.activities.containsActivityWithName(activityName)) {
+                if (dfg.canBeCutByAnyPartitions()) {
+                    this._showFeedbackService.showMessage(
+                        'Another cut can be performed in this DFG, try this first.',
+                        true,
+                    );
+                    return;
+                }
+                const eventLog: EventLog = dfg.eventLog;
+                for (const trace of eventLog.getAllTraces()) {
+                    for (const activity of trace.getAllActivities()) {
+                        if (
+                            eventLog.activityOncePerTraceIsPossibleBy(activity)
+                        ) {
+                            this._showFeedbackService.showMessage(
+                                'Another Fall-Through can be performed in this Petri Net, try this first.',
+                                true,
+                            );
+                            return;
+                        }
                     }
                 }
+                const eventLogs: EventLog[] =
+                    eventLog.splitByFlowerFallThrough();
+                const subDFGs: Dfg[] = [];
+                for (const log of eventLogs) {
+                    subDFGs.push(this._calculateDfgService.calculate(log));
+                }
+                this._petriNetManagementService.updatePnByFlowerFallThrough(
+                    dfg,
+                    subDFGs,
+                );
+                return;
             }
-            const eventLogs: EventLog[] = eventLog.splitByFlowerFallThrough();
-            const subDFGs: Dfg[] = [];
-            for (const log of eventLogs) {
-                subDFGs.push(this._calculateDfgService.calculate(log));
-            }
-            this._petriNetManagementService.updatePnByFlowerFallThrough(
-                dfg,
-                subDFGs,
-            );
-            return;
         }
-        this._showFeedbackService.showMessage(
-            'Flower-Model Fall-Through is not valid for the selected DFG',
-            true,
-        );
     }
 
     processActivityClick(activityName: string) {
