@@ -349,21 +349,10 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('B')
             .build();
 
-        const result: Array<
-            [boolean, CutType, Arcs, Arcs, Activities, Activities]
-        > = sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
 
-        const a1: Activities = new Activities()
-            .createActivity('A')
-            .createActivity('B');
-        const a2: Activities = new Activities().createActivity('C');
-
-        const arcsForA1 = new Arcs().addArc(sut.getArc('A', 'B'));
-        const arcsForA2 = new Arcs();
-
-        expect(result).toEqual([
-            [true, CutType.LoopCut, arcsForA1, arcsForA2, a1, a2],
-        ]);
+        expect(result).toEqual([[true, CutType.LoopCut]]);
     });
 
     it('get all cuts - parallel cut with 2 partition options possible', () => {
@@ -378,19 +367,12 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('B')
             .build();
 
-        const result: Array<
-            [boolean, CutType, Arcs, Arcs, Activities, Activities]
-        > = sut.calculateAllPossibleCuts();
-
-        const a1: Activities = new Activities().createActivity('A');
-        const a2: Activities = new Activities().createActivity('B');
-
-        const arcsForA1 = new Arcs();
-        const arcsForA2 = new Arcs();
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
 
         expect(result).toEqual([
-            [true, CutType.ParallelCut, arcsForA1, arcsForA2, a1, a2],
-            [true, CutType.ParallelCut, arcsForA2, arcsForA1, a2, a1],
+            [true, CutType.ParallelCut],
+            [true, CutType.ParallelCut],
         ]);
     });
 
@@ -409,71 +391,16 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('D')
             .build();
 
-        const result: Array<
-            [boolean, CutType, Arcs, Arcs, Activities, Activities]
-        > = sut.calculateAllPossibleCuts();
-
-        const a1: Activities = new Activities()
-            .createActivity('A')
-            .createActivity('B');
-        const a2: Activities = new Activities()
-            .createActivity('C')
-            .createActivity('D');
-
-        const arcsForA1_1 = new Arcs().addArc(sut.getArc('A', 'B'));
-        const arcsForA2_1 = new Arcs();
-        const arcsForA1_2 = new Arcs();
-        const arcsForA2_2 = new Arcs().addArc(sut.getArc('A', 'B'));
-        const arcsForA1_3 = new Arcs().addArc(sut.getArc('A', 'B'));
-        const arcsForA2_3 = new Arcs();
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
 
         expect(result).toEqual([
-            [true, CutType.ExclusiveCut, arcsForA1_1, arcsForA2_1, a1, a2],
-            [
-                true,
-                CutType.ExclusiveCut,
-                arcsForA1_2,
-                arcsForA2_2,
-                new Activities().createActivity('C'),
-                new Activities()
-                    .createActivity('A')
-                    .createActivity('B')
-                    .createActivity('D'),
-            ],
-            [
-                true,
-                CutType.ExclusiveCut,
-                arcsForA1_3,
-                arcsForA2_3,
-                new Activities()
-                    .createActivity('A')
-                    .createActivity('B')
-                    .createActivity('C'),
-                new Activities().createActivity('D'),
-            ],
-            [
-                true,
-                CutType.ExclusiveCut,
-                arcsForA2_1,
-                arcsForA1_1,
-                new Activities().createActivity('D'),
-                new Activities()
-                    .createActivity('A')
-                    .createActivity('B')
-                    .createActivity('C'),
-            ],
-            [
-                true,
-                CutType.ExclusiveCut,
-                arcsForA2_2,
-                arcsForA1_2,
-                new Activities()
-                    .createActivity('A')
-                    .createActivity('B')
-                    .createActivity('D'),
-                new Activities().createActivity('C'),
-            ],
-            [true, CutType.ExclusiveCut, arcsForA2_3, arcsForA1_3, a2, a1],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
         ]);
     });
 
@@ -491,25 +418,10 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('C')
             .build();
 
-        const result: Array<
-            [boolean, CutType, Arcs, Arcs, Activities, Activities]
-        > = sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
 
-        const a1: Activities = new Activities().createActivity('A');
-        const a2: Activities = new Activities()
-            .createActivity('B')
-            .createActivity('C')
-            .createActivity('D');
-
-        const arcsForA1 = new Arcs();
-        const arcsForA2 = new Arcs()
-            .addArc(sut.getArc('B', 'C'))
-            .addArc(sut.getArc('C', 'D'))
-            .addArc(sut.getArc('D', 'B'));
-
-        expect(result).toEqual([
-            [true, CutType.SequenceCut, arcsForA1, arcsForA2, a1, a2],
-        ]);
+        expect(result).toEqual([[true, CutType.SequenceCut]]);
     });
 
     it('get all cuts - exclusive cut with 2 partition options possible and sequence cut + loop cut seems to be possible', () => {
@@ -529,27 +441,12 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('Z')
             .build();
 
-        const result: Array<
-            [boolean, CutType, Arcs, Arcs, Activities, Activities]
-        > = sut.calculateAllPossibleCuts();
-
-        const a1: Activities = new Activities()
-            .createActivity('A')
-            .createActivity('B')
-            .createActivity('C')
-            .createActivity('D');
-        const a2: Activities = new Activities().createActivity('Z');
-
-        const arcsForA1 = new Arcs()
-            .addArc(sut.getArc('A', 'B'))
-            .addArc(sut.getArc('B', 'C'))
-            .addArc(sut.getArc('C', 'D'))
-            .addArc(sut.getArc('D', 'B'));
-        const arcsForA2 = new Arcs();
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
 
         expect(result).toEqual([
-            [true, CutType.ExclusiveCut, arcsForA1, arcsForA2, a1, a2],
-            [true, CutType.ExclusiveCut, arcsForA2, arcsForA1, a2, a1],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
         ]);
     });
 
@@ -578,114 +475,16 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('Z')
             .build();
 
-        const result: Array<
-            [boolean, CutType, Arcs, Arcs, Activities, Activities]
-        > = sut.calculateAllPossibleCuts();
-
-        const a1: Activities = new Activities()
-            .createActivity('A')
-            .createActivity('B')
-            .createActivity('C')
-            .createActivity('D');
-        const a2: Activities = new Activities()
-            .createActivity('X')
-            .createActivity('Z')
-            .createActivity('H')
-            .createActivity('P');
-
-        const arcsForA1_1 = new Arcs()
-            .addArc(sut.getArc('A', 'B'))
-            .addArc(sut.getArc('B', 'C'))
-            .addArc(sut.getArc('C', 'D'))
-            .addArc(sut.getArc('D', 'B'));
-        const arcsForA2_1 = new Arcs()
-            .addArc(sut.getArc('Z', 'H'))
-            .addArc(sut.getArc('H', 'P'))
-            .addArc(sut.getArc('P', 'Z'));
-        const arcsForA1_2 = new Arcs();
-        const arcsForA2_2 = new Arcs()
-            .addArc(sut.getArc('A', 'B'))
-            .addArc(sut.getArc('B', 'C'))
-            .addArc(sut.getArc('C', 'D'))
-            .addArc(sut.getArc('D', 'B'))
-            .addArc(sut.getArc('Z', 'H'))
-            .addArc(sut.getArc('H', 'P'))
-            .addArc(sut.getArc('P', 'Z'));
-        const arcsForA1_3 = new Arcs()
-            .addArc(sut.getArc('A', 'B'))
-            .addArc(sut.getArc('B', 'C'))
-            .addArc(sut.getArc('C', 'D'))
-            .addArc(sut.getArc('D', 'B'));
-        const arcsForA2_3 = new Arcs()
-            .addArc(sut.getArc('Z', 'H'))
-            .addArc(sut.getArc('H', 'P'))
-            .addArc(sut.getArc('P', 'Z'));
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
 
         expect(result).toEqual([
-            [true, CutType.ExclusiveCut, arcsForA1_1, arcsForA2_1, a1, a2],
-            [
-                true,
-                CutType.ExclusiveCut,
-                arcsForA1_2,
-                arcsForA2_2,
-                new Activities().createActivity('X'),
-                new Activities()
-                    .createActivity('A')
-                    .createActivity('B')
-                    .createActivity('C')
-                    .createActivity('D')
-                    .createActivity('Z')
-                    .createActivity('H')
-                    .createActivity('P'),
-            ],
-            [
-                true,
-                CutType.ExclusiveCut,
-                arcsForA1_3,
-                arcsForA2_3,
-                new Activities()
-                    .createActivity('A')
-                    .createActivity('B')
-                    .createActivity('C')
-                    .createActivity('D')
-                    .createActivity('X'),
-                new Activities()
-                    .createActivity('Z')
-                    .createActivity('H')
-                    .createActivity('P'),
-            ],
-            [
-                true,
-                CutType.ExclusiveCut,
-                arcsForA2_3,
-                arcsForA1_3,
-                new Activities()
-                    .createActivity('Z')
-                    .createActivity('H')
-                    .createActivity('P'),
-                new Activities()
-                    .createActivity('A')
-                    .createActivity('B')
-                    .createActivity('C')
-                    .createActivity('D')
-                    .createActivity('X'),
-            ],
-            [
-                true,
-                CutType.ExclusiveCut,
-                arcsForA2_2,
-                arcsForA1_2,
-                new Activities()
-                    .createActivity('A')
-                    .createActivity('B')
-                    .createActivity('C')
-                    .createActivity('D')
-                    .createActivity('Z')
-                    .createActivity('H')
-                    .createActivity('P'),
-                new Activities().createActivity('X'),
-            ],
-            [true, CutType.ExclusiveCut, arcsForA2_1, arcsForA1_1, a2, a1],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
         ]);
     });
 
@@ -714,33 +513,12 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('Z')
             .build();
 
-        const result: Array<
-            [boolean, CutType, Arcs, Arcs, Activities, Activities]
-        > = sut.calculateAllPossibleCuts();
-
-        const a1: Activities = new Activities()
-            .createActivity('A')
-            .createActivity('B')
-            .createActivity('C')
-            .createActivity('H')
-            .createActivity('P');
-        const a2: Activities = new Activities().createActivity('Z');
-
-        const arcsForA1 = new Arcs()
-            .addArc(sut.getArc('A', 'B'))
-            .addArc(sut.getArc('B', 'C'))
-            .addArc(sut.getArc('H', 'P'))
-            .addArc(sut.getArc('A', 'H'))
-            .addArc(sut.getArc('H', 'A'))
-            .addArc(sut.getArc('B', 'P'))
-            .addArc(sut.getArc('P', 'B'))
-            .addArc(sut.getArc('C', 'P'))
-            .addArc(sut.getArc('P', 'C'));
-        const arcsForA2 = new Arcs();
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
 
         expect(result).toEqual([
-            [true, CutType.ExclusiveCut, arcsForA1, arcsForA2, a1, a2],
-            [true, CutType.ExclusiveCut, arcsForA2, arcsForA1, a2, a1],
+            [true, CutType.ExclusiveCut],
+            [true, CutType.ExclusiveCut],
         ]);
     });
 
@@ -757,48 +535,13 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('D')
             .build();
 
-        const result: Array<
-            [boolean, CutType, Arcs, Arcs, Activities, Activities]
-        > = sut.calculateAllPossibleCuts();
-
-        const a1: Activities = new Activities().createActivity('A');
-        const a2: Activities = new Activities()
-            .createActivity('B')
-            .createActivity('C')
-            .createActivity('D');
-
-        const arcsForA1_1 = new Arcs();
-        const arcsForA2_1 = new Arcs()
-            .addArc(sut.getArc('B', 'C'))
-            .addArc(sut.getArc('C', 'D'));
-        const arcsForA1_2 = new Arcs().addArc(sut.getArc('A', 'B'));
-        const arcsForA2_2 = new Arcs().addArc(sut.getArc('C', 'D'));
-        const arcsForA1_3 = new Arcs()
-            .addArc(sut.getArc('A', 'B'))
-            .addArc(sut.getArc('B', 'C'));
-        const arcsForA2_3 = new Arcs();
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
 
         expect(result).toEqual([
-            [true, CutType.SequenceCut, arcsForA1_1, arcsForA2_1, a1, a2],
-            [
-                true,
-                CutType.SequenceCut,
-                arcsForA1_2,
-                arcsForA2_2,
-                new Activities().createActivity('A').createActivity('B'),
-                new Activities().createActivity('C').createActivity('D'),
-            ],
-            [
-                true,
-                CutType.SequenceCut,
-                arcsForA1_3,
-                arcsForA2_3,
-                new Activities()
-                    .createActivity('A')
-                    .createActivity('B')
-                    .createActivity('C'),
-                new Activities().createActivity('D'),
-            ],
+            [true, CutType.SequenceCut],
+            [true, CutType.SequenceCut],
+            [true, CutType.SequenceCut],
         ]);
     });
 
@@ -824,31 +567,10 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('P')
             .build();
 
-        const result: Array<
-            [boolean, CutType, Arcs, Arcs, Activities, Activities]
-        > = sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
 
-        const a1: Activities = new Activities()
-            .createActivity('A')
-            .createActivity('H');
-        const a2: Activities = new Activities()
-            .createActivity('B')
-            .createActivity('C')
-            .createActivity('P');
-
-        const arcsForA1 = new Arcs()
-            .addArc(sut.getArc('A', 'H'))
-            .addArc(sut.getArc('H', 'A'));
-        const arcsForA2 = new Arcs()
-            .addArc(sut.getArc('B', 'C'))
-            .addArc(sut.getArc('B', 'P'))
-            .addArc(sut.getArc('P', 'B'))
-            .addArc(sut.getArc('C', 'P'))
-            .addArc(sut.getArc('P', 'C'));
-
-        expect(result).toEqual([
-            [true, CutType.SequenceCut, arcsForA1, arcsForA2, a1, a2],
-        ]);
+        expect(result).toEqual([[true, CutType.SequenceCut]]);
     });
 
     it('get all cuts - 1 parallel cut with 2 partition options possible', () => {
@@ -871,24 +593,12 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('P')
             .build();
 
-        const result: Array<
-            [boolean, CutType, Arcs, Arcs, Activities, Activities]
-        > = sut.calculateAllPossibleCuts();
-
-        const a1: Activities = new Activities()
-            .createActivity('A')
-            .createActivity('B')
-            .createActivity('C');
-        const a2: Activities = new Activities().createActivity('P');
-
-        const arcsForA1 = new Arcs()
-            .addArc(sut.getArc('A', 'B'))
-            .addArc(sut.getArc('B', 'C'));
-        const arcsForA2 = new Arcs();
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
 
         expect(result).toEqual([
-            [true, CutType.ParallelCut, arcsForA1, arcsForA2, a1, a2],
-            [true, CutType.ParallelCut, arcsForA2, arcsForA1, a2, a1],
+            [true, CutType.ParallelCut],
+            [true, CutType.ParallelCut],
         ]);
     });
 
@@ -920,26 +630,12 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('P')
             .build();
 
-        const result: Array<
-            [boolean, CutType, Arcs, Arcs, Activities, Activities]
-        > = sut.calculateAllPossibleCuts();
-
-        const a1: Activities = new Activities()
-            .createActivity('A')
-            .createActivity('B')
-            .createActivity('C');
-        const a2: Activities = new Activities()
-            .createActivity('H')
-            .createActivity('P');
-
-        const arcsForA1 = new Arcs()
-            .addArc(sut.getArc('A', 'B'))
-            .addArc(sut.getArc('B', 'C'));
-        const arcsForA2 = new Arcs().addArc(sut.getArc('H', 'P'));
+        const result: Array<[boolean, CutType]> =
+            sut.calculateAllPossibleCuts();
 
         expect(result).toEqual([
-            [true, CutType.ParallelCut, arcsForA1, arcsForA2, a1, a2],
-            [true, CutType.ParallelCut, arcsForA2, arcsForA1, a2, a1],
+            [true, CutType.ParallelCut],
+            [true, CutType.ParallelCut],
         ]);
     });
 });
