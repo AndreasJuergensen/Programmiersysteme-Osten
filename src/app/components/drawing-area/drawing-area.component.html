@@ -1,35 +1,43 @@
 <div>
-    <svg (mousedown)="mouseDown()" (mouseup)="mouseUp()">
-        <ng-container *ngFor="let arc of arcs">
-            <svg:g app-drawing-arc [arc]="arc"></svg:g>
-        </ng-container>
-
-        <ng-container *ngFor="let box of boxes">
-            <svg:g
-                app-drawing-box
-                [box]="box"
-                [showEventLogs]="showEventLogs.checked"
-            ></svg:g>
-        </ng-container>
-
-        <ng-container *ngIf="!showEventLogs.checked">
-            <ng-container *ngFor="let boxArc of boxArcs">
-                <svg:g app-drawing-arc [arc]="boxArc"></svg:g>
+    <div id="drawingArea">
+        <svg
+            (mousedown)="mouseDown()"
+            (mouseup)="mouseUp()"
+            id="svg"
+            #svgElement
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <ng-container *ngFor="let arc of arcs">
+                <svg:g app-drawing-arc [arc]="arc"></svg:g>
             </ng-container>
 
-            <ng-container *ngFor="let activity of activities">
-                <svg:g app-drawing-activity [activity]="activity"></svg:g>
+            <ng-container *ngFor="let box of boxes">
+                <svg:g
+                    app-drawing-box
+                    [box]="box"
+                    [showEventLogs]="showEventLogs.checked"
+                ></svg:g>
             </ng-container>
-        </ng-container>
 
-        <ng-container *ngFor="let transition of transitions">
-            <svg:g app-drawing-transition [transition]="transition"></svg:g>
-        </ng-container>
+            <ng-container *ngIf="!showEventLogs.checked">
+                <ng-container *ngFor="let boxArc of boxArcs">
+                    <svg:g app-drawing-arc [arc]="boxArc"></svg:g>
+                </ng-container>
 
-        <ng-container *ngFor="let place of places">
-            <svg:g app-drawing-place [place]="place"></svg:g>
-        </ng-container>
-    </svg>
+                <ng-container *ngFor="let activity of activities">
+                    <svg:g app-drawing-activity [activity]="activity"></svg:g>
+                </ng-container>
+            </ng-container>
+
+            <ng-container *ngFor="let transition of transitions">
+                <svg:g app-drawing-transition [transition]="transition"></svg:g>
+            </ng-container>
+
+            <ng-container *ngFor="let place of places">
+                <svg:g app-drawing-place [place]="place"></svg:g>
+            </ng-container>
+        </svg>
+    </div>
     <mat-checkbox
         class="show-eventlog-checkbox"
         (checked)="(showEventLogs)"

@@ -1,4 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+    AfterViewChecked,
+    Component,
+    ElementRef,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from '@angular/core';
 import { Subscription } from 'rxjs';
 import {
     ActivityNode,
@@ -27,7 +34,10 @@ import {
     styleUrl: './drawing-area.component.css',
 })
 export class DrawingAreaComponent implements OnInit, OnDestroy {
+    @ViewChild('svgElement') svgElement!: ElementRef<SVGSVGElement>;
+
     private _sub: Subscription | undefined;
+    private observer!: MutationObserver;
 
     private _activities: Array<Activity> = new Array<Activity>();
     private _boxes: Array<Box> = new Array<Box>();
@@ -177,10 +187,41 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 this._boxArcs = boxArcs;
             },
         );
+
+        this.observer = new MutationObserver((mutations) => {
+            this.recalculateSVGSize();
+        });
+
+        const container = document.getElementById('svg');
+        if (container) {
+            this.observer.observe(container, {
+                childList: true,
+                subtree: false,
+                attributes: false,
+            });
+        }
     }
 
     ngOnDestroy(): void {
         this._sub?.unsubscribe();
+        if (this.observer) {
+            this.observer.disconnect();
+        }
+    }
+
+    private recalculateSVGSize() {
+        if (this.svgElement) {
+            const svg = this.svgElement.nativeElement;
+            const boundingBox = svg.getBBox();
+            svg.setAttribute(
+                'width',
+                (boundingBox.width + boundingBox.x).toString(),
+            );
+            svg.setAttribute(
+                'height',
+                (boundingBox.height + boundingBox.y).toString(),
+            );
+        }
     }
 
     mouseDown(): void {
