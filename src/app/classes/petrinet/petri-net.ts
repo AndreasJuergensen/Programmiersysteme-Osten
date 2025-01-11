@@ -158,29 +158,11 @@ export class PetriNet {
         return replacingTransition;
     }
 
-    isBasicPetriNet(): boolean {
-        return this.transitions.eachTransitionIsBaseCase();
-    }
-
     updateByFlowerFallThrough(originDFG: Dfg, flowerDFGs: Dfg[]): PetriNet {
         const flowerCentre: Place = this.replaceOriginByFlowerCentre(originDFG);
         for (const dfg of flowerDFGs) {
             this.insertFlowerDFG(dfg, flowerCentre);
         }
-        return this;
-    }
-
-    private insertFlowerDFG(dfg: Dfg, centre: Place): PetriNet {
-        this.transitions.addDFG(dfg);
-        this.arcs
-            .addPlaceToTransitionArc(
-                centre,
-                this.transitions.getLastTransition(),
-            )
-            .addTransitionToPlaceArc(
-                this.transitions.getLastTransition(),
-                centre,
-            );
         return this;
     }
 
@@ -202,27 +184,22 @@ export class PetriNet {
         return flowerCentre;
     }
 
-    cutCanBeExecuted(): boolean {
-        const petriNetDFGs: Dfg[] = this.getDFGs();
-        for (const dfg of petriNetDFGs) {
-            if (dfg.canBeCutByAnyPartitions()) {
-                return true;
-            }
-        }
-        return false;
+    private insertFlowerDFG(dfg: Dfg, centre: Place): PetriNet {
+        this.transitions.addDFG(dfg);
+        this.arcs
+            .addPlaceToTransitionArc(
+                centre,
+                this.transitions.getLastTransition(),
+            )
+            .addTransitionToPlaceArc(
+                this.transitions.getLastTransition(),
+                centre,
+            );
+        return this;
     }
 
-    acitivityOncePerTraceIsFeasible(): boolean {
-        const petriNetDFGs: Dfg[] = this.getDFGs();
-        for (const dfg of petriNetDFGs) {
-            const eventLog: EventLog = dfg.eventLog;
-            for (const activity of dfg.activities.getAllActivites()) {
-                if (eventLog.activityOncePerTraceIsPossibleBy(activity)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    isBasicPetriNet(): boolean {
+        return this.transitions.eachTransitionIsBaseCase();
     }
 
     get inputPlace(): Place {
