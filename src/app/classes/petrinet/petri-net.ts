@@ -158,29 +158,11 @@ export class PetriNet {
         return replacingTransition;
     }
 
-    isBasicPetriNet(): boolean {
-        return this.transitions.eachTransitionIsBaseCase();
-    }
-
     updateByFlowerFallThrough(originDFG: Dfg, flowerDFGs: Dfg[]): PetriNet {
         const flowerCentre: Place = this.replaceOriginByFlowerCentre(originDFG);
         for (const dfg of flowerDFGs) {
             this.insertFlowerDFG(dfg, flowerCentre);
         }
-        return this;
-    }
-
-    private insertFlowerDFG(dfg: Dfg, centre: Place): PetriNet {
-        this.transitions.addDFG(dfg);
-        this.arcs
-            .addPlaceToTransitionArc(
-                centre,
-                this.transitions.getLastTransition(),
-            )
-            .addTransitionToPlaceArc(
-                this.transitions.getLastTransition(),
-                centre,
-            );
         return this;
     }
 
@@ -200,6 +182,20 @@ export class PetriNet {
             .addPlaceToTransitionArc(flowerCentre, blockStopTransition);
         this._transitions.removeDFG(originDFG);
         return flowerCentre;
+    }
+
+    private insertFlowerDFG(dfg: Dfg, centre: Place): PetriNet {
+        this.transitions.addDFG(dfg);
+        this.arcs
+            .addPlaceToTransitionArc(
+                centre,
+                this.transitions.getLastTransition(),
+            )
+            .addTransitionToPlaceArc(
+                this.transitions.getLastTransition(),
+                centre,
+            );
+        return this;
     }
 
     cutCanBeExecuted(): boolean {
@@ -223,6 +219,10 @@ export class PetriNet {
             }
         }
         return false;
+    }
+
+    isBasicPetriNet(): boolean {
+        return this.transitions.eachTransitionIsBaseCase();
     }
 
     get inputPlace(): Place {
