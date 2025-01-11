@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Arcs, DfgArc } from '../classes/dfg/arcs';
+import { Arcs, CategorizedArcs, DfgArc } from '../classes/dfg/arcs';
 import {
     PetriNetArcs,
     PlaceToTransitionArc,
@@ -20,6 +20,8 @@ export class CollectArcsService {
     private _collectedArcs: Arcs = new Arcs();
     private _currentDFG: Dfg | undefined;
     private _correctArcs: Arcs = new Arcs();
+    private _PossiblyCorrectArcs: Arcs = new Arcs();
+    private _wrongArcs: Arcs = new Arcs();
 
     constructor(private petriNetManagementService: PetriNetManagementService) {
         this.petriNetManagementService.petriNet$.subscribe((petriNetSub) => {
@@ -44,11 +46,17 @@ export class CollectArcsService {
     }
 
     public setCorrectArcs(selectedCut: CutType): void {
-        this._correctArcs = this._currentDFG!.getCorrectArcsBasedOnSelectedArcs(
-            this._collectedArcs,
-            selectedCut,
-        );
-        this.markCorrectArcs();
+        const validatedArcs: CategorizedArcs =
+            this._currentDFG!.validateSelectedArcs(
+                this._collectedArcs,
+                selectedCut,
+            );
+
+        this._correctArcs = validatedArcs.correctArcs;
+        this._PossiblyCorrectArcs = validatedArcs.possiblyCorrectArcs;
+        this._wrongArcs = validatedArcs.wrongArcs;
+
+        this.markArcs();
     }
 
     private resetClickedElements(): void {
@@ -62,6 +70,8 @@ export class CollectArcsService {
                 path.classList.remove('active');
                 path.classList.remove('hovered');
                 path.classList.remove('correct');
+                path.classList.remove('possbiblyCorrect');
+                path.classList.remove('wrong');
                 if (path.classList.contains('visiblePath')) {
                     path.setAttribute('marker-end', 'url(#arrowhead)');
                 }
@@ -69,7 +79,7 @@ export class CollectArcsService {
         }
     }
 
-    private markCorrectArcs(): void {
+    private markArcs(): void {
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
@@ -93,6 +103,22 @@ export class CollectArcsService {
                             arcId,
                     );
 
+                const isPossibleCorrectArc = this._PossiblyCorrectArcs
+                    .getArcs()
+                    .some(
+                        (arc) =>
+                            `arc_${arc.asJson().start}_${arc.asJson().end}` ===
+                            arcId,
+                    );
+
+                const isWrongArc = this._wrongArcs
+                    .getArcs()
+                    .some(
+                        (arc) =>
+                            `arc_${arc.asJson().start}_${arc.asJson().end}` ===
+                            arcId,
+                    );
+
                 if (isCollectedArc && isCorrectArc) {
                     path.classList.add('correct');
                     if (path.classList.contains('visiblePath')) {
@@ -100,14 +126,21 @@ export class CollectArcsService {
                             'marker-end',
                             'url(#arrowhead-green)',
                         );
-                    } // Füge die 'correct' Klasse hinzu
+                    }
+                } else if (isCollectedArc && isPossibleCorrectArc) {
+                    path.classList.add('possbiblyCorrect');
+                    if (path.classList.contains('visiblePath')) {
+                        path.setAttribute(
+                            'marker-end',
+                            'url(#arrowhead-orange)',
+                        );
+                    }
+                } else if (isCollectedArc && isWrongArc) {
+                    path.classList.add('wrong');
+                    if (path.classList.contains('visiblePath')) {
+                        path.setAttribute('marker-end', 'url(#arrowhead-red)');
+                    }
                 }
-
-                // if (
-                //     this._correctArcs.getArcs().some((arc) => arc.id === arcId)
-                // ) {
-                //     path.classList.add('correct'); // Füge die 'correct' Klasse hinzu
-                // }
             });
         }
     }

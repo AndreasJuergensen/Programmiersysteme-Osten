@@ -24,6 +24,23 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>
+            <!--Spitzen modified-->
+            <svg:marker
+                id="arrowhead-deepskyblue"
+                viewBox="0 0 10 10"
+                markerWidth="10"
+                markerHeight="10"
+                refX="5"
+                refY="5"
+                orient="auto-start-reverse"
+            >
+                <svg:path
+                    d="M 1,1 L 9,5 L 1,9 Z"
+                    [attr.fill]="'deepskyblue'"
+                    [attr.stroke]="'deepskyblue'"
+                    [attr.stroke-width]="width"
+                ></svg:path>
+            </svg:marker>
             <svg:marker
                 id="arrowhead-red"
                 viewBox="0 0 10 10"
@@ -37,6 +54,22 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
                     d="M 1,1 L 9,5 L 1,9 Z"
                     [attr.fill]="'red'"
                     [attr.stroke]="'red'"
+                    [attr.stroke-width]="width"
+                ></svg:path>
+            </svg:marker>
+            <svg:marker
+                id="arrowhead-orange"
+                viewBox="0 0 10 10"
+                markerWidth="10"
+                markerHeight="10"
+                refX="5"
+                refY="5"
+                orient="auto-start-reverse"
+            >
+                <svg:path
+                    d="M 1,1 L 9,5 L 1,9 Z"
+                    [attr.fill]="'orange'"
+                    [attr.stroke]="'orange'"
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>
@@ -57,7 +90,7 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
                 ></svg:path>
             </svg:marker>
         </svg:defs>
-
+        <!--Linen modified-->
         <svg:path
             [attr.d]="pathForLine(arc)"
             [attr.stroke-width]="10"
@@ -84,15 +117,23 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
         }
 
         path.active {
-            stroke: red !important;
+            stroke: deepskyblue !important;
         }
 
         path.hovered {
-            stroke: red !important;
+            stroke: deepskyblue !important;
         }
 
         path.correct {
             stroke: green !important;
+        }
+
+        path.possbiblyCorrect {
+            stroke: orange !important;
+        }
+
+        path.wrong {
+            stroke: red !important;
         }
     `,
 })
@@ -120,7 +161,7 @@ export class DrawingArcComponent {
 
         if (line && !line.classList.contains('active')) {
             line.classList.add('hovered');
-            line.setAttribute('marker-end', 'url(#arrowhead-red)');
+            line.setAttribute('marker-end', 'url(#arrowhead-deepskyblue)');
         }
     }
     changeLineColorOut(event: Event): void {
@@ -144,6 +185,12 @@ export class DrawingArcComponent {
                 }
                 if (line.classList.contains('correct')) {
                     line.classList.remove('correct');
+                }
+                if (line.classList.contains('possbiblyCorrect')) {
+                    line.classList.remove('possbiblyCorrect');
+                }
+                if (line.classList.contains('wrong')) {
+                    line.classList.remove('wrong');
                 }
                 this.collectArcsService.updateCollectedArcs(arc);
             } else {

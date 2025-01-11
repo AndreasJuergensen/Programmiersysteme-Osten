@@ -212,6 +212,13 @@ export interface ArcJson {
     start: string;
     end: string;
 }
+
+export interface CategorizedArcs {
+    correctArcs: Arcs;
+    possiblyCorrectArcs: Arcs;
+    wrongArcs: Arcs;
+}
+
 export class DfgArc {
     private start: Activity;
     private end: Activity;
