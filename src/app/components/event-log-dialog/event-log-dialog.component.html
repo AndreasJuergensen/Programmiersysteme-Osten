@@ -41,6 +41,7 @@
                 type="file"
                 class="file-input"
                 (change)="onFileSelected($event)"
+                accept=".xes"
                 #fileUpload
             />
             <div class="file-upload-wrapper">
@@ -50,6 +51,7 @@
                         color="primary"
                         class="upload-btn"
                         (click)="fileUpload.click()"
+                        type="button"
                     >
                         <mat-icon>attach_file</mat-icon>
                     </button>
