@@ -61,6 +61,15 @@ export class EventLogDialogComponent implements OnInit {
         control: FormControl,
     ): { [key: string]: boolean } | null {
         const input = control.value;
+
+        if (input && input.includes('*')) {
+            return { invalidCharacter: true };
+        }
+
+        if (input && /[^A-Za-z0-9\+\s\*]/.test(input)) {
+            return { otherInvalidCharacter: true };
+        }
+
         if (input) {
             setTimeout(() => {
                 if (!this.eventLogValidationService.validateInput(input)) {

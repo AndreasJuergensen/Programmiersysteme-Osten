@@ -5,14 +5,14 @@
             style="width: 100%"
             hintLabel="Activities per trace concatenated by exactly one whitespace.
                 The traces concatenated by a plus (+). The whitespaces before
-                and after the plus are optional. No empty input is allowed."
+                and after the plus are optional. No empty input and no special characters are allowed."
         >
             <mat-label>Enter Event-Log here!</mat-label>
             <textarea
                 matInput
                 cdkTextareaAutosize
                 cdkAutosizeMinRows="4"
-                placeholder="A B C + D+F + Y Z ..."
+                placeholder="A B C + testAktivitaet1+testAktivitaet2 + Aktivitaet3 Z P L ..."
                 [formControl]="eventLogControl"
                 cdkFocusInitial
                 (keydown)="onKeyDown($event)"
@@ -28,12 +28,30 @@
             </mat-error>
             <mat-error
                 *ngIf="
+                    eventLogControl.hasError('invalidCharacter') &&
+                    eventLogControl.dirty
+                "
+            >
+                The Input of multiplicities through a "*" is not possible.
+            </mat-error>
+            <mat-error
+                *ngIf="
+                    eventLogControl.hasError('otherInvalidCharacter') &&
+                    eventLogControl.dirty
+                "
+            >
+                The Input of special characters, except "+" and whitespaces, is
+                not possible.
+            </mat-error>
+            <mat-error
+                *ngIf="
                     eventLogControl.hasError('invalidInput') &&
                     eventLogControl.dirty
                 "
             >
-                Invalid Input Reason: A leading plus at the beginning, too many
-                whitespaces in a row or too many plus signs
+                Invalid Input! Reason: A plus at the beginning or the of the
+                string, too many whitespaces in a row between activities or too
+                many plus signs.
             </mat-error>
         </mat-form-field>
         <mat-dialog-actions align="end">
