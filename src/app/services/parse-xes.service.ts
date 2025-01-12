@@ -12,8 +12,12 @@ export class ParseXesService {
         const xmlParser: XMLParser = new XMLParser({
             ignoreAttributes: false,
         });
-        const eventLogXml: EventLogXml = xmlParser.parse(content);
-        const eventLog: EventLog = EventLog.fromXml(eventLogXml);
+        const xesFile: XesFile = xmlParser.parse(content);
+        const eventLog: EventLog = EventLog.fromXml(xesFile.log);
         return eventLog.toString();
     }
+}
+
+interface XesFile {
+    log: EventLogXml
 }

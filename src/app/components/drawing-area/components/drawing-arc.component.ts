@@ -97,8 +97,8 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
             [attr.fill]="'none'"
             fill="transparent"
             pointer-events="all"
-            (mouseover)="changeLineColorOver($event)"
-            (mouseout)="changeLineColorOut($event)"
+            (pointerenter)="changeLineColorOver($event, arc)"
+            (pointerleave)="changeLineColorOut($event)"
             (click)="onLineClick($event, arc)"
         ></svg:path>
         <svg:path
@@ -147,30 +147,79 @@ export class DrawingArcComponent {
 
     readonly width: number = environment.drawingElements.arcs.width;
     readonly color: string = environment.drawingElements.arcs.color;
-    readonly svg: SVGSVGElement = document.getElementsByTagName(
-        'svg',
-    )[0] as SVGSVGElement;
+    rectheight = 10;
+    private timeoutId: any;
 
     getId(arc: Arc): string {
         return `arc_${arc.start.id}_${arc.end.id}`;
     }
 
-    changeLineColorOver(event: Event): void {
-        const rect: SVGRectElement = event.target as SVGRectElement;
-        const line = rect.nextElementSibling as SVGLineElement;
+    changeLineColorOver(event: Event, arc: Arc): void {
+        const pathDummy = event.target as SVGPathElement;
+        const path = pathDummy.nextElementSibling as SVGLineElement;
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
 
-        if (line && !line.classList.contains('active')) {
-            line.classList.add('hovered');
-            line.setAttribute('marker-end', 'url(#arrowhead-deepskyblue)');
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+        }
+
+        if (svg && path) {
+            if (
+                !svg.classList.contains('mouseDown') &&
+                !path.classList.contains('active')
+            ) {
+                path.classList.add('hovered');
+                path.setAttribute('marker-end', 'url(#arrowhead-red)');
+            } else if (svg.classList.contains('mouseDown')) {
+                this.timeoutId = setTimeout(() => {
+                    if (this.collectArcsService.isDFGArc(arc)) {
+                        if (this.collectArcsService.isArcinSameDFG(arc)) {
+                            if (!path.classList.contains('active')) {
+                                path.classList.toggle('active');
+                                path.setAttribute(
+                                    'marker-end',
+                                    'url(#arrowhead-red)',
+                                );
+                            } else {
+                                path.classList.toggle('active');
+                                path.setAttribute(
+                                    'marker-end',
+                                    'url(#arrowhead)',
+                                );
+                            }
+                            this.collectArcsService.updateCollectedArcs(arc);
+                        } else {
+                            this.feedbackService.showMessage(
+                                'Arc not in same DFG',
+                                true,
+                            );
+                        }
+                    } else {
+                        this.feedbackService.showMessage(
+                            'Arc is not a DFGArc',
+                            true,
+                        );
+                    }
+                }, 90);
+            }
         }
     }
-    changeLineColorOut(event: Event): void {
-        const rect = event.target as SVGRectElement;
-        const line = rect.nextElementSibling as SVGLineElement;
 
-        if (line && !line.classList.contains('active')) {
-            line.classList.remove('hovered');
-            line.setAttribute('marker-end', 'url(#arrowhead)');
+    changeLineColorOut(event: Event): void {
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
+
+        if (svg && !svg.classList.contains('mouseDown')) {
+            const rect = event.target as SVGRectElement;
+            const line = rect.nextElementSibling as SVGLineElement;
+
+            if (line && !line.classList.contains('active')) {
+                line.classList.remove('hovered');
+                line.setAttribute('marker-end', 'url(#arrowhead)');
+            }
         }
     }
 
@@ -200,8 +249,6 @@ export class DrawingArcComponent {
             this.feedbackService.showMessage('Arc is not a DFGArc', true);
         }
     }
-
-    rectheight = 10;
 
     rectWidth(arc: Arc): number {
         const width = Math.sqrt(
