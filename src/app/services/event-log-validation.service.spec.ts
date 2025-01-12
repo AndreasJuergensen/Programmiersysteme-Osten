@@ -30,6 +30,36 @@ describe('EventLogValidationService False Cases', () => {
         const result = sut.validateInput(input);
         expect(result).toBeFalse();
     });
+
+    it('leading number at the beginning', () => {
+        const input: string = '1A';
+        const result = sut.validateInput(input);
+        expect(result).toBeFalse();
+    });
+
+    it('leading number at the beginning of a random activity', () => {
+        const input: string = 'a B + F 1TEst';
+        const result = sut.validateInput(input);
+        expect(result).toBeFalse();
+    });
+
+    it('special characters', () => {
+        const input: string = '! B';
+        const result = sut.validateInput(input);
+        expect(result).toBeFalse();
+    });
+
+    it('special characters1', () => {
+        const input: string = '? B';
+        const result = sut.validateInput(input);
+        expect(result).toBeFalse();
+    });
+
+    it('special characters2', () => {
+        const input: string = '* B';
+        const result = sut.validateInput(input);
+        expect(result).toBeFalse();
+    });
 });
 
 describe('EventLogValidationService True Cases', () => {
