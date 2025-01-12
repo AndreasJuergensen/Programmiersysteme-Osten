@@ -11,7 +11,7 @@ export class EventLogValidationService {
         gefolgt von einem Leerzeichen gefolgt einem String ohne Plus und Leerzeichen (0 bis n mal)*/
 
     private readonly validEventLogPattern =
-        /^[A-Za-z][A-Za-z0-9]*((?:\s[A-Za-z][A-Za-z0-9]*)*|(?:\s*\+\s*[A-Za-z][A-Za-z0-9]*)*(?:\s[A-Za-z][A-Za-z0-9]*)*)*$/;
+        /^[A-Za-z][A-Za-z0-9]*(?:\s+[A-Za-z][A-Za-z0-9]*|\s*\+\s*[A-Za-z][A-Za-z0-9]*)*$/;
     constructor() {}
 
     validateInput(input: string): boolean {

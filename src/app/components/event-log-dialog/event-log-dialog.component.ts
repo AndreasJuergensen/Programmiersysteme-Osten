@@ -61,8 +61,12 @@ export class EventLogDialogComponent implements OnInit {
         control: FormControl,
     ): { [key: string]: boolean } | null {
         const input = control.value;
-        if (input && !this.eventLogValidationService.validateInput(input)) {
-            return { invalidInput: true };
+        if (input) {
+            setTimeout(() => {
+                if (!this.eventLogValidationService.validateInput(input)) {
+                    control.setErrors({ invalidInput: true });
+                }
+            }, 0);
         }
         return null;
     }
@@ -112,7 +116,9 @@ export class EventLogDialogComponent implements OnInit {
         if (file) {
             this.fileName = file.name;
             file.text().then((content) => {
-                this.eventLogControl.setValue(this.parseXesService.parse(content));
+                this.eventLogControl.setValue(
+                    this.parseXesService.parse(content),
+                );
             });
         }
     }
