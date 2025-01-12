@@ -1,4 +1,4 @@
-import { EventLog } from '../event-log';
+import { CutType } from 'src/app/components/cut-execution/cut-execution.component';
 import { Activities } from './activities';
 import { Arcs, DfgArc } from './arcs';
 import { ExclusiveCut, LoopCut, ParallelCut, SequenceCut } from './cut';
@@ -22,7 +22,7 @@ describe('A Dfg', () => {
         const a1: Activities = partitions[0];
         const a2: Activities = partitions[1];
 
-        const result: boolean = sut.canBeCutIn(a1, a2).result;
+        const result: boolean = sut.canBeCutIn(a1, a2).cutIsPossible;
 
         expect(result).toBeFalse();
     });
@@ -44,7 +44,7 @@ describe('A Dfg', () => {
         const a1: Activities = partitions[0];
         const a2: Activities = partitions[1];
 
-        const result: boolean = sut.canBeCutIn(a1, a2).result;
+        const result: boolean = sut.canBeCutIn(a1, a2).cutIsPossible;
 
         expect(result).toBeFalse();
     });
@@ -68,7 +68,7 @@ describe('A Dfg', () => {
         const a1: Activities = partitions[0];
         const a2: Activities = partitions[1];
 
-        const result: boolean = sut.canBeCutIn(a1, a2).result;
+        const result: boolean = sut.canBeCutIn(a1, a2).cutIsPossible;
 
         expect(result).toBeFalse();
     });
@@ -88,7 +88,7 @@ describe('A Dfg', () => {
         const a2: Activities = partitions[1];
         a2.createActivity('C');
 
-        const result: boolean = sut.canBeCutIn(a1, a2).result;
+        const result: boolean = sut.canBeCutIn(a1, a2).cutIsPossible;
 
         expect(result).toBeFalse();
     });
@@ -108,7 +108,7 @@ describe('A Dfg', () => {
         const a1: Activities = partitions[0];
         const a2: Activities = partitions[1];
 
-        const result: boolean = sut.canBeCutIn(a1, a2).result;
+        const result: boolean = sut.canBeCutIn(a1, a2).cutIsPossible;
 
         expect(result).toBeFalse();
     });
@@ -134,14 +134,18 @@ describe('A Dfg', () => {
                 .addArc(sut.getArc('play', 'C'))
                 .addArc(sut.getArc('C', 'stop'));
 
-            const partitions: Activities[] =
-                sut.calculatePartitions(cuttedArcs);
-            const a1: Activities = partitions[0];
-            const a2: Activities = partitions[1];
+            const result = sut.canBeCutBy(cuttedArcs, CutType.ExclusiveCut);
+            const selectedCut = result[0].cutIsPossible;
+            let selectedArcsIsMinimum = true;
+            for (let i = 1; i < result.length; i++) {
+                if (result[i].cutIsPossible) {
+                    selectedArcsIsMinimum = false;
+                    break;
+                }
+            }
 
-            const result: boolean = sut.canBeCutIn(a1, a2).result;
-
-            expect(result).toBeTrue();
+            expect(selectedCut).toBeTrue();
+            expect(selectedArcsIsMinimum).toBeTrue();
         },
     );
 
@@ -171,14 +175,18 @@ describe('A Dfg', () => {
                 .addArc(sut.getArc('A', 'C'))
                 .addArc(sut.getArc('B', 'D'));
 
-            const partitions: Activities[] =
-                sut.calculatePartitions(cuttedArcs);
-            const a1: Activities = partitions[0];
-            const a2: Activities = partitions[1];
+            const result = sut.canBeCutBy(cuttedArcs, CutType.SequenceCut);
+            const selectedCut = result[0].cutIsPossible;
+            let selectedArcsIsMinimum = true;
+            for (let i = 1; i < result.length; i++) {
+                if (result[i].cutIsPossible) {
+                    selectedArcsIsMinimum = false;
+                    break;
+                }
+            }
 
-            const result: boolean = sut.canBeCutIn(a1, a2).result;
-
-            expect(result).toBeTrue();
+            expect(selectedCut).toBeTrue();
+            expect(selectedArcsIsMinimum).toBeTrue();
         },
     );
 
@@ -214,14 +222,18 @@ describe('A Dfg', () => {
                 .addArc(sut.getArc('C', 'B'))
                 .addArc(sut.getArc('B', 'C'));
 
-            const partitions: Activities[] =
-                sut.calculatePartitions(cuttedArcs);
-            const a1: Activities = partitions[0];
-            const a2: Activities = partitions[1];
+            const result = sut.canBeCutBy(cuttedArcs, CutType.ParallelCut);
+            const selectedCut = result[0].cutIsPossible;
+            let selectedArcsIsMinimum = true;
+            for (let i = 1; i < result.length; i++) {
+                if (result[i].cutIsPossible) {
+                    selectedArcsIsMinimum = false;
+                    break;
+                }
+            }
 
-            const result: boolean = sut.canBeCutIn(a1, a2).result;
-
-            expect(result).toBeTrue();
+            expect(selectedCut).toBeTrue();
+            expect(selectedArcsIsMinimum).toBeTrue();
         },
     );
 
@@ -251,14 +263,18 @@ describe('A Dfg', () => {
                 .addArc(sut.getArc('C', 'A'))
                 .addArc(sut.getArc('B', 'C'));
 
-            const partitions: Activities[] =
-                sut.calculatePartitions(cuttedArcs);
-            const a1: Activities = partitions[0];
-            const a2: Activities = partitions[1];
+            const result = sut.canBeCutBy(cuttedArcs, CutType.ExclusiveCut);
+            const selectedCut = result[0].cutIsPossible;
+            let selectedArcsIsMinimum = true;
+            for (let i = 1; i < result.length; i++) {
+                if (result[i].cutIsPossible) {
+                    selectedArcsIsMinimum = false;
+                    break;
+                }
+            }
 
-            const result: boolean = sut.canBeCutIn(a1, a2).result;
-
-            expect(result).toBeTrue();
+            expect(selectedCut).toBeTrue();
+            expect(selectedArcsIsMinimum).toBeTrue();
         },
     );
 });
@@ -1029,5 +1045,199 @@ describe('A LoopCut', () => {
         const result: boolean = sut.isPossible(activities, arcs);
 
         expect(result).toBeFalse();
+    });
+});
+
+describe('Complete event Log split: x y x + a b c + a c b', () => {
+    it('can not be exclusive-cut if unnecessary arcs are selected', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('X')
+            .createActivity('Y')
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .addFromPlayArc('X')
+            .addArc('X', 'Y')
+            .addArc('Y', 'X')
+            .addToStopArc('X')
+            .addFromPlayArc('A')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addToStopArc('C')
+            .addArc('A', 'C')
+            .addArc('C', 'B')
+            .addToStopArc('B')
+            .build();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('A', 'C'))
+            .addArc(sut.getArc('B', 'C'))
+            .addArc(sut.getArc('C', 'B'))
+            .addArc(sut.getArc('play', 'X'))
+            .addArc(sut.getArc('X', 'stop'));
+        const result = sut.canBeCutBy(cuttedArcs, CutType.ExclusiveCut);
+
+        const selectedCut = result[0].cutIsPossible;
+        let selectedArcsIsMinimum = true;
+        for (let i = 1; i < result.length; i++) {
+            if (result[i].cutIsPossible) {
+                selectedArcsIsMinimum = false;
+                break;
+            }
+        }
+        expect(selectedCut).toBeTrue();
+        expect(selectedArcsIsMinimum).toBeFalse();
+    });
+
+    it('can be exclusive-cut if no unnecessary arcs are selected', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('X')
+            .createActivity('Y')
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .addFromPlayArc('X')
+            .addArc('X', 'Y')
+            .addArc('Y', 'X')
+            .addToStopArc('X')
+            .addFromPlayArc('A')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addToStopArc('C')
+            .addArc('A', 'C')
+            .addArc('C', 'B')
+            .addToStopArc('B')
+            .build();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('play', 'X'))
+            .addArc(sut.getArc('X', 'stop'));
+
+        const result = sut.canBeCutBy(cuttedArcs, CutType.ExclusiveCut);
+        const selectedCut: boolean = result[0].cutIsPossible;
+        let selectedArcsIsMinimum = true;
+        for (let i = 1; i < result.length; i++) {
+            if (result[i].cutIsPossible) {
+                selectedArcsIsMinimum = false;
+                break;
+            }
+        }
+        expect(selectedCut).toBeTrue();
+        expect(selectedArcsIsMinimum).toBeTrue();
+    });
+
+    it('can not be sequence-cut if unnecessary arcs are selected', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .addFromPlayArc('A')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addToStopArc('C')
+            .addArc('A', 'C')
+            .addArc('C', 'B')
+            .addToStopArc('B')
+            .build();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('A', 'B'))
+            .addArc(sut.getArc('A', 'C'))
+            .addArc(sut.getArc('C', 'stop'));
+
+        const result = sut.canBeCutBy(cuttedArcs, CutType.SequenceCut);
+        const selectedCut = result[0].cutIsPossible;
+        let selectedArcsIsMinimum = true;
+        for (let i = 1; i < result.length; i++) {
+            if (result[i].cutIsPossible) {
+                selectedArcsIsMinimum = false;
+                break;
+            }
+        }
+        expect(selectedCut).toBeTrue();
+        expect(selectedArcsIsMinimum).toBeFalse();
+    });
+
+    it('can be sequence-cut if no unnecessary arcs are selected', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('A')
+            .createActivity('B')
+            .createActivity('C')
+            .addFromPlayArc('A')
+            .addArc('A', 'B')
+            .addArc('B', 'C')
+            .addToStopArc('C')
+            .addArc('A', 'C')
+            .addArc('C', 'B')
+            .addToStopArc('B')
+            .build();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('A', 'B'))
+            .addArc(sut.getArc('A', 'C'));
+
+        const result = sut.canBeCutBy(cuttedArcs, CutType.SequenceCut);
+        const selectedCut = result[0].cutIsPossible;
+        let selectedArcsIsMinimum = true;
+        for (let i = 1; i < result.length; i++) {
+            if (result[i].cutIsPossible) {
+                selectedArcsIsMinimum = false;
+                break;
+            }
+        }
+        expect(selectedCut).toBeTrue();
+        expect(selectedArcsIsMinimum).toBeTrue();
+    });
+
+    it('can be parallel-cut if no unnecessary arcs are selected', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('B')
+            .createActivity('C')
+            .addFromPlayArc('B')
+            .addArc('B', 'C')
+            .addToStopArc('C')
+            .addFromPlayArc('C')
+            .addArc('C', 'B')
+            .addToStopArc('B')
+            .build();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('play', 'B'))
+            .addArc(sut.getArc('B', 'stop'))
+            .addArc(sut.getArc('B', 'C'))
+            .addArc(sut.getArc('C', 'B'));
+
+        const result = sut.canBeCutBy(cuttedArcs, CutType.ParallelCut);
+        const selectedCut = result[0].cutIsPossible;
+        let selectedArcsIsMinimum = true;
+        for (let i = 1; i < result.length; i++) {
+            if (result[i].cutIsPossible) {
+                selectedArcsIsMinimum = false;
+                break;
+            }
+        }
+        expect(selectedCut).toBeTrue();
+        expect(selectedArcsIsMinimum).toBeTrue();
+    });
+
+    it('can be loop-cut if no unnecessary arcs are selected', () => {
+        const sut: Dfg = new DfgBuilder()
+            .createActivity('X')
+            .createActivity('Y')
+            .addFromPlayArc('X')
+            .addArc('X', 'Y')
+            .addArc('Y', 'X')
+            .addToStopArc('X')
+            .build();
+        const cuttedArcs: Arcs = new Arcs()
+            .addArc(sut.getArc('X', 'Y'))
+            .addArc(sut.getArc('Y', 'X'));
+
+        const result = sut.canBeCutBy(cuttedArcs, CutType.LoopCut);
+        const selectedCut = result[0].cutIsPossible;
+        let selectedArcsIsMinimum = true;
+        for (let i = 1; i < result.length; i++) {
+            if (result[i].cutIsPossible) {
+                selectedArcsIsMinimum = false;
+                break;
+            }
+        }
+        expect(selectedCut).toBeTrue();
+        expect(selectedArcsIsMinimum).toBeTrue();
     });
 });

@@ -3,7 +3,6 @@ import { PetriNet } from '../classes/petrinet/petri-net';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Dfg } from '../classes/dfg/dfg';
 import { ShowFeedbackService } from './show-feedback.service';
-import { CollectArcsService } from './collect-arcs.service';
 import _ from 'lodash';
 
 @Injectable({
@@ -90,10 +89,6 @@ export class PetriNetManagementService {
     private updatePn(): void {
         if (this._petriNet.isBasicPetriNet()) {
             this._isModifiable = false;
-            this._showFeedbackService.showMessage(
-                'The event log is completely splitted.',
-                false,
-            );
         } else {
             this._isModifiable = true;
         }
@@ -108,6 +103,13 @@ export class PetriNetManagementService {
     private addPreviousPetriNet(): void {
         const petriNetCopy: PetriNet = _.cloneDeep(this._petriNet);
         this._previousPetriNets.push(petriNetCopy);
+    }
+
+    showEventLogCompletelySplitted(): void {
+        this._showFeedbackService.showMessage(
+            'The event log is completely splitted.',
+            false,
+        );
     }
 
     get petriNet$(): Observable<PetriNet> {
