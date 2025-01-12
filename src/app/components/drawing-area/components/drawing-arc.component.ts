@@ -171,7 +171,7 @@ export class DrawingArcComponent {
                 !path.classList.contains('active')
             ) {
                 path.classList.add('hovered');
-                path.setAttribute('marker-end', 'url(#arrowhead-red)');
+                path.setAttribute('marker-end', 'url(#arrowhead-deepskyblue)');
             } else if (svg.classList.contains('mouseDown')) {
                 this.timeoutId = setTimeout(() => {
                     if (this.collectArcsService.isDFGArc(arc)) {
@@ -180,10 +180,21 @@ export class DrawingArcComponent {
                                 path.classList.toggle('active');
                                 path.setAttribute(
                                     'marker-end',
-                                    'url(#arrowhead-red)',
+                                    'url(#arrowhead-deepskyblue)',
                                 );
                             } else {
                                 path.classList.toggle('active');
+                                if (path.classList.contains('correct')) {
+                                    path.classList.remove('correct');
+                                }
+                                if (
+                                    path.classList.contains('possbiblyCorrect')
+                                ) {
+                                    path.classList.remove('possbiblyCorrect');
+                                }
+                                if (path.classList.contains('wrong')) {
+                                    path.classList.remove('wrong');
+                                }
                                 path.setAttribute(
                                     'marker-end',
                                     'url(#arrowhead)',

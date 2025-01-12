@@ -12,12 +12,58 @@ export interface DfgJson {
 export class Dfg implements PetriNetTransition {
     private static idCount: number = 0;
     public id: string;
+    private _allPossibleCuts: Array<[boolean, CutType]> = [];
+
+    //lookup table for arc subsets
+    private arcSubsetsLookup: Array<Array<DfgArc>> = [];
+    private arcSubsetsInitialized: boolean = false;
+
+    // A promise that resolves when the arcSubsetsLookup is initialized
+    private arcSubsetsInitializedPromise: Promise<void>;
+    private resolveArcSubsetsInitialized!: () => void;
+
     constructor(
         private readonly _activities: Activities,
         private readonly _arcs: Arcs,
         private readonly _eventLog: EventLog,
     ) {
         this.id = 'DFG' + ++Dfg.idCount;
+
+        this.initializeAllPossibleCuts();
+        // console.log(this.getAllPossibleCuts());
+
+        this.arcSubsetsInitializedPromise = new Promise((resolve) => {
+            this.resolveArcSubsetsInitialized = resolve;
+        });
+
+        this.initializeArcSubsets();
+    }
+
+    // Methode wird beim Erstellen des Objekts aufgerufen
+    private initializeAllPossibleCuts(): void {
+        this._allPossibleCuts = this.calculateAllPossibleCuts();
+    }
+
+    // Getter für den Zugriff auf die gespeicherten Ergebnisse
+    public getAllPossibleCuts(): Array<[boolean, CutType]> {
+        return this._allPossibleCuts;
+    }
+
+    private async initializeArcSubsets(): Promise<void> {
+        const allArcs = this._arcs.getArcs();
+        this.arcSubsetsLookup = generateAllSubsets(allArcs);
+        this.arcSubsetsInitialized = true;
+
+        this.resolveArcSubsetsInitialized();
+        // console.log('ready');
+        // console.log(this._arcs);
+        // console.log(this.arcSubsetsLookup);
+    }
+
+    async waitForArcsSubsetsinitialization(): Promise<void> {
+        if (!this.arcSubsetsInitialized) {
+            await this.arcSubsetsInitializedPromise;
+        }
     }
 
     /*
@@ -91,14 +137,34 @@ export class Dfg implements PetriNetTransition {
         return cuts;
     }
 
-    calculateAllPossibleCorrectArcsToCreatePartitions(
+    async calculateAllPossibleCorrectArcsToCreatePartitions(
         selectedCut: CutType,
-    ): Array<Arcs> {
+    ): Promise<Array<Arcs>> {
+        await this.waitForArcsSubsetsinitialization();
+
         const possiblyCorrectArcs: Array<Arcs> = new Array<Arcs>();
 
         const allArcs = this._arcs.getArcs();
 
-        const allCombinations = generateAllSubsets(allArcs);
+        // const allCombinations = generateAllSubsets(allArcs);
+        const allCombinations = this.arcSubsetsLookup;
+
+        //Alternative
+        // for (const cut of this.getAllPossibleCuts()) {
+        //     if (cut[0] === true && cut[1] === CutType.ExclusiveCut) {
+        //         for (const arcSubset of allCombinations) {
+        //             let selectedArcsToTest: Arcs = new Arcs();
+        //             arcSubset.forEach((arc) => selectedArcsToTest.addArc(arc));
+        //             if (arcSubset.length < allArcs.length) {
+        //                 let a1: Activities =
+        //                     this.calculatePartitions(selectedArcsToTest)[0];
+
+        //                 let a2: Activities =
+        //                     this.calculatePartitions(selectedArcsToTest)[1];
+        //             }
+        //         }
+        //     }
+        // }
 
         for (const arcSubset of allCombinations) {
             let selectedArcsToTest: Arcs = new Arcs();
@@ -161,21 +227,23 @@ export class Dfg implements PetriNetTransition {
         return possiblyCorrectArcs;
     }
 
-    validateSelectedArcs(
+    async validateSelectedArcs(
         selectedArcs: Arcs,
         selectedCut: CutType,
-    ): CategorizedArcs {
+    ): Promise<CategorizedArcs> {
         const correctArcs: Arcs = new Arcs();
         const possiblyCorrectArcs: Arcs = new Arcs();
         const wrongArcs: Arcs = new Arcs();
 
         const calculatedPossibleCorrectArcs: Array<Arcs> =
-            this.calculateAllPossibleCorrectArcsToCreatePartitions(selectedCut);
+            await this.calculateAllPossibleCorrectArcsToCreatePartitions(
+                selectedCut,
+            );
 
         switch (selectedCut) {
             case CutType.ExclusiveCut:
                 if (
-                    this.calculateAllPossibleCuts().some(
+                    this.getAllPossibleCuts().some(
                         (cut) =>
                             cut[0] === true && cut[1] === CutType.ExclusiveCut,
                     ) &&
@@ -204,7 +272,7 @@ export class Dfg implements PetriNetTransition {
                 break;
             case CutType.SequenceCut:
                 if (
-                    this.calculateAllPossibleCuts().some(
+                    this.getAllPossibleCuts().some(
                         (cut) =>
                             cut[0] === true && cut[1] === CutType.SequenceCut,
                     ) &&
@@ -233,7 +301,7 @@ export class Dfg implements PetriNetTransition {
                 break;
             case CutType.ParallelCut:
                 if (
-                    this.calculateAllPossibleCuts().some(
+                    this.getAllPossibleCuts().some(
                         (cut) =>
                             cut[0] === true && cut[1] === CutType.ParallelCut,
                     ) &&
@@ -262,7 +330,7 @@ export class Dfg implements PetriNetTransition {
                 break;
             case CutType.LoopCut:
                 if (
-                    this.calculateAllPossibleCuts().some(
+                    this.getAllPossibleCuts().some(
                         (cut) => cut[0] === true && cut[1] === CutType.LoopCut,
                     ) &&
                     selectedArcs.getArcs().length < this._arcs.getArcs().length

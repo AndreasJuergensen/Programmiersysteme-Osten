@@ -190,7 +190,6 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
         if (svg) {
             svg.classList.add('mouseDown');
-            console.log('Mouse Down');
         }
     }
 
@@ -201,7 +200,6 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
         if (svg) {
             svg.classList.remove('mouseDown');
-            console.log('Mouse Up');
         }
     }
 }
