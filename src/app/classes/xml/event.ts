@@ -15,8 +15,8 @@ export class Event {
     }
 
     toString(): string {
-        return this.eventXml.string.find(
-            (property) => property['@_key'] === 'concept:name',
-        )!['@_value'];
+        return this.eventXml.string
+            .find((property) => property['@_key'] === 'concept:name')!
+            ['@_value'].replaceAll(' ', '_');
     }
 }
