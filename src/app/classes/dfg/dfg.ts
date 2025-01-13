@@ -29,7 +29,6 @@ export class Dfg implements PetriNetTransition {
         a1: Activities;
         a2: Activities;
     }[] {
-        console.log('methode selected: ' + selectedArcs.getArcs().length);
         const results = [];
         let partitionsCount = 0;
         const partitions: Activities[] = this.calculatePartitions(selectedArcs);
@@ -44,14 +43,12 @@ export class Dfg implements PetriNetTransition {
             const reducedArcs: Arcs = selectedArcs.removeArcsBy(
                 new Arcs([arc]),
             );
-            console.log('reduced length ' + reducedArcs.getArcs().length);
             const partitions: Activities[] =
                 this.calculatePartitions(reducedArcs);
             const reducedA1: Activities = partitions[0];
             const reducedA2: Activities = partitions[1];
             results[partitionsCount++] = this.canBeCutIn(reducedA1, reducedA2);
         }
-        console.log('methode result: ' + results.length);
         return results;
     }
 
