@@ -85,4 +85,11 @@ describe('EventLogValidationService True Cases', () => {
         const result = sut.validateInput(input);
         expect(result).toBeTrue();
     });
+
+    it('valid string / event log with some activities with _ in it', () => {
+        const input: string =
+            'A+B (C) + X (test) ich_bin_18_Jahre_alt Z +N (hallo) +L K + hallo_mama';
+        const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
 });

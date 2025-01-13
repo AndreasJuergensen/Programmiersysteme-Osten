@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class EventLogValidationService {
     private readonly validEventLogPattern =
-        /^(\([A-Za-z][A-Za-z0-9]*\)|[A-Za-z][A-Za-z0-9]*)(?:(\s(\([A-Za-z][A-Za-z0-9]*\)|[A-Za-z][A-Za-z0-9]*))|(\s*\+\s*(\([A-Za-z][A-Za-z0-9]*\)|[A-Za-z][A-Za-z0-9]*)))*$/;
+        /^(\([A-Za-z][A-Za-z0-9\_]*\)|[A-Za-z][A-Za-z0-9\_]*)(?:(\s(\([A-Za-z][A-Za-z0-9\_]*\)|[A-Za-z][A-Za-z0-9\_]*))|(\s*\+\s*(\([A-Za-z][A-Za-z0-9\_]*\)|[A-Za-z][A-Za-z0-9\_]*)))*$/;
 
     constructor() {}
 
