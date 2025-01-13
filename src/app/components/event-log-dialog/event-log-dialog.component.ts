@@ -66,7 +66,7 @@ export class EventLogDialogComponent implements OnInit {
             return { invalidCharacter: true };
         }
 
-        if (input && /[^A-Za-z0-9\+\s\*]/.test(input)) {
+        if (input && /[^A-Za-z0-9\+\s\*\(\)]/.test(input)) {
             return { otherInvalidCharacter: true };
         }
 

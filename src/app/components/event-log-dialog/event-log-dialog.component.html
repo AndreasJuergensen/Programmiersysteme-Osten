@@ -5,7 +5,7 @@
             style="width: 100%"
             hintLabel="Activities per trace concatenated by exactly one whitespace.
                 The traces concatenated by a plus (+). The whitespaces before
-                and after the plus are optional. No empty input and no special characters are allowed."
+                and after the plus are optional. () around the activityName are allowed. Empty input and other special characters aren't allowed."
         >
             <mat-label>Enter Event-Log here!</mat-label>
             <textarea
@@ -13,7 +13,7 @@
                 cdkTextareaAutosize
                 cdkAutosizeMinRows="4"
                 cdkAutosizeMaxRows="15"
-                placeholder="A B C + testAktivitaet1+testAktivitaet2 + Aktivitaet3 Z P L ..."
+                placeholder="A B C + testAktivitaet1+testAktivitaet2 (activity) + Aktivitaet3 Z (P) L ..."
                 [formControl]="eventLogControl"
                 cdkFocusInitial
                 (keydown)="onKeyDown($event)"

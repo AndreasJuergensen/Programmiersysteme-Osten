@@ -26,7 +26,7 @@ describe('EventLogValidationService False Cases', () => {
     });
 
     it('too many whitespaces means more than one whitespace betweens Strings', () => {
-        const input: string = 'A   B';
+        const input: string = 'A   B C';
         const result = sut.validateInput(input);
         expect(result).toBeFalse();
     });
@@ -74,8 +74,14 @@ describe('EventLogValidationService True Cases', () => {
         expect(result).toBeTrue();
     });
 
-    it('valid string / event log an optional whitespace around the plus', () => {
+    it('valid string / event log with an optional whitespace around the plus', () => {
         const input: string = 'A+B C + X Y Z +N M +L K';
+        const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
+
+    it('valid string / event log with some activities with () around it', () => {
+        const input: string = 'A+B (C) + X (test) Z +N (hallo) +L K';
         const result = sut.validateInput(input);
         expect(result).toBeTrue();
     });
