@@ -43,22 +43,6 @@ class Cut {
         );
     }
 
-    arcFromPlayToA2Exists(activities: Activities, arcs: Arcs): boolean {
-        const activitiesReachableFromPlay: Activities =
-            arcs.calculateReachableActivitiesFromSingleActivity(
-                activities.playActivity,
-            );
-        return activitiesReachableFromPlay.containsAnyActivityOf(this.a2);
-    }
-
-    arcFromA1ToStopExists(activities: Activities, arcs: Arcs): boolean {
-        const activitiesReachingStop: Activities =
-            arcs.calculateReachingActivitiesFromSingleActivity(
-                activities.stopActivity,
-            );
-        return activitiesReachingStop.containsAnyActivityOf(this.a1);
-    }
-
     noArcFromA1ToA2Exists(arcs: Arcs): boolean {
         return !arcs
             .calculateReachableActivities(this.a1)
@@ -285,8 +269,6 @@ export class SequenceCut {
     isPossible(activities: Activities, arcs: Arcs): boolean {
         return (
             this.cut.basicRequirementsHaveBeenMet(activities) &&
-            !this.cut.arcFromPlayToA2Exists(activities, arcs) &&
-            !this.cut.arcFromA1ToStopExists(activities, arcs) &&
             this.cut.noArcFromA2ToA1Exists(arcs) &&
             this.cut.everyActivityInA1CanReachEveryActivityInA2(arcs)
         );
