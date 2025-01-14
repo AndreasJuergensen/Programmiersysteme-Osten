@@ -1,5 +1,5 @@
 import { PetriNet } from '../../petrinet/petri-net';
-import { AsStringArrayExportable } from '../AsStringArrayExportable';
+import { AsStringArrayExportable } from './AsStringArrayExportable';
 import { ToPnExportableTransitions } from './ToPnExportableTransitions';
 import { ToPnExportablePlaces } from './ToPnExportablePlaces';
 import { ToPnExportableArcs } from './ToPnExportableArcs';

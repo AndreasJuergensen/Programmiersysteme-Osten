@@ -25,4 +25,8 @@ export class ContextMenuComponent {
     exportPn() {
         this.exportService.exportPn();
     }
+
+    exportJson() {
+        this.exportService.exportJson();
+    }
 }

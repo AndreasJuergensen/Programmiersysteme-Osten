@@ -3,6 +3,7 @@ import { PetriNet } from '../classes/petrinet/petri-net';
 import { PetriNetManagementService } from './petri-net-management.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ToPnExportablePetriNet } from '../classes/export/pn/ToPnExportablePetriNet';
+import { ToJsonExportablePetriNet } from '../classes/export/json/ToJsonExportablePetriNet';
 
 @Injectable({
     providedIn: 'root',
@@ -41,7 +42,6 @@ export class ExportService {
     }
 
     exportPn() {
-        console.log(this._petriNet);
         const filename = 'petri-net.pn';
         this.export(
             new File(
@@ -51,6 +51,24 @@ export class ExportService {
                 filename,
                 {
                     type: 'text/plain',
+                },
+            ),
+            filename,
+        );
+    }
+
+    exportJson() {
+        const filename = 'petri-net.json';
+        this.export(
+            new File(
+                [
+                    ToJsonExportablePetriNet.fromPetriNet(
+                        this._petriNet,
+                    ).asJson(),
+                ],
+                filename,
+                {
+                    type: 'application/json',
                 },
             ),
             filename,

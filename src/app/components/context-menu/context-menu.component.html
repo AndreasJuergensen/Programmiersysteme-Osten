@@ -16,7 +16,13 @@
             >
                 to PN
             </button>
-            <button mat-button [disabled]="isExportDisabled">to JSON</button>
+            <button
+                mat-button
+                (click)="exportJson()"
+                [disabled]="isExportDisabled"
+            >
+                to JSON
+            </button>
             <button mat-button [disabled]="isExportDisabled">to PNML</button>
         </div>
     </div>
