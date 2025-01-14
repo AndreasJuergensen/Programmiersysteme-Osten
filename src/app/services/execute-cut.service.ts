@@ -7,31 +7,36 @@ import { EventLog } from '../classes/event-log';
 import { PetriNetManagementService } from './petri-net-management.service';
 import { CutType } from '../components/cut-execution/cut-execution.component';
 import { ShowFeedbackService } from './show-feedback.service';
+import { PetriNet } from '../classes/petrinet/petri-net';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ExecuteCutService {
+    private _petriNet!: PetriNet;
+
     constructor(
         private _petriNetManagementService: PetriNetManagementService,
         private _calculateDfgService: CalculateDfgService,
         private _feedbackService: ShowFeedbackService,
-    ) {}
+    ) {
+        this._petriNetManagementService.petriNet$.subscribe((pn) => {
+            this._petriNet = pn;
+        });
+    }
 
     public execute(
         dfg: Dfg,
         selectedArcs: Arcs,
         selectedCut: CutType,
     ): boolean {
-        const partitions: Activities[] = dfg.calculatePartitions(selectedArcs);
-        const a1: Activities = partitions[0];
-        const a2: Activities = partitions[1];
-
-        const isValidCut: boolean =
-            dfg.canBeCutIn(a1, a2).result &&
-            dfg.canBeCutIn(a1, a2).matchingcut === selectedCut;
-
-        if (!isValidCut) {
+        const cutFeasibilityResults: {
+            cutIsPossible: boolean;
+            matchingCut: CutType | null;
+            a1: Activities;
+            a2: Activities;
+        }[] = dfg.canBeCutBy(selectedArcs, selectedCut);
+        if (cutFeasibilityResults.length === 1) {
             this._feedbackService.showMessage(
                 'Not a valid Cut! Please try again!',
                 true,
@@ -39,13 +44,30 @@ export class ExecuteCutService {
             );
             return false;
         }
+        const validCut: {
+            cutIsPossible: boolean;
+            matchingCut: CutType | null;
+            a1: Activities;
+            a2: Activities;
+        } = cutFeasibilityResults[0];
+        for (let i = 1; i < cutFeasibilityResults.length; i++) {
+            if (
+                cutFeasibilityResults[i].cutIsPossible &&
+                cutFeasibilityResults[i].matchingCut === selectedCut
+            ) {
+                this._feedbackService.showMessage(
+                    'Too many arcs selected. Please select minimum amount of required arcs.',
+                    true,
+                );
+                return false;
+            }
+        }
 
         let subEventLogs: [EventLog, EventLog];
         let subDfgs: [Dfg, Dfg];
-
         switch (selectedCut) {
             case CutType.ExclusiveCut:
-                subEventLogs = dfg.eventLog.splitByExclusiveCut(a1);
+                subEventLogs = dfg.eventLog.splitByExclusiveCut(validCut.a1);
                 subDfgs = this.createSubDfgs(subEventLogs);
                 this._petriNetManagementService.updatePnByExclusiveCut(
                     dfg,
@@ -54,7 +76,7 @@ export class ExecuteCutService {
                 );
                 break;
             case CutType.SequenceCut:
-                subEventLogs = dfg.eventLog.splitBySequenceCut(a2);
+                subEventLogs = dfg.eventLog.splitBySequenceCut(validCut.a2);
                 subDfgs = this.createSubDfgs(subEventLogs);
                 this._petriNetManagementService.updatePnBySequenceCut(
                     dfg,
@@ -63,7 +85,7 @@ export class ExecuteCutService {
                 );
                 break;
             case CutType.ParallelCut:
-                subEventLogs = dfg.eventLog.splitByParallelCut(a1);
+                subEventLogs = dfg.eventLog.splitByParallelCut(validCut.a1);
                 subDfgs = this.createSubDfgs(subEventLogs);
                 this._petriNetManagementService.updatePnByParallelCut(
                     dfg,
@@ -72,7 +94,10 @@ export class ExecuteCutService {
                 );
                 break;
             case CutType.LoopCut:
-                subEventLogs = dfg.eventLog.splitByLoopCut(a1, a2);
+                subEventLogs = dfg.eventLog.splitByLoopCut(
+                    validCut.a1,
+                    validCut.a2,
+                );
                 subDfgs = this.createSubDfgs(subEventLogs);
                 this._petriNetManagementService.updatePnByLoopCut(
                     dfg,
@@ -81,13 +106,11 @@ export class ExecuteCutService {
                 );
                 break;
         }
-
-        this._feedbackService.showMessage(
-            'Cut was executed successfully! ' + '(' + selectedCut + ')',
-            false,
-        );
-        this._feedbackService.showMessage('The petri net was updated.', false);
-
+        if (this._petriNet.isBasicPetriNet()) {
+            this._petriNetManagementService.showEventLogCompletelySplitted();
+            return true;
+        }
+        this._feedbackService.showMessage(selectedCut + ' executed', false);
         return true;
     }
 

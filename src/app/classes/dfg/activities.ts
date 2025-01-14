@@ -60,7 +60,7 @@ export class Activities {
         return this;
     }
 
-    private containsActivityWithName(name: string): boolean {
+    containsActivityWithName(name: string): boolean {
         return this.containsActivity(new Activity(name));
     }
 

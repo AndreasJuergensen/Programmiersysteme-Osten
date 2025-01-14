@@ -155,12 +155,10 @@ export class Arcs {
         return partition.addAll(reachableActivities);
     }
     /* 
-    return all arcs from this Arcs, except that ones contained in cuttedArcs
+    return all arcs from this Arcs, except that ones contained in arcs
      */
-    private removeArcsBy(cuttedArcs: Arcs): Arcs {
-        return new Arcs(
-            this.arcs.filter((arc) => !cuttedArcs.containsArc(arc)),
-        );
+    removeArcsBy(arcs: Arcs): Arcs {
+        return new Arcs(this.arcs.filter((arc) => !arcs.containsArc(arc)));
     }
 
     addArc(arc: DfgArc): Arcs {
