@@ -1,5 +1,4 @@
 import {
-    AfterViewChecked,
     Component,
     ElementRef,
     OnDestroy,
@@ -231,7 +230,6 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
         if (svg) {
             svg.classList.add('mouseDown');
-            console.log('Mouse Down');
         }
     }
 
@@ -242,7 +240,22 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
         if (svg) {
             svg.classList.remove('mouseDown');
-            console.log('Mouse Up');
         }
+    }
+
+    contextMenuPosition = { x: '0px', y: '0px' };
+    showContextMenu = 'hidden';
+
+    onContextMenu(event: MouseEvent) {
+        event.preventDefault();
+        this.contextMenuPosition = {
+            x: event.clientX + 4 + 'px',
+            y: event.clientY + 4 + 'px',
+        };
+        this.showContextMenu = 'visible';
+    }
+
+    onMenuClose() {
+        this.showContextMenu = 'hidden';
     }
 }

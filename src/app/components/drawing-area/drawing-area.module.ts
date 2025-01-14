@@ -1,6 +1,6 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DrawingAreaComponent } from './drawing-area.component';
+import { NgModule } from '@angular/core';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import {
     DrawingActivityComponent,
     DrawingArcComponent,
@@ -8,7 +8,8 @@ import {
     DrawingTransitionsComponent,
 } from './components';
 import { DrawingBoxComponent } from './components/drawing-box.component';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { DrawingAreaComponent } from './drawing-area.component';
+import { ContextMenuComponent } from '../context-menu/context-menu.component';
 
 @NgModule({
     declarations: [
@@ -19,7 +20,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
         DrawingPlaceComponent,
         DrawingTransitionsComponent,
     ],
-    imports: [CommonModule, MatCheckboxModule],
+    imports: [CommonModule, MatCheckboxModule, ContextMenuComponent],
     exports: [DrawingAreaComponent],
 })
 export class DrawingAreaModule {}

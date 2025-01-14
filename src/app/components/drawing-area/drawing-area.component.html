@@ -1,4 +1,4 @@
-<div>
+<div (contextmenu)="onContextMenu($event)" (click)="onMenuClose()">
     <div id="drawingArea">
         <svg
             (mousedown)="mouseDown()"
@@ -45,3 +45,4 @@
         >Show Event Logs</mat-checkbox
     >
 </div>
+<app-context-menu [visibility]="showContextMenu" [position]="contextMenuPosition"  />

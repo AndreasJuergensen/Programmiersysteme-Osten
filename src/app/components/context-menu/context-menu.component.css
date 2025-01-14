@@ -1,0 +1,18 @@
+.context-menu {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid grey;
+    border-radius: 4px;
+    background-color: white;
+}
+
+.sub-menu {
+    position: absolute;
+    right: calc(-100% - 16px);
+    top: 0;
+    display: none;
+}
+
+.sub-menu-wrapper:hover .sub-menu {
+    display: flex !important;
+}
