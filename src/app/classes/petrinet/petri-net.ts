@@ -68,8 +68,26 @@ export class PetriNet {
                 secondReplacingTransition,
             )
             .redirectArcStart(originDFG, secondReplacingTransition);
+        this.addInvisibleTransitionFor(subDFG1, firstReplacingTransition);
+        this.addInvisibleTransitionFor(subDFG2, secondReplacingTransition);
         this._transitions.removeDFG(originDFG);
         return this;
+    }
+
+    addInvisibleTransitionFor(dfg: Dfg, transition: PetriNetTransition): void {
+        if (dfg.eventLog.hasOptionalSequence) {
+            const invisibleBypassTransition: PetriNetTransition =
+                this.transitions.createTransition('').getLastTransition();
+            this.arcs
+                .addPlaceToTransitionArc(
+                    this.arcs.getPrevPlace(transition),
+                    invisibleBypassTransition,
+                )
+                .addTransitionToPlaceArc(
+                    invisibleBypassTransition,
+                    this.arcs.getNextPlace(transition),
+                );
+        }
     }
 
     updateByParallelCut(originDFG: Dfg, subDFG1: Dfg, subDFG2: Dfg): PetriNet {

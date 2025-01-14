@@ -1,11 +1,11 @@
 import { Activities, Activity } from './dfg/activities';
-import { ExclusiveCut, LoopCut, ParallelCut, SequenceCut } from './dfg/cut';
 
 export class EventLog {
+    private _hasOptionalSequence: boolean = false;
     constructor(private readonly _traces: Trace[] = []) {}
 
     toString(): string {
-        return this._traces.map(trace => trace.toString()).join(" +\n")
+        return this._traces.map((trace) => trace.toString()).join(' +\n');
     }
 
     get traces(): Trace[] {
@@ -40,18 +40,26 @@ export class EventLog {
         const e2: EventLog = new EventLog();
         for (const trace of this.traces) {
             let firstSequence: Trace = new Trace();
-            for (const [index, activity] of trace
-                .getAllActivities()
-                .entries()) {
+            let secondSequence: Trace = new Trace();
+            for (const [index, activity] of trace.activities.entries()) {
                 if (a2.containsActivity(activity)) {
-                    e2.addTrace(
-                        new Trace(trace.getAllActivities().slice(index)),
+                    secondSequence.addAllActivities(
+                        trace.activities.slice(index),
                     );
                     break;
                 }
                 firstSequence.addActivity(activity);
             }
             e1.addTrace(firstSequence);
+            e2.addTrace(secondSequence);
+            if (firstSequence.isEmpty()) {
+                e1._hasOptionalSequence = true;
+                continue;
+            }
+            if (secondSequence.isEmpty()) {
+                e2._hasOptionalSequence = true;
+                continue;
+            }
         }
         return [e1, e2];
     }
@@ -150,17 +158,29 @@ export class EventLog {
         }
         return true;
     }
+
+    get hasOptionalSequence(): boolean {
+        return this._hasOptionalSequence;
+    }
 }
 
 export class Trace {
     constructor(private readonly _activities: Activity[] = []) {}
 
     toString(): string {
-        return this._activities.map(activity => activity.toString()).join(" ")
+        return this._activities
+            .map((activity) => activity.toString())
+            .join(' ');
     }
 
     addActivity(activity: Activity): void {
         this.activities.push(activity);
+    }
+
+    addAllActivities(activities: Activity[]) {
+        for (const act of activities) {
+            this.addActivity(act);
+        }
     }
 
     getAllActivities(): Activity[] {

@@ -263,42 +263,6 @@ describe('Cut a DFG by any partitions', () => {
         expect(result).toBeTrue();
     });
 
-    it('is not possible by sequence cut if play is connected to a2', () => {
-        const sut: Dfg = new DfgBuilder()
-            .createActivity('A')
-            .createActivity('B')
-            .createActivity('C')
-            .addFromPlayArc('A')
-            .addFromPlayArc('C')
-            .addArc('A', 'B')
-            .addArc('A', 'C')
-            .addToStopArc('B')
-            .addToStopArc('C')
-            .build();
-
-        const result: boolean = sut.canBeCutByAnyPartitions();
-
-        expect(result).toBeFalse();
-    });
-
-    it('is not possible by sequence cut if stop is connected to a1', () => {
-        const sut: Dfg = new DfgBuilder()
-            .createActivity('A')
-            .createActivity('B')
-            .createActivity('C')
-            .addFromPlayArc('A')
-            .addArc('A', 'B')
-            .addArc('A', 'C')
-            .addToStopArc('A')
-            .addToStopArc('B')
-            .addToStopArc('C')
-            .build();
-
-        const result: boolean = sut.canBeCutByAnyPartitions();
-
-        expect(result).toBeFalse();
-    });
-
     it('is possible by parallel cut', () => {
         const sut: Dfg = new DfgBuilder()
             .createActivity('A')

@@ -95,6 +95,14 @@ export class FallThroughHandlingService {
                         subDFGs[0],
                         subDFGs[1],
                     );
+                    if (this._petriNet.isBasicPetriNet()) {
+                        this._petriNetManagementService.showEventLogCompletelySplitted();
+                        return;
+                    }
+                    this._showFeedbackService.showMessage(
+                        'Activity-Once-Per-Trace Fall-Through executed',
+                        false,
+                    );
                     return;
                 }
                 this._showFeedbackService.showMessage(
@@ -140,9 +148,17 @@ export class FallThroughHandlingService {
                     dfg,
                     subDFGs,
                 );
-                return;
+                if (this._petriNet.isBasicPetriNet()) {
+                    this._petriNetManagementService.showEventLogCompletelySplitted();
+                    return;
+                }
             }
         }
+        this._showFeedbackService.showMessage(
+            'Flower-Model Fall-Through executed',
+            false,
+        );
+        return;
     }
 
     processActivityClick(activityName: string) {
