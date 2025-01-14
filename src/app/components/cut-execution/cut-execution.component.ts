@@ -102,22 +102,22 @@ export class CutExecutionComponent implements OnInit {
         }
     }
 
-    onTestClick(): void {
-        const selectedValue = this.radioForm.get('selectedCut')?.value;
-        if (selectedValue && this._collectArcsService.currentDFG) {
-            if (
-                !this._executeCutService.execute(
-                    this._collectArcsService.currentDFG,
-                    this._collectArcsService.collectedArcs,
-                    selectedValue,
-                )
-            ) {
-                this._collectArcsService.currentDFG.calculateAllPossibleCorrectArcsToCreatePartitions(
-                    selectedValue,
-                );
-            }
-        }
-    }
+    // onTestClick(): void {
+    //     const selectedValue = this.radioForm.get('selectedCut')?.value;
+    //     if (selectedValue && this._collectArcsService.currentDFG) {
+    //         if (
+    //             !this._executeCutService.execute(
+    //                 this._collectArcsService.currentDFG,
+    //                 this._collectArcsService.collectedArcs,
+    //                 selectedValue,
+    //             )
+    //         ) {
+    //             this._collectArcsService.currentDFG.calculateAllPossibleCorrectArcsToCreatePartitions(
+    //                 selectedValue,
+    //             );
+    //         }
+    //     }
+    // }
 
     onCancelClick(): void {
         if (this.radioForm.get('selectedCut')?.value !== null) {
