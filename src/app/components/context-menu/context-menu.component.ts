@@ -17,7 +17,6 @@ export class ContextMenuComponent {
 
     constructor(private exportService: ExportService) {
         this.exportService.isPetriNetExportable$.subscribe((isExportable) => {
-            console.log('isExportable', isExportable);
             this.isExportDisabled = !isExportable;
         });
     }
@@ -28,5 +27,9 @@ export class ContextMenuComponent {
 
     exportJson() {
         this.exportService.exportJson();
+    }
+
+    exportPnml() {
+        this.exportService.exportPnml();
     }
 }

@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { ToJsonExportablePetriNet } from '../classes/export/json/ToJsonExportablePetriNet';
+import { ToPnExportablePetriNet } from '../classes/export/pn/ToPnExportablePetriNet';
+import { ToPnmlExportablePetriNet } from '../classes/export/pnml/ToPnmlExportablePetriNet';
 import { PetriNet } from '../classes/petrinet/petri-net';
 import { PetriNetManagementService } from './petri-net-management.service';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { ToPnExportablePetriNet } from '../classes/export/pn/ToPnExportablePetriNet';
-import { ToJsonExportablePetriNet } from '../classes/export/json/ToJsonExportablePetriNet';
 
 @Injectable({
     providedIn: 'root',
@@ -69,6 +70,24 @@ export class ExportService {
                 filename,
                 {
                     type: 'application/json',
+                },
+            ),
+            filename,
+        );
+    }
+
+    exportPnml() {
+        const filename = 'petri-net.pnml';
+        this.export(
+            new File(
+                [
+                    ToPnmlExportablePetriNet.fromPetriNet(
+                        this._petriNet,
+                    ).asPnml(),
+                ],
+                filename,
+                {
+                    type: 'application/pnml',
                 },
             ),
             filename,
