@@ -21,15 +21,23 @@ export class ContextMenuComponent {
         });
     }
 
+    private closeMenu() {
+        this.visibility = 'hidden';
+    }
+        
+
     exportPn() {
         this.exportService.exportPn();
+        this.closeMenu();
     }
 
     exportJson() {
         this.exportService.exportJson();
+        this.closeMenu();
     }
 
     exportPnml() {
         this.exportService.exportPnml();
+        this.closeMenu();
     }
 }
