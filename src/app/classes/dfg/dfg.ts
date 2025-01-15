@@ -31,6 +31,8 @@ export class Dfg implements PetriNetTransition {
         this.id = 'DFG' + ++Dfg.idCount;
 
         this.initializeAllPossibleCuts();
+        // console.log('cuts initialized');
+
         // console.log(this.getAllPossibleCuts());
 
         // this.arcSubsetsInitializedPromise = new Promise((resolve) => {
@@ -42,6 +44,7 @@ export class Dfg implements PetriNetTransition {
         //     this._arcs.getArcs(),
         // );
         this.initializeArcSubsets();
+        // console.log('arcs initialized');
     }
 
     // Methode wird beim Erstellen des Objekts aufgerufen
@@ -212,7 +215,10 @@ export class Dfg implements PetriNetTransition {
     generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
         arcs: Array<DfgArc>,
     ): Array<Array<DfgArc>> {
-        const matchingCut: CutType = this.getAllPossibleCuts()[0][1];
+        // console.log(this.getAllPossibleCuts());
+        // const matchingCut2: Array<[boolean, CutType]> =
+        //     this.getAllPossibleCuts().filter((cut) => cut[0] === true);
+        // console.log(matchingCut2);
         const subsets: Array<Array<DfgArc>> = [];
         const totalSubsets = 1 << arcs.length;
         let cutFeasibilityResults: {
@@ -221,6 +227,10 @@ export class Dfg implements PetriNetTransition {
             a1: Activities;
             a2: Activities;
         }[] = [];
+        if (this.getAllPossibleCuts().length === 0) {
+            return subsets;
+        }
+        const matchingCut: CutType = this.getAllPossibleCuts()[0][1];
 
         for (let i = 0; i < totalSubsets; i++) {
             const subset: Array<DfgArc> = [];
@@ -342,10 +352,10 @@ export class Dfg implements PetriNetTransition {
     }
     */
 
-    async validateSelectedArcs(
+    validateSelectedArcs(
         selectedArcs: Arcs,
         selectedCut: CutType,
-    ): Promise<CategorizedArcs> {
+    ): CategorizedArcs {
         const correctArcs: Arcs = new Arcs();
         const possiblyCorrectArcs: Arcs = new Arcs();
         const wrongArcs: Arcs = new Arcs();
@@ -356,6 +366,12 @@ export class Dfg implements PetriNetTransition {
         //     );
         const calculatedPossibleCorrectArcs: Array<Arcs> = [];
 
+        if (this.getArcSubsets().length === 0) {
+            selectedArcs.getArcs().forEach((arc) => {
+                wrongArcs.addArc(arc);
+            });
+            return { correctArcs, possiblyCorrectArcs, wrongArcs };
+        }
         for (const arcs of this.getArcSubsets()) {
             calculatedPossibleCorrectArcs.push(new Arcs(arcs));
         }
@@ -402,10 +418,13 @@ export class Dfg implements PetriNetTransition {
                         let arcCount = calculatedPossibleCorrectArcs.filter(
                             (arcs) => arcs.containsArc(arc),
                         ).length;
-                        console.log(arc);
+                        // console.log(arc);
 
-                        console.log(arcCount);
-                        console.log(calculatedPossibleCorrectArcs.length);
+                        // console.log(arcCount);
+                        // console.log(calculatedPossibleCorrectArcs.length);c);
+
+                        // console.log(arcCount);
+                        // console.log(calculatedPossibleCorrectArcs.length);
 
                         if (arcCount === 0) {
                             wrongArcs.addArc(arc);

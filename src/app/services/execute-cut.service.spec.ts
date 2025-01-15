@@ -33,8 +33,6 @@ describe('ExecuteCutService', () => {
         );
     });
 
-    it('test', () => {});
-
     it('Testing on simple dfg if wrong selected Cut returns nothing', () => {
         const eventLog: EventLog = new EventLog([
             new Trace([new Activity('A'), new Activity('B')]),

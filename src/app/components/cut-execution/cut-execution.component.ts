@@ -71,6 +71,8 @@ export class CutExecutionComponent implements OnInit {
                 //     selectedValue,
                 // );
                 this.resetRadioSelection();
+                // console.log(this._collectArcsService.currentDFG);
+
                 this._collectArcsService.setCorrectArcs(selectedValue);
                 this._feedbackService.showMessage(
                     'Not a valid Cut! Please try again!',
