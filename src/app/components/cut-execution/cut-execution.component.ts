@@ -74,11 +74,11 @@ export class CutExecutionComponent implements OnInit {
                 // console.log(this._collectArcsService.currentDFG);
 
                 this._collectArcsService.setCorrectArcs(selectedValue);
-                this._feedbackService.showMessage(
-                    'Not a valid Cut! Please try again!',
-                    true,
-                    'The chosen arcs do not fit the selected cut. Please try again. For help use the help-button.',
-                );
+                // this._feedbackService.showMessage(
+                //     'Not a valid Cut! Please try again!',
+                //     true,
+                //     'The chosen arcs do not fit the selected cut. Please try again. For help use the help-button.',
+                // );
             }
         } else if (!selectedValue && this._collectArcsService.currentDFG) {
             this._feedbackService.showMessage(

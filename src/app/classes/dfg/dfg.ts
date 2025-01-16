@@ -260,6 +260,39 @@ export class Dfg implements PetriNetTransition {
 
         return subsets;
     }
+
+    // generateAllArcSubsetsAndCheckForPossibleCorrectArcsWorker(
+    //     arcs: Array<DfgArc>,
+    // ): Promise<Array<Array<DfgArc>>> {
+    //     return new Promise((resolve, reject) => {
+    //         if (this.getAllPossibleCuts().length === 0) {
+    //             resolve([]);
+    //             return;
+    //         }
+
+    //         const worker = new Worker(
+    //             new URL('./workers/subset.worker', import.meta.url),
+    //         );
+
+    //         worker.postMessage({
+    //             arcs: arcs.map((arc) => ({
+    //                 /* Simplify arc data if needed */
+    //             })),
+    //             allPossibleCuts: this.getAllPossibleCuts(),
+    //         });
+
+    //         worker.onmessage = function (e) {
+    //             resolve(e.data); // Subsets returned from the worker
+    //             worker.terminate(); // Clean up the worker
+    //         };
+
+    //         worker.onerror = function (e) {
+    //             reject(e.message);
+    //             worker.terminate(); // Clean up the worker
+    //         };
+    //     });
+    // }
+
     /*
     async calculateAllPossibleCorrectArcsToCreatePartitions(
         selectedCut: CutType,
