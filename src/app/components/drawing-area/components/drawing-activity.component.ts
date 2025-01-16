@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Activity } from '../models';
 import { environment } from 'src/environments/environment';
 import { FallThroughHandlingService } from 'src/app/services/fall-through-handling.service';
+import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 
 @Component({
     selector: 'svg:g[app-drawing-activity]',
@@ -16,7 +17,7 @@ import { FallThroughHandlingService } from 'src/app/services/fall-through-handli
             [attr.stroke]="strokeColor"
             [attr.stroke-opacity]="strokeOpacity"
             [attr.stroke-width]="strokeWidth"
-            (click)="onActivityClick(activity)"
+            (click)="onActivityClick($event, activity)"
         />
         <svg:text
             [attr.x]="activity.x"
@@ -29,6 +30,11 @@ import { FallThroughHandlingService } from 'src/app/services/fall-through-handli
         rect:hover {
             cursor: pointer;
             stroke-width: 5;
+            stroke: #085c5c;
+        }
+        rect.activity-marked {
+            stroke-width: 5;
+            stroke: #085c5c;
         }
     `,
 })
@@ -37,6 +43,7 @@ export class DrawingActivityComponent {
 
     constructor(
         private _fallThroughHandlingService: FallThroughHandlingService,
+        private _collectSelectedElementsService: CollectSelectedElementsService,
     ) {}
 
     readonly width: number = environment.drawingElements.activities.height;
@@ -53,7 +60,25 @@ export class DrawingActivityComponent {
     readonly strokeWidth: number =
         environment.drawingElements.activities.strokeWidth;
 
-    onActivityClick(activity: Activity): void {
+    onActivityClick(event: Event, activity: Activity): void {
+        this._collectSelectedElementsService.updateSelectedActivity(
+            activity.id,
+        );
+        const rect = event.target as SVGRectElement;
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
+
+        if (svg) {
+            const activities = svg.querySelectorAll('rect');
+            activities.forEach((activity) => {
+                if (rect === activity) {
+                    rect.classList.toggle('activity-marked');
+                } else {
+                    activity.classList.remove('activity-marked');
+                }
+            });
+        }
         this._fallThroughHandlingService.processActivityClick(activity.id);
     }
 }
