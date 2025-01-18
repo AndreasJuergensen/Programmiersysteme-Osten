@@ -313,8 +313,7 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('B')
             .build();
 
-        const result: Array<[boolean, CutType]> =
-            sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> = sut.calculatePossibleCut();
 
         expect(result).toEqual([[true, CutType.LoopCut]]);
     });
@@ -331,8 +330,7 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('B')
             .build();
 
-        const result: Array<[boolean, CutType]> =
-            sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> = sut.calculatePossibleCut();
 
         expect(result).toEqual([
             [true, CutType.ParallelCut],
@@ -355,8 +353,7 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('D')
             .build();
 
-        const result: Array<[boolean, CutType]> =
-            sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> = sut.calculatePossibleCut();
 
         expect(result).toEqual([
             [true, CutType.ExclusiveCut],
@@ -382,8 +379,7 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('C')
             .build();
 
-        const result: Array<[boolean, CutType]> =
-            sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> = sut.calculatePossibleCut();
 
         expect(result).toEqual([[true, CutType.SequenceCut]]);
     });
@@ -405,8 +401,7 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('Z')
             .build();
 
-        const result: Array<[boolean, CutType]> =
-            sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> = sut.calculatePossibleCut();
 
         expect(result).toEqual([
             [true, CutType.ExclusiveCut],
@@ -439,8 +434,7 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('Z')
             .build();
 
-        const result: Array<[boolean, CutType]> =
-            sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> = sut.calculatePossibleCut();
 
         expect(result).toEqual([
             [true, CutType.ExclusiveCut],
@@ -477,8 +471,7 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('Z')
             .build();
 
-        const result: Array<[boolean, CutType]> =
-            sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> = sut.calculatePossibleCut();
 
         expect(result).toEqual([
             [true, CutType.ExclusiveCut],
@@ -499,8 +492,7 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('D')
             .build();
 
-        const result: Array<[boolean, CutType]> =
-            sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> = sut.calculatePossibleCut();
 
         expect(result).toEqual([
             [true, CutType.SequenceCut],
@@ -531,8 +523,7 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('P')
             .build();
 
-        const result: Array<[boolean, CutType]> =
-            sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> = sut.calculatePossibleCut();
 
         expect(result).toEqual([[true, CutType.SequenceCut]]);
     });
@@ -557,8 +548,7 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('P')
             .build();
 
-        const result: Array<[boolean, CutType]> =
-            sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> = sut.calculatePossibleCut();
 
         expect(result).toEqual([
             [true, CutType.ParallelCut],
@@ -594,8 +584,7 @@ describe('Possible Cuts Tests', () => {
             .addToStopArc('P')
             .build();
 
-        const result: Array<[boolean, CutType]> =
-            sut.calculateAllPossibleCuts();
+        const result: Array<[boolean, CutType]> = sut.calculatePossibleCut();
 
         expect(result).toEqual([
             [true, CutType.ParallelCut],

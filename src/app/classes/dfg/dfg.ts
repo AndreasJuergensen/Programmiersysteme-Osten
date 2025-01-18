@@ -12,12 +12,13 @@ export interface DfgJson {
 export class Dfg implements PetriNetTransition {
     private static idCount: number = 0;
     public id: string;
+    private _currentPossibleCut: CutType | undefined;
     private _allPossibleCuts: Array<[boolean, CutType]> = [];
 
     //lookup table for arc subsets
     // private arcSubsetsLookup: Array<Array<DfgArc>> = [];
     // private arcSubsetsInitialized: boolean = false;
-    private arcSubsets2: Array<Array<DfgArc>> = [];
+    private _arcSubsets: Array<Array<DfgArc>> = [];
 
     // A promise that resolves when the arcSubsetsLookup is initialized
     // private arcSubsetsInitializedPromise: Promise<void>;
@@ -29,8 +30,10 @@ export class Dfg implements PetriNetTransition {
         private readonly _eventLog: EventLog,
     ) {
         this.id = 'DFG' + ++Dfg.idCount;
+        console.log('Number of all arcs');
+        console.log(this._arcs.getArcs().length);
 
-        this.initializeAllPossibleCuts();
+        this.initializePossibleCut();
         // console.log('cuts initialized');
 
         // console.log(this.getAllPossibleCuts());
@@ -48,24 +51,78 @@ export class Dfg implements PetriNetTransition {
     }
 
     // Methode wird beim Erstellen des Objekts aufgerufen
-    private initializeAllPossibleCuts(): void {
-        this._allPossibleCuts = this.calculateAllPossibleCuts();
+    private initializePossibleCut(): void {
+        this._currentPossibleCut = this.calculatePossibleCut();
     }
 
     private initializeArcSubsets(): void {
-        this.arcSubsets2 =
-            this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
-                this._arcs.getArcs(),
-            );
+        // console.log('cuts in Arc Subsets');
+
+        // console.log(this.getAllPossibleCuts());
+
+        if (this.getPossibleCut() === undefined) {
+            console.log('nothing');
+
+            const noSubsets: Array<DfgArc> = [];
+
+            this._arcSubsets =
+                this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
+                    noSubsets,
+                );
+        } else {
+            switch (this.getPossibleCut()) {
+                case CutType.ExclusiveCut:
+                    console.log('exclusive');
+
+                    this._arcSubsets =
+                        this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
+                            this._arcs
+                                .getArcs()
+                                .filter(
+                                    (arcs) =>
+                                        arcs.startsAtPlay() ||
+                                        arcs.endsAtStop(),
+                                ),
+                        );
+                    break;
+                case CutType.SequenceCut:
+                    console.log('sequence');
+                    this._arcSubsets =
+                        this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
+                            this._arcs.getArcs(),
+                        );
+                    break;
+                case CutType.ParallelCut:
+                    console.log('parallel');
+                    this._arcSubsets =
+                        this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
+                            this._arcs.getArcs(),
+                        );
+                    break;
+                case CutType.LoopCut:
+                    console.log('loop');
+                    this._arcSubsets =
+                        this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
+                            this._arcs
+                                .getArcs()
+                                .filter(
+                                    (arcs) =>
+                                        !arcs.startsAtPlay() &&
+                                        !arcs.endsAtStop(),
+                                ),
+                        );
+                    break;
+            }
+        }
     }
 
     // Getter für den Zugriff auf die gespeicherten Ergebnisse
-    public getAllPossibleCuts(): Array<[boolean, CutType]> {
-        return this._allPossibleCuts;
+    public getPossibleCut(): CutType | undefined {
+        return this._currentPossibleCut;
     }
 
     public getArcSubsets(): Array<Array<DfgArc>> {
-        return this.arcSubsets2;
+        return this._arcSubsets;
     }
 
     // private async initializeArcSubsets(): Promise<void> {
@@ -184,12 +241,16 @@ export class Dfg implements PetriNetTransition {
         return false;
     }
 
-    calculateAllPossibleCuts(): Array<[boolean, CutType]> {
-        let cuts: Array<[boolean, CutType]> = new Array<[boolean, CutType]>();
+    calculatePossibleCut(): CutType | undefined {
         const allActivities: Activities = new Activities()
             .addAll(this.activities)
             .removePlayAndStop();
 
+        console.log('Number of all activities');
+
+        console.log(allActivities.getLength());
+
+        const testedCombinations = new Set<string>();
         for (let mask = 1; mask < 1 << allActivities.getLength(); mask++) {
             const a1: Activities = new Activities();
             const a2: Activities = new Activities();
@@ -202,14 +263,38 @@ export class Dfg implements PetriNetTransition {
                 }
             }
 
+            // Sort activities to create a unique key for the combination
+            // const a1Key = a1
+            //     .getAllActivites()
+            //     .map((act) => act.name)
+            //     .sort()
+            //     .join(',');
+            // const a2Key = a2
+            //     .getAllActivites()
+            //     .map((act) => act.name)
+            //     .sort()
+            //     .join(',');
+            // const combinationKey = [a1Key, a2Key].sort().join('|');
+            // Check if this combination has already been tested
+            // if (testedCombinations.has(combinationKey)) {
+            //     continue;
+            // }
+            // testedCombinations.add(combinationKey);
+            // console.log(testedCombinations);
+
+            // console.log('a1');
+            // console.log(a1);
+            // console.log('a2');
+            // console.log(a2);
+
             if (this.canBeCutIn(a1, a2).cutIsPossible) {
-                cuts.push([
-                    this.canBeCutIn(a1, a2).cutIsPossible,
-                    this.canBeCutIn(a1, a2).matchingCut!,
-                ]);
+                return this.canBeCutIn(a1, a2).matchingCut!;
             }
         }
-        return cuts;
+        // console.log('cuts');
+        // console.log(cuts);
+
+        return undefined;
     }
 
     generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
@@ -227,13 +312,16 @@ export class Dfg implements PetriNetTransition {
             a1: Activities;
             a2: Activities;
         }[] = [];
-        if (this.getAllPossibleCuts().length === 0) {
+        if (this.getPossibleCut() === undefined) {
+            console.log('empty cuts');
+
             return subsets;
         }
-        const matchingCut: CutType = this.getAllPossibleCuts()[0][1];
+        const matchingCut: CutType = this.getPossibleCut()!;
 
         for (let i = 0; i < totalSubsets; i++) {
             const subset: Array<DfgArc> = [];
+
             for (let j = 0; j < arcs.length; j++) {
                 if (i & (1 << j)) {
                     // Check if jth element is in the current subset
@@ -412,10 +500,7 @@ export class Dfg implements PetriNetTransition {
         switch (selectedCut) {
             case CutType.ExclusiveCut:
                 if (
-                    this.getAllPossibleCuts().some(
-                        (cut) =>
-                            cut[0] === true && cut[1] === CutType.ExclusiveCut,
-                    ) &&
+                    this.getPossibleCut() === CutType.ExclusiveCut &&
                     selectedArcs.getArcs().length < this._arcs.getArcs().length
                 ) {
                     selectedArcs.getArcs().forEach((arc) => {
@@ -441,10 +526,7 @@ export class Dfg implements PetriNetTransition {
                 break;
             case CutType.SequenceCut:
                 if (
-                    this.getAllPossibleCuts().some(
-                        (cut) =>
-                            cut[0] === true && cut[1] === CutType.SequenceCut,
-                    ) &&
+                    this.getPossibleCut() === CutType.SequenceCut &&
                     selectedArcs.getArcs().length < this._arcs.getArcs().length
                 ) {
                     selectedArcs.getArcs().forEach((arc) => {
@@ -477,10 +559,7 @@ export class Dfg implements PetriNetTransition {
                 break;
             case CutType.ParallelCut:
                 if (
-                    this.getAllPossibleCuts().some(
-                        (cut) =>
-                            cut[0] === true && cut[1] === CutType.ParallelCut,
-                    ) &&
+                    this.getPossibleCut() === CutType.ParallelCut &&
                     selectedArcs.getArcs().length < this._arcs.getArcs().length
                 ) {
                     selectedArcs.getArcs().forEach((arc) => {
@@ -506,9 +585,7 @@ export class Dfg implements PetriNetTransition {
                 break;
             case CutType.LoopCut:
                 if (
-                    this.getAllPossibleCuts().some(
-                        (cut) => cut[0] === true && cut[1] === CutType.LoopCut,
-                    ) &&
+                    this.getPossibleCut() === CutType.LoopCut &&
                     selectedArcs.getArcs().length < this._arcs.getArcs().length
                 ) {
                     selectedArcs.getArcs().forEach((arc) => {
