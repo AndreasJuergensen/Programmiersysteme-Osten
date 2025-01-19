@@ -63,119 +63,22 @@ export class EventLogDialogComponent implements OnInit {
     ): { [key: string]: boolean } | null {
         const input = control.value;
 
-        // if (
-        //     input &&
-        //     /[0-9]+[\*{1}][^\*^0-9]+|[^\*^0-9]+[\*{1}][0-9]+/.test(input)
-        // ) {
-        //     console.log('regex1');
-
-        //     return { multiplicityRegEx: true };
-        // }
-
-        // if (input && input.includes('*')) {
-        //     return { multiplicityRegEx: true };
-        // }
-        // if (input) {
-        //     setTimeout(() => {
-        //         if (!this.eventLogValidationService.validateInput(input)) {
-        //             control.setErrors({ invalidInput: true });
-        //         }
-        //     }, 0);
-        // }
-        // if (input) {
-        //     console.log('regex2');
-        //     this.debounceValidation(input, control);
-        // }
-
         if (input) {
-            console.log('regex2');
-            this.validateLargeInput(input, control);
+            this.checkInput(input, control);
         }
 
         return null;
     }
 
-    private debounceValidation(input: string, control: FormControl): void {
+    private checkInput(input: string, control: FormControl): void {
         clearTimeout((control as any)._validationTimeout);
 
         (control as any)._validationTimeout = setTimeout(() => {
-            const currentErrors = control.errors || {};
-            const errors = { ...currentErrors };
-
-            // Validate input with validEventLogPattern
-            if (!this.eventLogValidationService.validateInput(input)) {
-                errors['invalidInput'] = true;
-            } else {
-                delete errors['invalidInput'];
-            }
-
-            // Validate input with multiplicityPattern
-            if (
-                this.eventLogValidationService.checkForMultiplicityPattern(
-                    input,
-                )
-            ) {
-                errors['multiplicityRegEx'] = true;
-            } else {
-                delete errors['multiplicityRegEx'];
-            }
-
-            // Update errors only if there is a change
-            const hasErrors = Object.keys(errors).length > 0;
-            if (hasErrors) {
-                control.setErrors(errors);
-            } else if (control.errors) {
-                control.setErrors(null);
-            }
-        }, 300); // Debounce time
-    }
-
-    private validateLargeInput(input: string, control: FormControl): void {
-        clearTimeout((control as any)._validationTimeout);
-
-        // let hasError = false;
-        (control as any)._validationTimeout = setTimeout(() => {
-            // const chunkSize = 1000; // Number of characters per chunk
-            // const chunks =
-            //     input.match(new RegExp(`.{1,${chunkSize}}`, 'g')) || [];
             const errors: { [key: string]: boolean } = {};
-            // const currentErrors = control.errors || {};
-            // const errors = { ...currentErrors };
-            // console.log(errors);
 
-            // Preserve required error if it exists
             if (control.hasError('required')) {
                 errors['required'] = true;
             }
-
-            // let isInvalid = false;
-            // let hasMultiplicityError = false;
-
-            /*
-            for (const chunk of chunks) {
-                console.log('for');
-
-                if (!this.eventLogValidationService.validateInput(chunk)) {
-                    console.log('validate');
-                    isInvalid = true;
-                    // hasError = true;
-                    break; // Stop further validation on the first error
-                }
-            }
-
-            for (const chunk of chunks) {
-                if (
-                    this.eventLogValidationService.checkForMultiplicityPattern(
-                        chunk,
-                    )
-                ) {
-                    console.log('***');
-                    hasMultiplicityError = true;
-                    // hasError = true;
-                    break; // Stop further validation on the first error
-                }
-            }
-                */
 
             const isValid = this.eventLogValidationService.validateInput(input);
             const hasMultiplicityError =
@@ -191,49 +94,11 @@ export class EventLogDialogComponent implements OnInit {
                 errors['multiplicityRegEx'] = true;
             }
 
-            // Ensure we are not overwriting 'required' error
-            // if (currentErrors.hasOwnProperty('required')) {
-            //     delete errors['required'];
-            // }
-
-            // Set errors based on the results
-            // const hasErrors = Object.keys(errors).length > 0;
-            // if (Object.keys(errors).length > 0) {
-            //     console.log('error sets');
-            //     control.markAsDirty();
-            //     control.setErrors(errors);
-
-            //     console.log(errors);
-            // } else {
-            //     control.setErrors(null);
-            // }
-
             control.setErrors(Object.keys(errors).length > 0 ? errors : null);
             control.markAsDirty();
 
             this.cdr.detectChanges();
-        }, 300); // Debounce time
-    }
-
-    private isValidInput(input: string): boolean {
-        // Optimized validation for large inputs
-        try {
-            return this.eventLogValidationService.validateInput(input);
-        } catch (error) {
-            console.error('Validation error:', error);
-            return false; // Or handle the error as needed
-        }
-    }
-
-    private checkMultiplicity(input: string): boolean {
-        try {
-            return this.eventLogValidationService.checkForMultiplicityPattern(
-                input,
-            );
-        } catch (error) {
-            console.error('Multiplicity check error:', error);
-            return true; // Or handle the error as needed (e.g., return false)
-        }
+        }, 2);
     }
 
     public onOkClick(): void {
