@@ -72,6 +72,7 @@ export class CalculateCoordinatesService {
                 playActivity.name,
                 initialXCoordinate,
                 initialYCoordinate,
+                dfg.id,
             ),
         );
         const neighbours: Activities =
@@ -103,6 +104,7 @@ export class CalculateCoordinatesService {
                 stackElement.activity.name,
                 stackElement.source_x + gapX,
                 yCoordinate,
+                dfg.id,
             );
             nodes.push(activityAsNode);
 

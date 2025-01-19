@@ -20,6 +20,14 @@ export abstract class Node {
     get y(): number {
         return this._node.y;
     }
+
+    set x(x: number) {
+        this._node.x = x;
+    }
+
+    set y(y: number) {
+        this._node.y = y;
+    }
 }
 
 export class Place extends Node {
@@ -29,8 +37,16 @@ export class Place extends Node {
 }
 
 export class Activity extends Node {
+    private readonly _dfgId: string;
+
     constructor(node: ActivityNode) {
         super(node);
+
+        this._dfgId = node.dfg;
+    }
+
+    get dfgId(): string {
+        return this._dfgId;
     }
 }
 
@@ -58,7 +74,7 @@ export class Box extends Node {
 
         this._width = node.width;
         this._height = node.height;
-        this._eventLog = node.eventLog
+        this._eventLog = node.eventLog;
     }
 
     get width(): number {
