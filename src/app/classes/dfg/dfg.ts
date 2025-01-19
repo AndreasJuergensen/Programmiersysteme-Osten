@@ -20,31 +20,110 @@ export class Dfg implements PetriNetTransition {
         this.id = 'DFG' + ++Dfg.idCount;
     }
 
+    canBeCutBy(
+        selectedArcs: Arcs,
+        cutType: CutType,
+    ): {
+        cutIsPossible: boolean;
+        matchingCut: CutType | null;
+        a1: Activities;
+        a2: Activities;
+    }[] {
+        const results = [];
+        let partitionsCount = 0;
+        const partitions: Activities[] = this.calculatePartitions(selectedArcs);
+        const a1: Activities = partitions[0];
+        const a2: Activities = partitions[1];
+        const selectedCut = this.canBeCutIn(a1, a2);
+        results[partitionsCount++] = selectedCut;
+        if (!selectedCut.cutIsPossible || selectedCut.matchingCut !== cutType) {
+            return results;
+        }
+        for (const arc of selectedArcs.getArcs()) {
+            const reducedArcs: Arcs = selectedArcs.removeArcsBy(
+                new Arcs([arc]),
+            );
+            const partitions: Activities[] =
+                this.calculatePartitions(reducedArcs);
+            const reducedA1: Activities = partitions[0];
+            const reducedA2: Activities = partitions[1];
+            results[partitionsCount++] = this.canBeCutIn(reducedA1, reducedA2);
+        }
+        return results;
+    }
+
     canBeCutIn(
         a1: Activities,
         a2: Activities,
-    ): { result: boolean; matchingcut: CutType | null } {
+    ): {
+        cutIsPossible: boolean;
+        matchingCut: CutType | null;
+        a1: Activities;
+        a2: Activities;
+    } {
         if (new ExclusiveCut(a1, a2).isPossible(this.activities, this.arcs)) {
-            return { result: true, matchingcut: CutType.ExclusiveCut };
+            return {
+                cutIsPossible: true,
+                matchingCut: CutType.ExclusiveCut,
+                a1,
+                a2,
+            };
         }
         if (new SequenceCut(a1, a2).isPossible(this.activities, this.arcs)) {
-            return { result: true, matchingcut: CutType.SequenceCut };
+            return {
+                cutIsPossible: true,
+                matchingCut: CutType.SequenceCut,
+                a1,
+                a2,
+            };
         }
         if (new ParallelCut(a1, a2).isPossible(this.activities, this.arcs)) {
-            return { result: true, matchingcut: CutType.ParallelCut };
+            return {
+                cutIsPossible: true,
+                matchingCut: CutType.ParallelCut,
+                a1,
+                a2,
+            };
         }
         if (new LoopCut(a1, a2).isPossible(this.activities, this.arcs)) {
-            return { result: true, matchingcut: CutType.LoopCut };
+            return {
+                cutIsPossible: true,
+                matchingCut: CutType.LoopCut,
+                a1,
+                a2,
+            };
         }
 
-        return { result: false, matchingcut: null };
+        return { cutIsPossible: false, matchingCut: null, a1, a2 };
+    }
+
+    canBeCutByAnyPartitions(): boolean {
+        const copy: Activities = new Activities()
+            .addAll(this.activities)
+            .removePlayAndStop();
+        for (let mask = 1; mask < 1 << copy.getLength(); mask++) {
+            const sub1: Activities = new Activities();
+            const sub2: Activities = new Activities();
+            for (let i = 0; i < copy.getLength(); i++) {
+                const activity: Activity = copy.getActivityByIndex(i);
+                if ((mask & (1 << i)) !== 0) {
+                    sub1.addActivity(activity);
+                } else {
+                    sub2.addActivity(activity);
+                }
+            }
+            if (this.canBeCutIn(sub1, sub2).cutIsPossible) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /* 
-    cuttedArcs are the arcs that are choosen by user for cut, the return
-    partitions contain activities from this DFG divided into two partitions,
-    each one without play and stop and without any assurance for completeness
-    */
+        cuttedArcs are the arcs that are choosen by user for cut, the return
+        partitions contain activities from this DFG divided into two partitions,
+        each one without play and stop and without any assurance for completeness
+        */
     calculatePartitions(cuttedArcs: Arcs): Activities[] {
         const a1: Activities =
             this.arcs.calculateActivityPartitionByActivitiesReachableFromPlay(
@@ -64,28 +143,6 @@ export class Dfg implements PetriNetTransition {
             )
             .removePlayAndStop();
         return [a1, a2];
-    }
-
-    canBeCutByAnyPartitions(): boolean {
-        const copy: Activities = new Activities()
-            .addAll(this.activities)
-            .removePlayAndStop();
-        for (let mask = 1; mask < 1 << copy.getLength(); mask++) {
-            const sub1: Activities = new Activities();
-            const sub2: Activities = new Activities();
-            for (let i = 0; i < copy.getLength(); i++) {
-                const activity: Activity = copy.getActivityByIndex(i);
-                if ((mask & (1 << i)) !== 0) {
-                    sub1.addActivity(activity);
-                } else {
-                    sub2.addActivity(activity);
-                }
-            }
-            if (this.canBeCutIn(sub1, sub2).result) {
-                return true;
-            }
-        }
-        return false;
     }
 
     isBaseCase(): boolean {
