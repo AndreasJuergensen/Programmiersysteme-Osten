@@ -28,7 +28,7 @@ import { Arc } from '../models';
                 ></svg:path>
             </svg:marker>
             <svg:marker
-                id="arrowhead-red"
+                id="arrowhead-white"
                 viewBox="0 0 10 10"
                 markerWidth="10"
                 markerHeight="10"
@@ -38,8 +38,8 @@ import { Arc } from '../models';
             >
                 <svg:path
                     d="M 1,1 L 9,5 L 1,9 Z"
-                    [attr.fill]="'red'"
-                    [attr.stroke]="'red'"
+                    [attr.fill]="'white'"
+                    [attr.stroke]="'white'"
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>

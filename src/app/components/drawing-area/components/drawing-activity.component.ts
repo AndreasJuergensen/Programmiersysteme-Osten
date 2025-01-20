@@ -36,12 +36,12 @@ import { Activity } from '../models';
     styles: `
         rect:hover {
             cursor: pointer;
-            stroke-width: 5;
-            stroke: #085c5c;
+            stroke-width: 3;
+            stroke-opacity: 0.5;
         }
         rect.activity-marked {
-            stroke-width: 5;
-            stroke: #085c5c;
+            stroke-width: 3;
+            stroke: rgb(228, 54, 115);
         }
         .draggable {
             cursor: move;
