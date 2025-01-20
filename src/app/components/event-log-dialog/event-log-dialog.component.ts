@@ -98,7 +98,7 @@ export class EventLogDialogComponent implements OnInit {
             control.markAsDirty();
 
             this.cdr.detectChanges();
-        }, 2);
+        }, 1);
     }
 
     public onOkClick(): void {

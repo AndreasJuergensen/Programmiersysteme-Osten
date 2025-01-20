@@ -23,7 +23,7 @@ export class EventLogValidationService {
     }
 
     private validateInputInChunks(input: string, pattern: RegExp): boolean {
-        const chunkSize = 5000;
+        const chunkSize = 50000;
 
         if (input.length <= chunkSize) {
             return pattern.test(input);
