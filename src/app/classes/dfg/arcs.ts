@@ -185,6 +185,81 @@ export class Arcs {
         return false;
     }
 
+    getReverseArcs(): Arcs {
+        const reverseArcs: Arcs = new Arcs();
+        const foundReverses: Set<string> = new Set(); // Use a Set to track found pairs
+
+        for (const arc of this.arcs) {
+            const start = arc.getStart();
+            const end = arc.getEnd();
+            const arcKey = `${start.toString()}-${end.toString()}`; // Create a unique key for the arc
+
+            // Skip if we already processed this arc as part of a reversed pair
+            if (foundReverses.has(arcKey)) {
+                continue;
+            }
+
+            for (const otherArc of this.arcs) {
+                if (arc === otherArc) continue; // Skip comparing the arc to itself
+                const otherStart = otherArc.getStart();
+                const otherEnd = otherArc.getEnd();
+
+                if (start.equals(otherEnd) && end.equals(otherStart)) {
+                    reverseArcs.addArc(arc);
+                    reverseArcs.addArc(otherArc); // Add both arcs to the result
+                    const reverseKey = `${otherStart.toString()}-${otherEnd.toString()}`;
+                    foundReverses.add(arcKey); // Mark both directions as found
+                    foundReverses.add(reverseKey);
+                    break; // Once a match is found for the current arc, no need to check further
+                }
+            }
+        }
+
+        return reverseArcs;
+    }
+
+    getNonReversedArcs(): Arcs {
+        const nonReversedArcs: Arcs = new Arcs();
+        const reversedArcs: Set<string> = new Set();
+        const arcsToCheck: DfgArc[] = this.arcs.filter(
+            (arc) => !arc.getStart().isPlay() && !arc.getEnd().isStop(),
+        );
+
+        // First, identify all reversed arcs (as in the previous solution)
+        for (const arc of arcsToCheck) {
+            const start = arc.getStart();
+            const end = arc.getEnd();
+            const arcKey = `${start.toString()}-${end.toString()}`;
+
+            for (const otherArc of arcsToCheck) {
+                if (arc === otherArc) continue;
+
+                const otherStart = otherArc.getStart();
+                const otherEnd = otherArc.getEnd();
+
+                if (start.equals(otherEnd) && end.equals(otherStart)) {
+                    const reverseKey = `${otherStart.toString()}-${otherEnd.toString()}`;
+                    reversedArcs.add(arcKey);
+                    reversedArcs.add(reverseKey);
+                    break;
+                }
+            }
+        }
+
+        // Now, add arcs that are NOT in the reversedArcs set
+        for (const arc of arcsToCheck) {
+            const start = arc.getStart();
+            const end = arc.getEnd();
+            const arcKey = `${start.toString()}-${end.toString()}`;
+
+            if (!reversedArcs.has(arcKey)) {
+                nonReversedArcs.addArc(arc);
+            }
+        }
+
+        return nonReversedArcs;
+    }
+
     getArcByStartNameAndEndName(
         start: string,
         end: string,

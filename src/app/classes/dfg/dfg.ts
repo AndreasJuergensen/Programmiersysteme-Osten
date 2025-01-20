@@ -30,8 +30,8 @@ export class Dfg implements PetriNetTransition {
         private readonly _eventLog: EventLog,
     ) {
         this.id = 'DFG' + ++Dfg.idCount;
-        console.log('Number of all arcs');
-        console.log(this._arcs.getArcs().length);
+        // console.log('Number of all arcs');
+        // console.log(this._arcs.getArcs().length);
 
         this.initializePossibleCut();
         // console.log('cuts initialized');
@@ -48,6 +48,8 @@ export class Dfg implements PetriNetTransition {
         // );
         this.initializeArcSubsets();
         // console.log('arcs initialized');
+        // console.log(this._arcs.getNonReversedArcs());
+        // console.log(this.arcs.removeArcsBy(this.arcs.getNonReversedArcs()));
     }
 
     // Methode wird beim Erstellen des Objekts aufgerufen
@@ -61,7 +63,7 @@ export class Dfg implements PetriNetTransition {
         // console.log(this.getAllPossibleCuts());
 
         if (this.getPossibleCut() === undefined) {
-            console.log('nothing');
+            // console.log('nothing');
 
             const noSubsets: Array<DfgArc> = [];
 
@@ -87,16 +89,22 @@ export class Dfg implements PetriNetTransition {
                     break;
                 case CutType.SequenceCut:
                     console.log('sequence');
+                    const filteredSequenceArcs = this.arcs.removeArcsBy(
+                        this.arcs.getReverseArcs(),
+                    );
                     this._arcSubsets =
                         this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
-                            this._arcs.getArcs(),
+                            filteredSequenceArcs.getArcs(),
                         );
                     break;
                 case CutType.ParallelCut:
                     console.log('parallel');
+                    const filteredParallelArcs = this.arcs.removeArcsBy(
+                        this.arcs.getNonReversedArcs(),
+                    );
                     this._arcSubsets =
                         this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
-                            this._arcs.getArcs(),
+                            filteredParallelArcs.getArcs(),
                         );
                     break;
                 case CutType.LoopCut:
@@ -246,9 +254,9 @@ export class Dfg implements PetriNetTransition {
             .addAll(this.activities)
             .removePlayAndStop();
 
-        console.log('Number of all activities');
+        // console.log('Number of all activities');
 
-        console.log(allActivities.getLength());
+        // console.log(allActivities.getLength());
 
         const testedCombinations = new Set<string>();
         for (let mask = 1; mask < 1 << allActivities.getLength(); mask++) {
@@ -313,7 +321,7 @@ export class Dfg implements PetriNetTransition {
             a2: Activities;
         }[] = [];
         if (this.getPossibleCut() === undefined) {
-            console.log('empty cuts');
+            // console.log('empty cuts');
 
             return subsets;
         }
