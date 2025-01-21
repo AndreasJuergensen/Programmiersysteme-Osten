@@ -4,17 +4,95 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export class EventLogValidationService {
-    /* [^\+\s]+ = 1 bis n beliebige Zeichen außer "+" und Leerzeichen
-    ((?:\s[^\+\s]+)*|(?:\s?\+\s?[^\+\s]+)*(?:\s[^\+\s]+)*)* eine Alternative folgt
-        entweeder ein Leerzeichen gefolgt von einem String ohne Plus und Leerzeichen (0 bis n mal) ODER
-        ein Plus mit optionalen Leerzeichen gefolgt von einem String ohne Plus und Leerzeichen (0 bis n mal) 
-        gefolgt von einem Leerzeichen gefolgt einem String ohne Plus und Leerzeichen (0 bis n mal)*/
-
     private readonly validEventLogPattern =
-        /^[^\+\s]+((?:\s[^\+\s]+)*|(?:\s*\+\s*[^\+\s]+)*(?:\s[^\+\s]+)*)*$/;
+        /^[^\+\s]+(?:\s[^\+\s]+|\s*\+\s*[^\+\s]+)*$/;
+    private readonly multiplicityPattern =
+        /[0-9]+[\*{1}][^\*^0-9]+|[^\*^0-9]+[\*{1}][0-9]+/;
+
     constructor() {}
 
     validateInput(input: string): boolean {
-        return this.validEventLogPattern.test(input);
+        return this.validateInputInChunks(input, this.validEventLogPattern);
+    }
+
+    checkForMultiplicityPattern(input: string): boolean {
+        return this.checkForMultiplicitiesInChunks(
+            input,
+            this.multiplicityPattern,
+        );
+    }
+
+    private validateInputInChunks(input: string, pattern: RegExp): boolean {
+        const chunkSize = 50000;
+
+        if (input.length <= chunkSize) {
+            return pattern.test(input);
+        }
+
+        let start = 0;
+        while (start < input.length) {
+            let end = Math.min(start + chunkSize, input.length);
+            if (end < input.length) {
+                while (
+                    end <= input.length &&
+                    (input[end] === ' ' ||
+                        input[end] === '+' ||
+                        input[end + 1] === ' ' ||
+                        input[end + 1] === '+')
+                ) {
+                    end++;
+                }
+            }
+
+            let chunk = input.substring(start, end + 1);
+
+            if (!pattern.test(chunk)) {
+                return false;
+            }
+
+            start = end;
+        }
+
+        return true;
+    }
+
+    private checkForMultiplicitiesInChunks(
+        input: string,
+        pattern: RegExp,
+    ): boolean {
+        const chunkSize = 5000;
+
+        if (input.length <= chunkSize) {
+            return pattern.test(input);
+        }
+
+        let start = 0;
+        while (start < input.length) {
+            let end = Math.min(start + chunkSize, input.length);
+
+            if (end < input.length) {
+                while (
+                    end <= input.length &&
+                    (input[end] === ' ' ||
+                        input[end] === '+' ||
+                        input[end] === '*' ||
+                        input[end + 1] === ' ' ||
+                        input[end + 1] === '+' ||
+                        input[end + 1] === '*')
+                ) {
+                    end++;
+                }
+            }
+
+            let chunk = input.substring(start, end + 1);
+
+            if (pattern.test(chunk)) {
+                return true;
+            }
+
+            start = end;
+        }
+
+        return false;
     }
 }

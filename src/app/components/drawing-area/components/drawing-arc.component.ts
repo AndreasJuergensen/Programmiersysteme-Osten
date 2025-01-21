@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Arc } from '../models';
 import { environment } from 'src/environments/environment';
-import { CollectArcsService } from 'src/app/services/collect-arcs.service';
+import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 
 @Component({
@@ -141,7 +141,7 @@ export class DrawingArcComponent {
     @Input({ required: true }) arc!: Arc;
 
     constructor(
-        private collectArcsService: CollectArcsService,
+        private collectSelectedElementsService: CollectSelectedElementsService,
         private feedbackService: ShowFeedbackService,
     ) {}
 
@@ -174,8 +174,12 @@ export class DrawingArcComponent {
                 path.setAttribute('marker-end', 'url(#arrowhead-deepskyblue)');
             } else if (svg.classList.contains('mouseDown')) {
                 this.timeoutId = setTimeout(() => {
-                    if (this.collectArcsService.isDFGArc(arc)) {
-                        if (this.collectArcsService.isArcinSameDFG(arc)) {
+                    if (this.collectSelectedElementsService.isDFGArc(arc)) {
+                        if (
+                            this.collectSelectedElementsService.isArcinSameDFG(
+                                arc,
+                            )
+                        ) {
                             if (!path.classList.contains('active')) {
                                 path.classList.toggle('active');
                                 path.setAttribute(
@@ -200,7 +204,9 @@ export class DrawingArcComponent {
                                     'url(#arrowhead)',
                                 );
                             }
-                            this.collectArcsService.updateCollectedArcs(arc);
+                            this.collectSelectedElementsService.updateCollectedArcs(
+                                arc,
+                            );
                         } else {
                             this.feedbackService.showMessage(
                                 'Arc not in same DFG',
@@ -238,8 +244,8 @@ export class DrawingArcComponent {
         const rect = event.target as SVGRectElement;
         const line = rect.nextElementSibling as SVGLineElement;
 
-        if (this.collectArcsService.isDFGArc(arc)) {
-            if (this.collectArcsService.isArcinSameDFG(arc)) {
+        if (this.collectSelectedElementsService.isDFGArc(arc)) {
+            if (this.collectSelectedElementsService.isArcinSameDFG(arc)) {
                 if (line) {
                     line.classList.toggle('active');
                 }
@@ -252,7 +258,7 @@ export class DrawingArcComponent {
                 if (line.classList.contains('wrong')) {
                     line.classList.remove('wrong');
                 }
-                this.collectArcsService.updateCollectedArcs(arc);
+                this.collectSelectedElementsService.updateCollectedArcs(arc);
             } else {
                 this.feedbackService.showMessage('Arc not in same DFG', true);
             }
@@ -302,6 +308,6 @@ export class DrawingArcComponent {
     }
 
     private pathNecessary(arc: Arc): boolean {
-        return this.collectArcsService.overlayArcsExistsInDFGs(arc);
+        return this.collectSelectedElementsService.overlayArcsExistsInDFGs(arc);
     }
 }

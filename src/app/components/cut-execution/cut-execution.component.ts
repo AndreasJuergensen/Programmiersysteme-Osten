@@ -7,7 +7,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonModule } from '@angular/material/button';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
-import { CollectArcsService } from 'src/app/services/collect-arcs.service';
+import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 
 export enum CutType {
     ExclusiveCut = 'ExclusiveCut',
@@ -42,7 +42,7 @@ export class CutExecutionComponent implements OnInit {
         private _executeCutService: ExecuteCutService,
         private _feedbackService: ShowFeedbackService,
         private _petriNetManagementService: PetriNetManagementService,
-        private _collectArcsService: CollectArcsService,
+        private _collectSelectedElementsService: CollectSelectedElementsService,
     ) {
         this.radioForm = this._fb.group({
             selectedCut: null,
@@ -55,32 +55,29 @@ export class CutExecutionComponent implements OnInit {
 
     onCutClick(): void {
         const selectedValue = this.radioForm.get('selectedCut')?.value;
-        if (selectedValue && this._collectArcsService.currentDFG) {
+        if (
+            selectedValue &&
+            this._collectSelectedElementsService.currentCollectedArcsDFG
+        ) {
             if (
                 this._executeCutService.execute(
-                    this._collectArcsService.currentDFG,
-                    this._collectArcsService.collectedArcs,
+                    this._collectSelectedElementsService
+                        .currentCollectedArcsDFG,
+                    this._collectSelectedElementsService.collectedArcs,
                     selectedValue,
                 )
             ) {
                 this.resetRadioSelection();
-                this._collectArcsService.resetCollectedArcs();
             } else {
-                // this._collectArcsService.currentDFG.getCorrectArcsBasedOnSelectedArcs(
-                //     this._collectArcsService.collectedArcs,
-                //     selectedValue,
-                // );
                 this.resetRadioSelection();
-                // console.log(this._collectArcsService.currentDFG);
-
-                this._collectArcsService.setCorrectArcs(selectedValue);
-                // this._feedbackService.showMessage(
-                //     'Not a valid Cut! Please try again!',
-                //     true,
-                //     'The chosen arcs do not fit the selected cut. Please try again. For help use the help-button.',
-                // );
+                this._collectSelectedElementsService.setCorrectArcs(
+                    selectedValue,
+                );
             }
-        } else if (!selectedValue && this._collectArcsService.currentDFG) {
+        } else if (
+            !selectedValue &&
+            this._collectSelectedElementsService.currentCollectedArcsDFG
+        ) {
             this._feedbackService.showMessage(
                 'No cut selected via radio buttons!',
                 true,
@@ -88,7 +85,8 @@ export class CutExecutionComponent implements OnInit {
             );
         } else if (
             selectedValue &&
-            this._collectArcsService.currentDFG == undefined
+            this._collectSelectedElementsService.currentCollectedArcsDFG ==
+                undefined
         ) {
             this._feedbackService.showMessage(
                 'No arc selected via the drawing area!',
@@ -124,7 +122,7 @@ export class CutExecutionComponent implements OnInit {
     onCancelClick(): void {
         if (this.radioForm.get('selectedCut')?.value !== null) {
             this.resetRadioSelection();
-            this._collectArcsService.resetCollectedArcs();
+            this._collectSelectedElementsService.resetSelectedElements();
             this._feedbackService.showMessage('Canceled cut-selection!', false);
         }
     }

@@ -3,16 +3,16 @@
     <form (ngSubmit)="onOkClick()">
         <mat-form-field
             style="width: 100%"
-            hintLabel="Activities per trace concatenated by exactly one whitespace.
-                The traces concatenated by a plus (+). The whitespaces before
-                and after the plus are optional. No empty input is allowed."
+            hintLabel="Activities per trace may concatenated by exactly one whitespace.
+                Traces may concatenated by a plus (+). Empty input and multiplicity-patterns like '3*A' or 'B*4' can't be used."
         >
             <mat-label>Enter Event-Log here!</mat-label>
             <textarea
                 matInput
                 cdkTextareaAutosize
                 cdkAutosizeMinRows="4"
-                placeholder="A B C + D+F + Y Z ..."
+                cdkAutosizeMaxRows="15"
+                placeholder="Place your event-log activities here, e. g.: A + More Activities + B, or use the file upload"
                 [formControl]="eventLogControl"
                 cdkFocusInitial
                 (keydown)="onKeyDown($event)"
@@ -26,14 +26,14 @@
             >
                 There is no empty input allowed!
             </mat-error>
-            <mat-error
-                *ngIf="
-                    eventLogControl.hasError('invalidInput') &&
-                    eventLogControl.dirty
-                "
-            >
-                Invalid Input Reason: A leading plus at the beginning, too many
-                whitespaces in a row or too many plus signs
+            <mat-error *ngIf="eventLogControl.hasError('multiplicityRegEx')">
+                The Input of multiplicity-patterns through a "*" is not
+                possible.
+            </mat-error>
+            <mat-error *ngIf="eventLogControl.hasError('invalidInput')">
+                Invalid Input! Reason: A plus at the beginning or the end of the
+                string, too many whitespaces in a row between activities or too
+                many plus signs.
             </mat-error>
         </mat-form-field>
         <mat-dialog-actions align="end">

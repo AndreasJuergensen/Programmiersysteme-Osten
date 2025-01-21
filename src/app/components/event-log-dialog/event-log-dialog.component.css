@@ -5,7 +5,11 @@
 .mat-mdc-dialog-actions {
     display: flex;
     flex-direction: row;
-    padding: 40px 0 20px 0;
+    padding: 50px 0 20px 0;
+}
+
+.mat-mdc-input-element {
+    padding: 5px 0 0 0;
 }
 
 .mat-mdc-dialog-content {
