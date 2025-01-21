@@ -3,9 +3,8 @@
     <form (ngSubmit)="onOkClick()">
         <mat-form-field
             style="width: 100%"
-            hintLabel="Activities per trace concatenated by exactly one whitespace.
-                The traces concatenated by a plus (+). The whitespaces before
-                and after the plus are optional. Empty input and the input of multiplicity-patterns like '3*A' or 'B*4' aren't allowed."
+            hintLabel="Activities per trace may concatenated by exactly one whitespace.
+                Traces may concatenated by a plus (+). Empty input and multiplicity-patterns like '3*A' or 'B*4' can't be used."
         >
             <mat-label>Enter Event-Log here!</mat-label>
             <textarea
@@ -13,7 +12,7 @@
                 cdkTextareaAutosize
                 cdkAutosizeMinRows="4"
                 cdkAutosizeMaxRows="15"
-                placeholder="A B C + testAktivitaet1+testAktivitaet2 (activity) + Aktivitaet3 Z (P) L ..."
+                placeholder="Place your event-log activities here, e. g.: A + More Activities + B, or use the file upload"
                 [formControl]="eventLogControl"
                 cdkFocusInitial
                 (keydown)="onKeyDown($event)"
