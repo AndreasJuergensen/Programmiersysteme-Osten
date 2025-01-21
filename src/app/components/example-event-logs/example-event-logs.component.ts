@@ -97,6 +97,49 @@ export class ExampleEventLogsComponent {
         this.initializePetriNet(eventLog);
     }
 
+    public generateFUHProcessMiningExample(): void {
+        const traces: Trace[] = [
+            new Trace([new Activity('SetPc'), new Activity('SetCfp')]),
+            new Trace([
+                new Activity('SuggestPc'),
+                new Activity('SetUpCfp'),
+                new Activity('SendInvites'),
+                new Activity('ReceiveAnswers'),
+                new Activity('FinalizePc'),
+                new Activity('FinalizeCfp'),
+            ]),
+            new Trace([
+                new Activity('SuggestPc'),
+                new Activity('SendInvites'),
+                new Activity('SetUpCfp'),
+                new Activity('ReceiveAnswers'),
+                new Activity('FinalizePc'),
+                new Activity('FinalizeCfp'),
+            ]),
+            new Trace([
+                new Activity('SuggestPc'),
+                new Activity('SendInvites'),
+                new Activity('ReceiveAnswers'),
+                new Activity('SetUpCfp'),
+                new Activity('FinalizePc'),
+                new Activity('FinalizeCfp'),
+            ]),
+            new Trace([
+                new Activity('SuggestPc'),
+                new Activity('SendInvites'),
+                new Activity('ReceiveAnswers'),
+                new Activity('UpdateInvitees'),
+                new Activity('SendInvites'),
+                new Activity('ReceiveAnswers'),
+                new Activity('FinalizePc'),
+                new Activity('SetUpCfp'),
+                new Activity('FinalizeCfp'),
+            ]),
+        ];
+        const eventLog: EventLog = new EventLog(traces);
+        this.initializePetriNet(eventLog);
+    }
+
     private initializePetriNet(eventLog: EventLog): void {
         Dfg.resetIdCount();
         const dfg: Dfg = this._calculateDfgService.calculate(eventLog);
