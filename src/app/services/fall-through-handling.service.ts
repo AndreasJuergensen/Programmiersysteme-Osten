@@ -5,6 +5,7 @@ import { PetriNetManagementService } from './petri-net-management.service';
 import { ShowFeedbackService } from './show-feedback.service';
 import { Dfg } from '../classes/dfg/dfg';
 import { CalculateDfgService } from './calculate-dfg.service';
+import { CollectSelectedElementsService } from './collect-selected-elements.service';
 import { Activity } from '../classes/dfg/activities';
 
 @Injectable({
@@ -12,13 +13,12 @@ import { Activity } from '../classes/dfg/activities';
 })
 export class FallThroughHandlingService {
     private _petriNet!: PetriNet;
-    private _timeoutID: any;
-    private _resolvePromise: (value: string) => void = () => {};
 
     constructor(
         private _petriNetManagementService: PetriNetManagementService,
         private _showFeedbackService: ShowFeedbackService,
         private _calculateDfgService: CalculateDfgService,
+        private _collectSelectedElementsService: CollectSelectedElementsService,
     ) {
         this._petriNetManagementService.petriNet$.subscribe((pn) => {
             this._petriNet = pn;
@@ -26,63 +26,24 @@ export class FallThroughHandlingService {
     }
 
     executeActivityOncePerTraceFallThrough(): void {
-        this._showFeedbackService.showMessage(
-            'Select the activity you want to detach.',
-            false,
-        );
-        this.startWaitingForActivityClick('aopt');
-    }
-
-    executeFlowerFallThrough(): void {
-        this._showFeedbackService.showMessage(
-            'Select any activity from the DFG for which a Flower-Model should be created.',
-            false,
-        );
-        this.startWaitingForActivityClick('flower');
-    }
-
-    private startWaitingForActivityClick(caller: string): void {
-        if (caller === 'aopt') {
-            this.waitForActivityClick()
-                .then((response) => {
-                    this.continueAOPTExecution(response);
-                })
-                .catch((error) => {
-                    this._showFeedbackService.showMessage(error, true);
-                });
+        const activity: Activity | undefined =
+            this._collectSelectedElementsService.selectedActivity;
+        if (activity === undefined) {
+            this._showFeedbackService.showMessage(
+                'An Activity need to be selected first.',
+                true,
+            );
+            return;
         }
-        if (caller === 'flower') {
-            this.waitForActivityClick()
-                .then((response) => {
-                    this.continueFlowerExecution(response);
-                })
-                .catch((error) => {
-                    this._showFeedbackService.showMessage(error, true);
-                });
-        }
-    }
-
-    private waitForActivityClick(): Promise<string> {
-        return new Promise((resolve, reject) => {
-            this._resolvePromise = resolve;
-            this._timeoutID = setTimeout(() => {
-                reject('No activity clicked, Fall-Through attempt aborted.');
-            }, 10000);
-        });
-    }
-
-    private continueAOPTExecution(activityName: string): void {
         for (const dfg of this._petriNet.getDFGs()) {
-            if (dfg.activities.containsActivityWithName(activityName)) {
+            if (dfg.activities.containsActivity(activity)) {
                 if (dfg.canBeCutByAnyPartitions()) {
                     this._showFeedbackService.showMessage(
-                        'Another cut can be performed in this DFG, try this first.',
+                        'Another cut can be performed in the selected DFG, try this first.',
                         true,
                     );
                     return;
                 }
-                const activity: Activity =
-                    dfg.activities.getActivityByName(activityName);
                 if (dfg.eventLog.activityOncePerTraceIsPossibleBy(activity)) {
                     const eventLogs: [EventLog, EventLog] =
                         dfg.eventLog.splitByActivityOncePerTrace(activity);
@@ -114,55 +75,52 @@ export class FallThroughHandlingService {
         }
     }
 
-    continueFlowerExecution(activityName: string): void {
-        for (const dfg of this._petriNet.getDFGs()) {
-            if (dfg.activities.containsActivityWithName(activityName)) {
-                if (dfg.canBeCutByAnyPartitions()) {
+    executeFlowerFallThrough(): void {
+        const dfg: Dfg | undefined =
+            this._collectSelectedElementsService.selectedDFG;
+        if (dfg === undefined) {
+            this._showFeedbackService.showMessage(
+                'A DFG-Box need to be selected first.',
+                true,
+            );
+            return;
+        }
+        if (dfg.canBeCutByAnyPartitions()) {
+            this._showFeedbackService.showMessage(
+                'Another cut can be performed in the selected DFG, try this first.',
+                true,
+            );
+            return;
+        }
+        const eventLog: EventLog = dfg.eventLog;
+        for (const trace of eventLog.getAllTraces()) {
+            for (const activity of trace.getAllActivities()) {
+                if (eventLog.activityOncePerTraceIsPossibleBy(activity)) {
                     this._showFeedbackService.showMessage(
-                        'Another cut can be performed in this DFG, try this first.',
+                        'Another Fall-Through can be performed in this DFG, try this first.',
                         true,
                     );
                     return;
                 }
-                const eventLog: EventLog = dfg.eventLog;
-                for (const trace of eventLog.getAllTraces()) {
-                    for (const activity of trace.getAllActivities()) {
-                        if (
-                            eventLog.activityOncePerTraceIsPossibleBy(activity)
-                        ) {
-                            this._showFeedbackService.showMessage(
-                                'Another Fall-Through can be performed in this Petri Net, try this first.',
-                                true,
-                            );
-                            return;
-                        }
-                    }
-                }
-                const eventLogs: EventLog[] =
-                    eventLog.splitByFlowerFallThrough();
-                const subDFGs: Dfg[] = [];
-                for (const log of eventLogs) {
-                    subDFGs.push(this._calculateDfgService.calculate(log));
-                }
-                this._petriNetManagementService.updatePnByFlowerFallThrough(
-                    dfg,
-                    subDFGs,
-                );
-                if (this._petriNet.isBasicPetriNet()) {
-                    this._petriNetManagementService.showEventLogCompletelySplitted();
-                    return;
-                }
             }
+        }
+        const eventLogs: EventLog[] = eventLog.splitByFlowerFallThrough();
+        const subDFGs: Dfg[] = [];
+        for (const log of eventLogs) {
+            subDFGs.push(this._calculateDfgService.calculate(log));
+        }
+        this._petriNetManagementService.updatePnByFlowerFallThrough(
+            dfg,
+            subDFGs,
+        );
+        if (this._petriNet.isBasicPetriNet()) {
+            this._petriNetManagementService.showEventLogCompletelySplitted();
+            return;
         }
         this._showFeedbackService.showMessage(
             'Flower-Model Fall-Through executed',
             false,
         );
         return;
-    }
-
-    processActivityClick(activityName: string) {
-        clearTimeout(this._timeoutID);
-        this._resolvePromise(activityName);
     }
 }

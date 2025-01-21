@@ -65,12 +65,10 @@ export class DrawingBoxComponent {
         environment.drawingElements.boxes.strokeWidth;
 
     onBoxClick(event: Event, box: Box) {
-        this._collectSelectedElementsService.updateSelectedDFG(box.id);
         const rect = event.target as SVGRectElement;
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
-
         if (svg) {
             const boxes = svg.querySelectorAll('rect');
             boxes.forEach((box) => {
@@ -81,5 +79,6 @@ export class DrawingBoxComponent {
                 }
             });
         }
+        this._collectSelectedElementsService.updateSelectedDFG(box.id);
     }
 }

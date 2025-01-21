@@ -42,7 +42,6 @@ export class DrawingActivityComponent {
     @Input({ required: true }) activity!: Activity;
 
     constructor(
-        private _fallThroughHandlingService: FallThroughHandlingService,
         private _collectSelectedElementsService: CollectSelectedElementsService,
     ) {}
 
@@ -61,14 +60,10 @@ export class DrawingActivityComponent {
         environment.drawingElements.activities.strokeWidth;
 
     onActivityClick(event: Event, activity: Activity): void {
-        this._collectSelectedElementsService.updateSelectedActivity(
-            activity.id,
-        );
         const rect = event.target as SVGRectElement;
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
-
         if (svg) {
             const activities = svg.querySelectorAll('rect');
             activities.forEach((activity) => {
@@ -79,6 +74,8 @@ export class DrawingActivityComponent {
                 }
             });
         }
-        this._fallThroughHandlingService.processActivityClick(activity.id);
+        this._collectSelectedElementsService.updateSelectedActivity(
+            activity.id,
+        );
     }
 }
