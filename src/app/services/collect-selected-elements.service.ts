@@ -1,28 +1,25 @@
 import { Injectable } from '@angular/core';
 import { Arcs, DfgArc } from '../classes/dfg/arcs';
-import {
-    PetriNetArcs,
-    PlaceToTransitionArc,
-    TransitionToPlaceArc,
-} from '../classes/petrinet/petri-net-arcs';
 import { PetriNet } from '../classes/petrinet/petri-net';
-import { Dfg, DfgBuilder } from '../classes/dfg/dfg';
-import { Subscription } from 'rxjs';
+import { Dfg } from '../classes/dfg/dfg';
 import { Arc } from '../components/drawing-area/models';
 import { PetriNetManagementService } from './petri-net-management.service';
+import { Activity } from '../classes/dfg/activities';
 
 @Injectable({
     providedIn: 'root',
 })
-export class CollectArcsService {
-    private petriNet!: PetriNet;
+export class CollectSelectedElementsService {
+    private _petriNet!: PetriNet;
     private _collectedArcs: Arcs = new Arcs();
-    private _currentDFG: Dfg | undefined;
+    private _currentCollectedArcsDFG: Dfg | undefined;
+    private _selectedActivity: Activity | undefined;
+    private _selectedDFGBox: Dfg | undefined;
 
     constructor(private petriNetManagementService: PetriNetManagementService) {
         this.petriNetManagementService.petriNet$.subscribe((petriNetSub) => {
-            this.petriNet = petriNetSub;
-            this.resetCollectedArcs();
+            this._petriNet = petriNetSub;
+            this.resetSelectedElements();
         });
     }
 
@@ -30,18 +27,65 @@ export class CollectArcsService {
         return this._collectedArcs;
     }
 
-    get currentDFG(): Dfg | undefined {
-        return this._currentDFG;
+    get currentCollectedArcsDFG(): Dfg | undefined {
+        return this._currentCollectedArcsDFG;
     }
 
-    public resetCollectedArcs(): void {
+    get selectedActivity(): Activity | undefined {
+        return this._selectedActivity === undefined
+            ? undefined
+            : this._selectedActivity;
+    }
+
+    get selectedDFG(): Dfg | undefined {
+        return this._selectedDFGBox === undefined
+            ? undefined
+            : this._selectedDFGBox;
+    }
+
+    updateSelectedActivity(activityName: string): void {
+        if (
+            this._selectedActivity !== undefined &&
+            this._selectedActivity.name === activityName
+        ) {
+            this._selectedActivity = undefined;
+            return;
+        }
+        for (const dfg of this._petriNet.getDFGs()) {
+            if (dfg.activities.containsActivityWithName(activityName)) {
+                this._selectedActivity =
+                    dfg.activities.getActivityByName(activityName);
+            }
+        }
+    }
+
+    updateSelectedDFG(clickedBoxName: string): void {
+        if (
+            this._selectedDFGBox !== undefined &&
+            this._selectedDFGBox.id === clickedBoxName
+        ) {
+            this._selectedDFGBox = undefined;
+            return;
+        }
+        for (const dfg of this._petriNet.getDFGs()) {
+            if (dfg.id === clickedBoxName) {
+                this._selectedDFGBox = dfg;
+            }
+        }
+    }
+
+    public resetSelectedElements(): void {
         this._collectedArcs = new Arcs();
-        this._currentDFG = undefined;
+        this._currentCollectedArcsDFG = undefined;
+        this._selectedActivity = undefined;
+        this._selectedDFGBox = undefined;
 
-        this.resetClickedElements();
+        this.resetClickedArcs();
+        this.resetSelectedActivity();
+        this.resetSelectedDFGBox();
     }
 
-    private resetClickedElements(): void {
+    private resetClickedArcs(): void {
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
@@ -58,9 +102,35 @@ export class CollectArcsService {
         }
     }
 
+    private resetSelectedActivity(): void {
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
+
+        if (svg) {
+            const activities = svg.querySelectorAll('rect');
+            activities.forEach((activity) => {
+                activity.classList.remove('activity-marked');
+            });
+        }
+    }
+
+    private resetSelectedDFGBox(): void {
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
+
+        if (svg) {
+            const boxes = svg.querySelectorAll('rect');
+            boxes.forEach((box) => {
+                box.classList.remove('box-marked');
+            });
+        }
+    }
+
     private getDFGArcsFromPetriNet(): Array<DfgArc> {
         const dfgArcs = new Array<DfgArc>();
-        const dfgs = this.petriNet.transitions.getAllDFGs();
+        const dfgs = this._petriNet.transitions.getAllDFGs();
 
         for (const dfg of dfgs) {
             for (const dfgarc of dfg.arcs.getArcs()) {
@@ -81,9 +151,9 @@ export class CollectArcsService {
 
     public isArcinSameDFG(arc: Arc): boolean {
         const dfgArcToCheck = this.getDFGArc(arc);
-        if (this._currentDFG !== undefined) {
+        if (this._currentCollectedArcsDFG !== undefined) {
             const arcInDFG: DfgArc | undefined =
-                this._currentDFG.arcs.getArcByStartNameAndEndName(
+                this._currentCollectedArcsDFG.arcs.getArcByStartNameAndEndName(
                     arc.start.id,
                     arc.end.id,
                 );
@@ -120,14 +190,14 @@ export class CollectArcsService {
         }
 
         if (this._collectedArcs.isEmpty()) {
-            this._currentDFG = undefined;
+            this._currentCollectedArcsDFG = undefined;
         } else {
-            this._currentDFG = this.getDFG(arc);
+            this._currentCollectedArcsDFG = this.getDFG(arc);
         }
     }
 
     private getDFG(arc: Arc): Dfg | undefined {
-        const dfgs = this.petriNet.transitions.getAllDFGs();
+        const dfgs = this._petriNet.transitions.getAllDFGs();
 
         for (const dfg of dfgs) {
             if (this.isArcinDFG(arc, dfg)) {
