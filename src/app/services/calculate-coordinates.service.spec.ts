@@ -10,18 +10,6 @@ describe('CalculateDfgService', () => {
         sut = new CalculateDfgService();
     });
 
-    it('empty event log -> empty dfg', () => {
-        const eventLog: EventLog = new EventLog([]);
-
-        const result: DfgJson = sut.calculate(eventLog).asJson();
-
-        const expectedDfg: DfgJson = {
-            activities: ['play', 'stop'],
-            arcs: [{ start: 'play', end: 'stop' }],
-        };
-        expect(result).toEqual(expectedDfg);
-    });
-
     it('event log with one trace containing one activity', () => {
         const eventLog = new EventLog([new Trace([new Activity('A')])]);
 

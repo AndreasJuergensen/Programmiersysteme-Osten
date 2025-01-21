@@ -13,12 +13,6 @@ export class CalculateDfgService {
 
         dfgBuilder.addEventLog(eventLog);
 
-        if (eventLog.getAllTraces().length === 0) {
-            dfgBuilder.addPlayToStopArc();
-
-            return dfgBuilder.build();
-        }
-
         eventLog
             .getAllTraces()
             .flatMap((trace) => trace.getAllActivities())

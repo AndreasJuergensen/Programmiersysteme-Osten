@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import {
     FormControl,
     FormsModule,
@@ -48,6 +48,7 @@ export class EventLogDialogComponent implements OnInit {
         private eventLogParserService: EventLogParserService,
         private eventLogValidationService: EventLogValidationService,
         private parseXesService: ParseXesService,
+        private cdr: ChangeDetectorRef,
     ) {}
 
     public fileName: string = '';
@@ -61,10 +62,43 @@ export class EventLogDialogComponent implements OnInit {
         control: FormControl,
     ): { [key: string]: boolean } | null {
         const input = control.value;
-        if (input && !this.eventLogValidationService.validateInput(input)) {
-            return { invalidInput: true };
+
+        if (input) {
+            this.checkInput(input, control);
         }
+
         return null;
+    }
+
+    private checkInput(input: string, control: FormControl): void {
+        clearTimeout((control as any)._validationTimeout);
+
+        (control as any)._validationTimeout = setTimeout(() => {
+            const errors: { [key: string]: boolean } = {};
+
+            if (control.hasError('required')) {
+                errors['required'] = true;
+            }
+
+            const isValid = this.eventLogValidationService.validateInput(input);
+            const hasMultiplicityError =
+                this.eventLogValidationService.checkForMultiplicityPattern(
+                    input,
+                );
+
+            if (!isValid) {
+                errors['invalidInput'] = true;
+            }
+
+            if (hasMultiplicityError) {
+                errors['multiplicityRegEx'] = true;
+            }
+
+            control.setErrors(Object.keys(errors).length > 0 ? errors : null);
+            control.markAsDirty();
+
+            this.cdr.detectChanges();
+        }, 1);
     }
 
     public onOkClick(): void {
@@ -112,7 +146,9 @@ export class EventLogDialogComponent implements OnInit {
         if (file) {
             this.fileName = file.name;
             file.text().then((content) => {
-                this.eventLogControl.setValue(this.parseXesService.parse(content));
+                this.eventLogControl.setValue(
+                    this.parseXesService.parse(content),
+                );
             });
         }
     }
