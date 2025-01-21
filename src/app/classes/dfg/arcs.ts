@@ -260,6 +260,27 @@ export class Arcs {
         return nonReversedArcs;
     }
 
+    containArcWithSameStartAndEnd(): boolean {
+        for (const arc of this.arcs) {
+            if (arc.getStart() === arc.getEnd()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    getSelfLoopArcs(): Arcs {
+        const selfLoops: Arcs = new Arcs();
+
+        for (const arc of this.arcs) {
+            if (arc.getStart() === arc.getEnd()) {
+                selfLoops.addArc(arc);
+            }
+        }
+
+        return selfLoops;
+    }
+
     getArcByStartNameAndEndName(
         start: string,
         end: string,

@@ -50,6 +50,8 @@ export class Dfg implements PetriNetTransition {
         // console.log('arcs initialized');
         // console.log(this._arcs.getNonReversedArcs());
         // console.log(this.arcs.removeArcsBy(this.arcs.getNonReversedArcs()));
+
+        // console.log(this.arcs.getSelfLoopArcs());
     }
 
     // Methode wird beim Erstellen des Objekts aufgerufen
@@ -92,6 +94,9 @@ export class Dfg implements PetriNetTransition {
                     const filteredSequenceArcs = this.arcs.removeArcsBy(
                         this.arcs.getReverseArcs(),
                     );
+                    filteredSequenceArcs.removeArcsBy(
+                        filteredSequenceArcs.getSelfLoopArcs(),
+                    );
                     this._arcSubsets =
                         this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
                             filteredSequenceArcs.getArcs(),
@@ -101,6 +106,9 @@ export class Dfg implements PetriNetTransition {
                     console.log('parallel');
                     const filteredParallelArcs = this.arcs.removeArcsBy(
                         this.arcs.getNonReversedArcs(),
+                    );
+                    filteredParallelArcs.removeArcsBy(
+                        filteredParallelArcs.getSelfLoopArcs(),
                     );
                     this._arcSubsets =
                         this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
@@ -647,10 +655,20 @@ export class Dfg implements PetriNetTransition {
     }
 
     isBaseCase(): boolean {
-        if (this.activities.getLength() === 3) {
+        if (
+            this.activities.getLength() === 3 &&
+            this.notContainActivityWithSelfLoopArc()
+        ) {
             return true;
         }
         return false;
+    }
+
+    private notContainActivityWithSelfLoopArc(): boolean {
+        if (this.arcs.containArcWithSameStartAndEnd()) {
+            return false;
+        }
+        return true;
     }
 
     getBaseActivityName(): string {
