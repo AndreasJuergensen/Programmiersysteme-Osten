@@ -42,12 +42,12 @@ import { Box } from '../models';
     styles: `
         rect:hover {
             cursor: pointer;
-            stroke-width: 4;
+            stroke-width: 5;
             stroke-opacity: 0.5;
         }
         rect.box-marked {
             stroke:rgb(228, 54, 115);
-            stroke-width: 4;
+            stroke-width: 5;
         }
         .event-log {
             height: 100%;

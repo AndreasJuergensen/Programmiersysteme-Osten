@@ -16,7 +16,7 @@ export const environment = {
             strokeWidth: 2,
         },
         boxes: {
-            bgColor: 'lightgrey',
+            bgColor: ' #ffe843',
             bgOpacity: '1',
             strokeColor: 'black',
             strokeOpacity: '1',
