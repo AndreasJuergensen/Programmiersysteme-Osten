@@ -185,6 +185,15 @@ export class Arcs {
         return false;
     }
 
+    containArcWithSameStartAndEnd(): boolean {
+        for (const arc of this.arcs) {
+            if (arc.getStart() === arc.getEnd()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     getArcByStartNameAndEndName(
         start: string,
         end: string,
