@@ -38,8 +38,8 @@ import { Arc } from '../models';
             >
                 <svg:path
                     d="M 1,1 L 9,5 L 1,9 Z"
-                    [attr.fill]="'white'"
-                    [attr.stroke]="'white'"
+                    [attr.fill]="'#afafaf'"
+                    [attr.stroke]="'#afafaf'"
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>
