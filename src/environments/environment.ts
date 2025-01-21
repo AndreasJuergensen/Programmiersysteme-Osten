@@ -15,11 +15,11 @@ export const environment = {
             strokeWidth: 2,
         },
         boxes: {
-            bgColor: 'yellow',
+            bgColor: 'lightgrey',
             bgOpacity: '1',
             strokeColor: 'black',
             strokeOpacity: '1',
-            strokeWidth: 2,
+            strokeWidth: 4,
         },
         transitions: {
             width: 40,
