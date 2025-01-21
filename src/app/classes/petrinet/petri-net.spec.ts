@@ -1,4 +1,7 @@
+import { CalculateDfgService } from 'src/app/services/calculate-dfg.service';
+import { Activity, Activities } from '../dfg/activities';
 import { Dfg, DfgBuilder } from '../dfg/dfg';
+import { EventLog, Trace } from '../event-log';
 import { PetriNet } from './petri-net';
 import { PetriNetArcs } from './petri-net-arcs';
 import { PetriNetTransitions } from './petri-net-transitions';
@@ -203,6 +206,130 @@ describe('A Petrinet', () => {
             );
         expectedTransitions.removeDFG(originDFG);
 
+        expect(sut.places).toEqual(expectedPlaces);
+        expect(sut.transitions).toEqual(expectedTransitions);
+        expect(sut.arcs).toEqual(expectedArcs);
+    });
+
+    it('update by sequence cut with a connection vom a1 to stop', () => {
+        const calculateDfgService = new CalculateDfgService();
+        const eventLog: EventLog = new EventLog([
+            new Trace([new Activity('A'), new Activity('B')]),
+            new Trace([
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('C'),
+            ]),
+            new Trace([new Activity('A')]),
+        ]);
+        const originDFG: Dfg = calculateDfgService.calculate(eventLog);
+        const a1: Activities = new Activities().createActivity('A');
+        const a2: Activities = new Activities()
+            .createActivity('B')
+            .createActivity('C');
+
+        const splittedEventLogs: [EventLog, EventLog] =
+            eventLog.splitBySequenceCut(a2);
+        const subDFG1: Dfg = calculateDfgService.calculate(
+            splittedEventLogs[0],
+        );
+        const subDFG2: Dfg = calculateDfgService.calculate(
+            splittedEventLogs[1],
+        );
+
+        const sut = new PetriNet(originDFG).updateBySequenceCut(
+            originDFG,
+            subDFG1,
+            subDFG2,
+        );
+
+        const expectedPlaces: Places = new Places()
+            .addInputPlace()
+            .addOutputPlace();
+        const expectedTransitions: PetriNetTransitions =
+            new PetriNetTransitions().addDFG(subDFG1).addDFG(subDFG2);
+        const expectedArcs: PetriNetArcs = new PetriNetArcs()
+            .addPlaceToTransitionArc(
+                expectedPlaces.input,
+                expectedTransitions.transitions[0],
+            )
+            .addTransitionToPlaceArc(subDFG2, expectedPlaces.output)
+            .addTransitionToPlaceArc(
+                expectedTransitions.transitions[0],
+                expectedPlaces.addPlace().getPlaceByID('p1'),
+            )
+            .addPlaceToTransitionArc(expectedPlaces.getPlaceByID('p1'), subDFG2)
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('p1'),
+                expectedTransitions.createTransition('').getLastTransition(),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getLastTransition(),
+                expectedPlaces.output,
+            );
+
+        expect(subDFG1.eventLog.hasOptionalSequence).toBeFalse();
+        expect(subDFG2.eventLog.hasOptionalSequence).toBeTrue();
+        expect(sut.places).toEqual(expectedPlaces);
+        expect(sut.transitions).toEqual(expectedTransitions);
+        expect(sut.arcs).toEqual(expectedArcs);
+    });
+
+    it('update by sequence cut with a connection vom play to a2', () => {
+        const calculateDfgService = new CalculateDfgService();
+        const eventLog: EventLog = new EventLog([
+            new Trace([new Activity('A'), new Activity('B')]),
+            new Trace([new Activity('A'), new Activity('C')]),
+            new Trace([new Activity('C')]),
+        ]);
+        const originDFG: Dfg = calculateDfgService.calculate(eventLog);
+        const a1: Activities = new Activities().createActivity('A');
+        const a2: Activities = new Activities()
+            .createActivity('B')
+            .createActivity('C');
+
+        const splittedEventLogs: [EventLog, EventLog] =
+            eventLog.splitBySequenceCut(a2);
+        const subDFG1: Dfg = calculateDfgService.calculate(
+            splittedEventLogs[0],
+        );
+        const subDFG2: Dfg = calculateDfgService.calculate(
+            splittedEventLogs[1],
+        );
+
+        const sut = new PetriNet(originDFG).updateBySequenceCut(
+            originDFG,
+            subDFG1,
+            subDFG2,
+        );
+
+        const expectedPlaces: Places = new Places()
+            .addInputPlace()
+            .addOutputPlace();
+        const expectedTransitions: PetriNetTransitions =
+            new PetriNetTransitions().addDFG(subDFG1).addDFG(subDFG2);
+        const expectedArcs: PetriNetArcs = new PetriNetArcs()
+            .addPlaceToTransitionArc(
+                expectedPlaces.input,
+                expectedTransitions.transitions[0],
+            )
+            .addTransitionToPlaceArc(subDFG2, expectedPlaces.output)
+            .addTransitionToPlaceArc(
+                expectedTransitions.transitions[0],
+                expectedPlaces.addPlace().getPlaceByID('p1'),
+            )
+            .addPlaceToTransitionArc(expectedPlaces.getPlaceByID('p1'), subDFG2)
+            .addPlaceToTransitionArc(
+                expectedPlaces.getPlaceByID('input'),
+                expectedTransitions.createTransition('').getLastTransition(),
+            )
+            .addTransitionToPlaceArc(
+                expectedTransitions.getLastTransition(),
+                expectedPlaces.getPlaceByID('p1'),
+            );
+
+        expect(subDFG1.eventLog.hasOptionalSequence).toBeTrue();
+        expect(subDFG2.eventLog.hasOptionalSequence).toBeFalse();
         expect(sut.places).toEqual(expectedPlaces);
         expect(sut.transitions).toEqual(expectedTransitions);
         expect(sut.arcs).toEqual(expectedArcs);
