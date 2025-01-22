@@ -14,7 +14,7 @@ export class Dfg implements PetriNetTransition {
     public id: string;
     private _currentPossibleCut: CutType | undefined;
     private _arcSubsets: Array<Array<DfgArc>> = [];
-    private _arcCalculationFlag: boolean = false;
+    private static _arcCalculationFlag: boolean = false;
 
     constructor(
         private readonly _activities: Activities,
@@ -23,9 +23,25 @@ export class Dfg implements PetriNetTransition {
     ) {
         this.id = 'DFG' + ++Dfg.idCount;
 
-        this.initializePossibleCut();
+        if (Dfg._arcCalculationFlag) {
+            this.initializePossibleCut();
+            this.initializeArcSubsets();
+        }
+    }
 
-        this.initializeArcSubsets();
+    public static get arcCalculationFlag(): boolean {
+        return this._arcCalculationFlag;
+    }
+
+    public static set arcCalculationFlag(value: boolean) {
+        this._arcCalculationFlag = value;
+    }
+
+    public static toggleArcCalculationFlag(): void {
+        this._arcCalculationFlag = !this._arcCalculationFlag;
+        console.log(
+            `Arc calculation flag toggled to: ${this._arcCalculationFlag}`,
+        );
     }
 
     private initializePossibleCut(): void {

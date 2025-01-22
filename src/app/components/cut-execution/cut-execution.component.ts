@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
+import { Dfg } from 'src/app/classes/dfg/dfg';
 
 export enum CutType {
     ExclusiveCut = 'ExclusiveCut',
@@ -51,6 +52,14 @@ export class CutExecutionComponent implements OnInit {
 
     ngOnInit(): void {
         this.radioForm.get('selectedCut')?.valueChanges.subscribe(() => {});
+    }
+
+    get arcCalculationFlag(): boolean {
+        return Dfg.arcCalculationFlag;
+    }
+
+    toggleArcCalculation(): void {
+        Dfg.toggleArcCalculationFlag();
     }
 
     onCutClick(): void {

@@ -16,6 +16,7 @@ import { EventLogParserService } from 'src/app/services/event-log-parser.service
 import { CommonModule } from '@angular/common';
 import { EventLogValidationService } from 'src/app/services/event-log-validation.service';
 import { ParseXesService } from 'src/app/services/parse-xes.service';
+import { Dfg } from 'src/app/classes/dfg/dfg';
 
 @Component({
     selector: 'app-event-log-dialog',
@@ -56,6 +57,14 @@ export class EventLogDialogComponent implements OnInit {
     ngOnInit(): void {
         this.eventLogControl.markAsTouched();
         this.eventLogControl.updateValueAndValidity();
+    }
+
+    get arcCalculationFlag(): boolean {
+        return Dfg.arcCalculationFlag;
+    }
+
+    toggleArcCalculation(): void {
+        Dfg.toggleArcCalculationFlag();
     }
 
     private validateFormControlInput(
