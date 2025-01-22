@@ -281,6 +281,28 @@ export class Arcs {
         return selfLoops;
     }
 
+    getStartAndStopArcs(): Arcs {
+        const startAndStopArcs: Arcs = new Arcs();
+        for (const arc of this.arcs) {
+            if (arc.startsAtPlay() || arc.endsAtStop()) {
+                startAndStopArcs.addArc(arc);
+            }
+        }
+
+        return startAndStopArcs;
+    }
+
+    getNonStartAndStopArcs(): Arcs {
+        const nonStartAndStopArcs: Arcs = new Arcs();
+        for (const arc of this.arcs) {
+            if (!arc.startsAtPlay() && !arc.endsAtStop()) {
+                nonStartAndStopArcs.addArc(arc);
+            }
+        }
+
+        return nonStartAndStopArcs;
+    }
+
     getArcByStartNameAndEndName(
         start: string,
         end: string,
