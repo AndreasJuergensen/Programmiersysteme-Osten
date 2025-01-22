@@ -203,23 +203,22 @@ export class DrawingArcComponent {
             return `M ${arc.x1} ${arc.y1} L ${arc.x2} ${arc.y2}`;
         }
 
-        let controlPointX = (arc.x1 + arc.x2) / 2;
-        let controlPointY = Math.min(arc.start.y, arc.end.y);
+        const distance = Math.sqrt(
+            Math.pow(arc.x2 - arc.x1, 2) + Math.pow(arc.y2 - arc.y1, 2),
+        );
 
-        if (arc.start.y > arc.end.y) {
-            controlPointY = Math.min(arc.start.y, arc.end.y) + 100;
-        }
+        const xm = (arc.x1 + arc.x2) / 2;
+        const ym = (arc.y1 + arc.y2) / 2;
 
-        if (arc.start.y === arc.end.y) {
-            if (arc.start.x > arc.end.x) {
-                controlPointY = Math.min(arc.start.y, arc.end.y) - 30;
-            }
-            if (arc.start.x <= arc.end.x) {
-                controlPointY = Math.min(arc.start.y, arc.end.y) + 30;
-            }
-        }
+        const dx = (arc.x2 - arc.x1) / distance;
+        const dy = (arc.y2 - arc.y1) / distance;
 
-        return `M ${arc.x1} ${arc.y1} Q ${controlPointX} ${controlPointY} ${arc.x2} ${arc.y2}`;
+        const bowHeight = 50;
+
+        const controlX = xm - dy * bowHeight;
+        const controlY = ym + dx * bowHeight;
+
+        return `M ${arc.x1} ${arc.y1} Q ${controlX} ${controlY} ${arc.x2} ${arc.y2}`;
     }
 
     private pathNecessary(arc: Arc): boolean {
