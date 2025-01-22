@@ -14,6 +14,8 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
             [attr.y]="activity.y - height / 2"
             [attr.height]="height"
             [attr.width]="width"
+            [attr.rx]="10"
+            [attr.ry]="10"
             [attr.fill]="bgColor"
             [attr.fill-opacity]="bgOpacity"
             [attr.stroke]="strokeColor"
