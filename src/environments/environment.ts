@@ -30,6 +30,15 @@ export const environment = {
             strokeOpacity: '1',
             strokeWidth: 2,
         },
+        invisibleTransitions: {
+            width: 20,
+            height: 40,
+            bgColor: 'black',
+            bgOpacity: '1',
+            strokeColor: 'black',
+            strokeOpacity: '1',
+            strokeWidth: 2,
+        },
         places: {
             radius: 20,
             bgColor: 'white',

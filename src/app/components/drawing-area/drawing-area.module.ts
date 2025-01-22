@@ -7,10 +7,11 @@ import {
     DrawingArcComponent,
     DrawingBoxArcComponent,
     DrawingPlaceComponent,
-    DrawingTransitionsComponent,
+    DrawingTransitionComponent,
 } from './components';
 import { DrawingBoxComponent } from './components/drawing-box.component';
 import { DrawingAreaComponent } from './drawing-area.component';
+import { DrawingInvisibleTransitionComponent } from './components/drawing-invisible-transition.component';
 
 @NgModule({
     declarations: [
@@ -20,7 +21,8 @@ import { DrawingAreaComponent } from './drawing-area.component';
         DrawingArcComponent,
         DrawingBoxArcComponent,
         DrawingPlaceComponent,
-        DrawingTransitionsComponent,
+        DrawingTransitionComponent,
+        DrawingInvisibleTransitionComponent
     ],
     imports: [CommonModule, MatCheckboxModule, ContextMenuComponent],
     exports: [DrawingAreaComponent],
