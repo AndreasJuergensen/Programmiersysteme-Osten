@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Dfg } from '../classes/dfg/dfg';
-import { Activities, Activity } from '../classes/dfg/activities';
+import { Activity } from '../classes/dfg/activities';
 import { BehaviorSubject, Observable } from 'rxjs';
 import {
     Graph,
@@ -11,6 +11,8 @@ import {
 } from '../classes/graph';
 import { DfgArc } from '../classes/dfg/arcs';
 import { environment } from 'src/environments/environment';
+
+type Path = string[];
 
 @Injectable({
     providedIn: 'root',
@@ -42,9 +44,6 @@ export class CalculateCoordinatesService {
         // Stage 2
         this.recalculateCoordinatesForOverlaps(nodes, edges);
 
-        // Publish calculated graph
-        //this._graph$.next(new Graph(nodes, edges));
-
         return new Graph(nodes, edges);
     }
 
@@ -74,53 +73,48 @@ export class CalculateCoordinatesService {
                 initialYCoordinate,
             ),
         );
-        const neighbours: Activities =
-            dfg.arcs.calculateNextActivities(playActivity);
 
-        // Put all neighbours of start activity into stack with the coordinates
-        // of the start activity.
-        const stack: Array<DfgStackElement> = neighbours
-            .getAllActivites()
-            .map((neighbour) => {
-                return {
-                    activity: neighbour,
+        const paths = this.calculatePaths(dfg).sort(
+            (p1, p2) => p2.length - p1.length,
+        );
+
+        paths.forEach((path, index) => {
+            yCoordinate += index * gapY;
+
+            let i = 1;
+            for (let a of path) {
+                const activity = dfg.activities.getActivityByName(a);
+
+                const stackElement = {
+                    activity: activity,
                     source_x: initialXCoordinate,
                     source_y: initialYCoordinate,
                 };
-            });
 
-        while (stack.length > 0) {
-            const stackElement: DfgStackElement = stack.pop()!;
-            if (this.InsertNewLevel(nodes, stackElement, xOfLastModeledNode)) {
-                yCoordinate = this.biggestYCoodinateOfNodes(nodes) + gapY;
+                if (
+                    this.InsertNewLevel(nodes, stackElement, xOfLastModeledNode)
+                ) {
+                    yCoordinate = this.biggestYCoodinateOfNodes(nodes) + gapY;
+                }
+
+                if (this.IsNodeAlreadyModeled(nodes, stackElement)) {
+                    continue;
+                }
+
+                const activityAsNode = new ActivityNode(
+                    stackElement.activity.name,
+                    stackElement.source_x + i * gapX,
+                    yCoordinate,
+                );
+                nodes.push(activityAsNode);
+
+                xOfLastModeledNode = activityAsNode.x;
+
+                i++;
             }
 
-            if (this.IsNodeAlreadyModeled(nodes, stackElement)) {
-                continue;
-            }
-
-            const activityAsNode = new ActivityNode(
-                stackElement.activity.name,
-                stackElement.source_x + gapX,
-                yCoordinate,
-            );
-            nodes.push(activityAsNode);
-
-            const neighbours: Activities = dfg.arcs.calculateNextActivities(
-                stackElement.activity,
-            );
-
-            stack.push(
-                ...neighbours.getAllActivites().map((neighbour) => {
-                    return {
-                        activity: neighbour,
-                        source_x: activityAsNode.x,
-                        source_y: activityAsNode.y,
-                    };
-                }),
-            );
-            xOfLastModeledNode = activityAsNode.x;
-        }
+            i = 1;
+        });
 
         return nodes;
     }
@@ -208,7 +202,7 @@ export class CalculateCoordinatesService {
 
         do {
             nodeWasMoved = false;
-            nodes.forEach((node) => {
+            nodes.reverse().forEach((node) => {
                 if (
                     this.checkNodeOverlap(node, nodes) ||
                     this.checkEdgeOverlap(node, edges)
@@ -268,5 +262,64 @@ export class CalculateCoordinatesService {
         }
 
         return false;
+    }
+
+    private calculatePaths(dfg: Dfg): Path[] {
+        type InnerGraph = { [key: string]: string[] };
+        let innerGraph: InnerGraph = {};
+        dfg.activities.getAllActivites().forEach((a) => {
+            if (a.name === 'stop') {
+                return;
+            }
+
+            const nextActiviites = dfg.arcs.calculateNextActivities(a);
+            const neighbours: string[] = nextActiviites
+                .getAllActivites()
+                .map((nextActivity) => nextActivity.name);
+            innerGraph[a.name] = neighbours;
+        });
+
+        const allPaths: Path[] = [];
+
+        const stack: {
+            node: string;
+            path: string[];
+            visitCount: { [key: string]: number };
+        }[] = [{ node: 'play', path: ['play'], visitCount: { ['play']: 1 } }];
+
+        while (stack.length > 0) {
+            const { node, path, visitCount } = stack.pop()!;
+
+            // Wenn der Zielknoten erreicht ist, speichern wir den aktuellen Pfad
+            if (node === 'stop') {
+                allPaths.push([...path]);
+            } else {
+                // Besuche alle Nachbarn des aktuellen Knotens
+                for (const neighbor of innerGraph[node]) {
+                    const visits = visitCount[neighbor] || 0;
+
+                    // Erlaube den Besuch eines Knotens maximal zweimal
+                    if (visits < 2) {
+                        const newVisitCount = {
+                            ...visitCount,
+                            [neighbor]: visits + 1,
+                        };
+                        stack.push({
+                            node: neighbor,
+                            path: [...path, neighbor],
+                            visitCount: newVisitCount,
+                        });
+                    }
+                }
+            }
+        }
+
+        allPaths.forEach((p) => {
+            p.shift();
+        });
+
+        console.log(allPaths);
+
+        return allPaths;
     }
 }
