@@ -1,5 +1,4 @@
 import {
-    AfterViewChecked,
     Component,
     ElementRef,
     OnDestroy,
@@ -27,6 +26,7 @@ import {
     Transition,
     TransitionToPlaceArc,
 } from './models';
+import { ContextMenuService } from 'src/app/services/context-menu.service';
 
 @Component({
     selector: 'app-drawing-area',
@@ -48,7 +48,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
     public showEventLogs: boolean = false;
 
-    constructor(private calculatePetriNetService: CalculatePetriNetService) {}
+    constructor(private calculatePetriNetService: CalculatePetriNetService, private readonly contextMenuService: ContextMenuService) {}
 
     get activities(): Array<Activity> {
         return this._activities;
@@ -231,7 +231,6 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
         if (svg) {
             svg.classList.add('mouseDown');
-            console.log('Mouse Down');
         }
     }
 
@@ -242,7 +241,15 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
         if (svg) {
             svg.classList.remove('mouseDown');
-            console.log('Mouse Up');
         }
+    }
+
+    onContextMenu(event: MouseEvent) {
+        event.preventDefault();
+        this.contextMenuService.showAt(event.clientX + 4, event.clientY + 4);
+    }
+
+    onMenuClose() {
+        this.contextMenuService.hide();
     }
 }
