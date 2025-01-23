@@ -100,7 +100,6 @@ export class CollectSelectedElementsService {
     }
 
     resetSelectedActivity(): void {
-        this.resetSelectedActivity();
         this._selectedActivity = undefined;
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
@@ -115,7 +114,6 @@ export class CollectSelectedElementsService {
     }
 
     resetSelectedDFGBox(): void {
-        this.resetSelectedDFGBox();
         this._selectedDFGBox = undefined;
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
