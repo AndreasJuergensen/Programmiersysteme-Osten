@@ -26,6 +26,7 @@ import {
     Transition,
     TransitionToPlaceArc,
 } from './models';
+import { ContextMenuService } from 'src/app/services/context-menu.service';
 
 @Component({
     selector: 'app-drawing-area',
@@ -47,7 +48,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
     public showEventLogs: boolean = false;
 
-    constructor(private calculatePetriNetService: CalculatePetriNetService) {}
+    constructor(private calculatePetriNetService: CalculatePetriNetService, private readonly contextMenuService: ContextMenuService) {}
 
     get activities(): Array<Activity> {
         return this._activities;
@@ -243,19 +244,12 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         }
     }
 
-    contextMenuPosition = { x: '0px', y: '0px' };
-    showContextMenu = 'hidden';
-
     onContextMenu(event: MouseEvent) {
         event.preventDefault();
-        this.contextMenuPosition = {
-            x: event.clientX + 4 + 'px',
-            y: event.clientY + 4 + 'px',
-        };
-        this.showContextMenu = 'visible';
+        this.contextMenuService.showAt(event.clientX + 4, event.clientY + 4);
     }
 
     onMenuClose() {
-        this.showContextMenu = 'hidden';
+        this.contextMenuService.hide();
     }
 }
