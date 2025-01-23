@@ -9,6 +9,7 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import { Dfg } from 'src/app/classes/dfg/dfg';
+import { PetriNet } from 'src/app/classes/petrinet/petri-net';
 
 export enum CutType {
     ExclusiveCut = 'ExclusiveCut',
@@ -37,6 +38,7 @@ export class CutExecutionComponent implements OnInit {
         CutType.ParallelCut,
         CutType.LoopCut,
     ];
+    private _petriNet!: PetriNet;
 
     constructor(
         private _fb: FormBuilder,
@@ -52,6 +54,9 @@ export class CutExecutionComponent implements OnInit {
 
     ngOnInit(): void {
         this.radioForm.get('selectedCut')?.valueChanges.subscribe(() => {});
+        this._petriNetManagementService.petriNet$.subscribe((petriNetSub) => {
+            this._petriNet = petriNetSub;
+        });
     }
 
     get arcCalculationFlag(): boolean {
@@ -60,6 +65,11 @@ export class CutExecutionComponent implements OnInit {
 
     toggleArcCalculation(): void {
         Dfg.toggleArcCalculationFlag();
+        if (Dfg.arcCalculationFlag === true) {
+            this._petriNet.getDFGs().forEach((dfg) => {
+                dfg.startProcessing();
+            });
+        }
     }
 
     onCutClick(): void {
@@ -110,23 +120,6 @@ export class CutExecutionComponent implements OnInit {
             );
         }
     }
-
-    // onTestClick(): void {
-    //     const selectedValue = this.radioForm.get('selectedCut')?.value;
-    //     if (selectedValue && this._collectArcsService.currentDFG) {
-    //         if (
-    //             !this._executeCutService.execute(
-    //                 this._collectArcsService.currentDFG,
-    //                 this._collectArcsService.collectedArcs,
-    //                 selectedValue,
-    //             )
-    //         ) {
-    //             this._collectArcsService.currentDFG.calculateAllPossibleCorrectArcsToCreatePartitions(
-    //                 selectedValue,
-    //             );
-    //         }
-    //     }
-    // }
 
     onCancelClick(): void {
         if (this.radioForm.get('selectedCut')?.value !== null) {

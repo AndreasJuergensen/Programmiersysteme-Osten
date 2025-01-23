@@ -44,6 +44,12 @@ export class Dfg implements PetriNetTransition {
         );
     }
 
+    public startProcessing(): void {
+        console.log(`Starting processing for DFG: ${this.id}`);
+        this.initializePossibleCut();
+        this.initializeArcSubsets();
+    }
+
     private initializePossibleCut(): void {
         this._currentPossibleCut = this.calculatePossibleCut();
     }
@@ -201,7 +207,7 @@ export class Dfg implements PetriNetTransition {
             case CutType.ExclusiveCut:
                 console.log('exclusive');
                 const filteredExclusiveArcs = filteredArcs.removeArcsBy(
-                    filteredArcs.getStartAndStopArcs(),
+                    filteredArcs.getNonStartAndStopArcs(),
                 );
                 this._arcSubsets =
                     this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
@@ -231,7 +237,7 @@ export class Dfg implements PetriNetTransition {
             case CutType.LoopCut:
                 console.log('loop');
                 const filteredLoopArcs = filteredArcs.removeArcsBy(
-                    filteredArcs.getNonStartAndStopArcs(),
+                    filteredArcs.getStartAndStopArcs(),
                 );
                 this._arcSubsets =
                     this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
