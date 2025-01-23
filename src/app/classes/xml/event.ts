@@ -14,6 +14,11 @@ export class Event {
         return new Event(eventXml);
     }
 
+    isLifecycleComplete(): boolean {
+        return this.eventXml.string
+            .some((property) => property['@_key'] === 'lifecycle:transition' && property['@_value'] === 'complete');
+    }
+
     toString(): string {
         return this.eventXml.string
             .find((property) => property['@_key'] === 'concept:name')!
