@@ -223,7 +223,7 @@ export class CollectSelectedElementsService {
         return false;
     }
 
-    public overlayArcsExistsInDFGs(arc: Arc): boolean {
+    public isOverlayedArcInDFG(arc: Arc): boolean {
         const dfgOfArc = this.getDFG(arc);
 
         if (dfgOfArc) {

@@ -3,6 +3,7 @@ import { Arc } from '../models';
 import { environment } from 'src/environments/environment';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
+import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
 
 @Component({
     selector: 'svg:g[app-drawing-arc]',
@@ -81,6 +82,7 @@ export class DrawingArcComponent {
     constructor(
         private collectSelectedElementsService: CollectSelectedElementsService,
         private feedbackService: ShowFeedbackService,
+        private petriNetManagementService: PetriNetManagementService,
     ) {}
 
     readonly width: number = environment.drawingElements.arcs.width;
@@ -222,6 +224,9 @@ export class DrawingArcComponent {
     }
 
     private pathNecessary(arc: Arc): boolean {
-        return this.collectSelectedElementsService.overlayArcsExistsInDFGs(arc);
+        return (
+            this.collectSelectedElementsService.isOverlayedArcInDFG(arc) ||
+            this.petriNetManagementService.arcIsOverlayingArc(arc)
+        );
     }
 }
