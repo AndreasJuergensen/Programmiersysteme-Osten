@@ -26,12 +26,27 @@ import { CollectSelectedElementsService } from 'src/app/services/collect-selecte
             {{ box.id }}
         </svg:text>
         <ng-container *ngIf="showEventLogs">
-            <svg:text
-                [attr.x]="box.x - box.width / 2 + 10"
-                [attr.y]="box.y - box.height / 2 + 20"
+            <foreignObject
+                [attr.x]="box.x - box.width / 2"
+                [attr.y]="box.y - box.height / 2"
+                [attr.width]="box.width"
+                [attr.height]="box.height"
+                [attr.overflow-y]="'auto'"
             >
-                {{ box.eventLog }}
-            </svg:text>
+                <div
+                    style="height: 100%; 
+                        width: 100%; 
+                        overflow-y: auto; 
+                        padding: 10px; 
+                        box-sizing: border-box;"
+                >
+                    <ng-container *ngFor="let trace of box.traces">
+                        <p style="margin: 0px;">
+                            {{ trace }}
+                        </p>
+                    </ng-container>
+                </div>
+            </foreignObject>
         </ng-container>
     `,
     styles: `
