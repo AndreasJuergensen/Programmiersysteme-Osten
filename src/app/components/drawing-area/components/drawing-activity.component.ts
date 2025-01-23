@@ -5,7 +5,6 @@ import { FallThroughHandlingService } from 'src/app/services/fall-through-handli
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import { Subscription } from 'rxjs';
 import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
-import { CollectArcsService } from 'src/app/services/collect-arcs.service';
 
 @Component({
     selector: 'svg:g[app-drawing-activity]',
@@ -55,7 +54,6 @@ export class DrawingActivityComponent {
     constructor(
         private _collectSelectedElementsService: CollectSelectedElementsService,
         private _positionForActivitiesService: PositionForActivitiesService,
-        private _collectArcsService: CollectArcsService,
     ) {}
 
     readonly width: number = environment.drawingElements.activities.height;
@@ -213,7 +211,7 @@ export class DrawingActivityComponent {
                 this.activity.y,
             );
             this.mouseClicked = false;
-            this._collectArcsService.resetCollectedArcs();
+            this._collectSelectedElementsService.resetSelectedArcs();
         }
     }
 
