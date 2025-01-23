@@ -72,4 +72,8 @@ export class Box extends Node {
     get eventLog(): string {
         return this._eventLog;
     }
+
+    get traces(): string[] {
+        return this._eventLog.replaceAll("+", "+###SPLIT###").split('###SPLIT###');
+    }
 }
