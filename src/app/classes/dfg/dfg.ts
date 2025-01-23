@@ -146,10 +146,20 @@ export class Dfg implements PetriNetTransition {
     }
 
     isBaseCase(): boolean {
-        if (this.activities.getLength() === 3) {
+        if (
+            this.activities.getLength() === 3 &&
+            this.notContainActivityWithSelfLoopArc()
+        ) {
             return true;
         }
         return false;
+    }
+
+    private notContainActivityWithSelfLoopArc(): boolean {
+        if (this.arcs.containArcWithSameStartAndEnd()) {
+            return false;
+        }
+        return true;
     }
 
     getBaseActivityName(): string {
