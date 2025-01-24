@@ -176,6 +176,10 @@ export class PetriNet {
         return replacingTransition;
     }
 
+    isEmpty() {
+        return this.transitions.transitions.length === 0;
+    }
+
     updateByFlowerFallThrough(originDFG: Dfg, flowerDFGs: Dfg[]): PetriNet {
         const flowerCentre: Place = this.replaceOriginByFlowerCentre(originDFG);
         for (const dfg of flowerDFGs) {

@@ -2,15 +2,20 @@ import { Dfg } from '../dfg/dfg';
 
 export interface PetriNetTransition {
     id: string;
+    name?: string;
 }
 
 export class Transition implements PetriNetTransition {
-    readonly id: string;
+    readonly _id: string;
     constructor(
         private readonly _name: string,
         idCount: number,
     ) {
-        this.id = 't' + idCount;
+        this._id = 't' + idCount;
+    }
+
+    get id(): string {
+        return this._id;
     }
 
     get name(): string {

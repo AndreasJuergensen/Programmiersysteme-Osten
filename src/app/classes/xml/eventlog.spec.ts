@@ -10,16 +10,28 @@ describe('event log', () => {
                     event: [
                         {
                             string: [
+                                {
+                                    '@_key': 'lifecycle:transition',
+                                    '@_value': 'complete',
+                                },
                                 { '@_key': 'concept:name', '@_value': 'A' },
                             ],
                         },
                         {
                             string: [
+                                {
+                                    '@_key': 'lifecycle:transition',
+                                    '@_value': 'complete',
+                                },
                                 { '@_key': 'concept:name', '@_value': 'B' },
                             ],
                         },
                         {
                             string: [
+                                {
+                                    '@_key': 'lifecycle:transition',
+                                    '@_value': 'complete',
+                                },
                                 { '@_key': 'concept:name', '@_value': 'C' },
                             ],
                         },
@@ -29,16 +41,28 @@ describe('event log', () => {
                     event: [
                         {
                             string: [
+                                {
+                                    '@_key': 'lifecycle:transition',
+                                    '@_value': 'complete',
+                                },
                                 { '@_key': 'concept:name', '@_value': 'X' },
                             ],
                         },
                         {
                             string: [
+                                {
+                                    '@_key': 'lifecycle:transition',
+                                    '@_value': 'complete',
+                                },
                                 { '@_key': 'concept:name', '@_value': 'Y' },
                             ],
                         },
                         {
                             string: [
+                                {
+                                    '@_key': 'lifecycle:transition',
+                                    '@_value': 'complete',
+                                },
                                 { '@_key': 'concept:name', '@_value': 'Z' },
                             ],
                         },

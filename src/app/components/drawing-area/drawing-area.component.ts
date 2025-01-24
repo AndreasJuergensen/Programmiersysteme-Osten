@@ -1,5 +1,4 @@
 import {
-    AfterViewChecked,
     Component,
     ElementRef,
     OnDestroy,
@@ -27,6 +26,7 @@ import {
     Transition,
     TransitionToPlaceArc,
 } from './models';
+import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
 import _ from 'lodash';
 
@@ -62,6 +62,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     constructor(
         private calculatePetriNetService: CalculatePetriNetService,
         private positionForActivitiesService: PositionForActivitiesService,
+        private readonly contextMenuService: ContextMenuService,
     ) {}
 
     get activities(): Array<Activity> {
@@ -375,5 +376,14 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         if (svg) {
             svg.classList.remove('mouseDown');
         }
+    }
+
+    onContextMenu(event: MouseEvent) {
+        event.preventDefault();
+        this.contextMenuService.showAt(event.clientX + 4, event.clientY + 4);
+    }
+
+    onMenuClose() {
+        this.contextMenuService.hide();
     }
 }
