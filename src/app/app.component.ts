@@ -73,9 +73,20 @@ export class AppComponent {
         this._petriNetManagementService.updateToPreviousPetriNet();
     }
 
-    async process() {
-        await this._initializeArcFeedbackCalculationService.initialize();
+    // async process() {
+    //     await this._initializeArcFeedbackCalculationService.initialize();
+    // }
+
+    async process(): Promise<void> {
+        try {
+            console.log('Starting processing...');
+            await this._initializeArcFeedbackCalculationService.initialize();
+            console.log('Processing completed!');
+        } catch (error) {
+            console.error('Error during processing:', error);
+        }
     }
+
     get actionButtonsAreDisabled(): boolean {
         return !this._petriNetManagementService.isModifiable;
     }
