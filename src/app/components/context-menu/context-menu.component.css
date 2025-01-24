@@ -3,16 +3,64 @@
     flex-direction: column;
     border: 1px solid grey;
     border-radius: 4px;
-    background-color: white;
-}
+    background-color: #efc9db;
+    color: #d42f7c;
+    user-select: none;
 
-.sub-menu {
-    position: absolute;
-    right: calc(-100% - 4px);
-    top: 0;
-    display: none;
-}
+    .menu-button {
+        padding: 8px;
+        border: none;
+        border-radius: 4px;
+        background-color: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        box-sizing: border-box;
+        white-space: nowrap;
 
-.sub-menu-wrapper:hover .sub-menu {
-    display: flex !important;
+        &:hover {
+            background-color: #af899b;
+            color: #ffe9fb;
+        }
+    }
+
+    .sub-menu-wrapper {
+        position: relative;
+
+        & > .menu-button {
+            cursor: default;
+            &::after {
+                content: ">";
+                margin-left: 8px;
+            }
+        }
+
+        .sub-menu {
+            display: none;
+        }
+
+        &:not(.disabled):hover {
+            .sub-menu {
+                display: flex !important;
+                position: absolute;
+                top: 0;
+                left: 100%;
+            }
+        }
+    }
+
+    .hr {
+        height: 0px;
+        border-top: 1px solid #d42f7c;
+        margin: 0;
+    }
+
+    .disabled,
+    .sub-menu-wrapper.disabled .menu-button {
+        cursor: not-allowed;
+        color: #ffe9fb;
+        background-color: #efc9db !important;
+    }
 }

@@ -7,23 +7,91 @@
     [style.visibility]="visibility"
 >
     <div class="sub-menu-wrapper">
-        <button mat-button [disabled]="isExportDisabled">Export ></button>
+        <div class="menu-button" mat-button>Examples</div>
         <div class="context-menu sub-menu">
-            <button
-                mat-button
-                (click)="exportPn()"
-                [disabled]="isExportDisabled"
-            >
+            <div class="menu-button" (click)="examples.generateExclusiveExample()" mat-button>Exclusive Cut</div>
+            <div class="menu-button" (click)="examples.generateSequenceExample()" mat-button>Sequence Cut</div>
+            <div class="menu-button" (click)="examples.generateParallelExample()" mat-button>Parallel Cut</div>
+            <div class="menu-button" (click)="examples.generateLoopExample()" mat-button>Loop Cut</div>
+            <div class="menu-button" (click)="examples.generateAOPTExample()" mat-button>
+                Activity Once Per Trace Fall Through
+            </div>
+            <div class="menu-button" (click)="examples.generateFlowerExample()" mat-button>Flower Model Fall Through</div>
+            <div class="menu-button" (click)="examples.generateFUHProcessMiningExample()" mat-button>Example from Script</div>
+        </div>
+    </div>
+    <div class="menu-button" mat-button>Import Event Log...</div>
+    <div class="hr"></div>
+    <div
+        class="sub-menu-wrapper"
+        [class.disabled]="disabling.isExecuteCutDisabled()"
+    >
+        <div class="menu-button" mat-button>Execute Cut</div>
+        <div class="context-menu sub-menu">
+            <div class="menu-button" mat-button>Parallel Cut</div>
+            <div class="menu-button" mat-button>Sequence Cut</div>
+            <div class="menu-button" mat-button>Exclusive Cut</div>
+            <div class="menu-button" mat-button>Loop Cut</div>
+        </div>
+    </div>
+    <div
+        class="sub-menu-wrapper"
+        [class.disabled]="disabling.isExecuteFallThroughDisabled()"
+    >
+        <div class="menu-button" mat-button>Execute Fall Through</div>
+        <div class="context-menu sub-menu">
+            <div class="menu-button" mat-button>Parallel Cut</div>
+            <div class="menu-button" mat-button>Sequence Cut</div>
+            <div class="menu-button" mat-button>Exclusive Cut</div>
+            <div class="menu-button" mat-button>Loop Cut</div>
+        </div>
+    </div>
+    <div
+        class="menu-button"
+        [class.disabled]="disabling.isUndoDisabled()"
+        mat-button
+    >
+        Undo Last Split
+    </div>
+    <div class="hr"></div>
+    <div
+        class="menu-button"
+        [class.disabled]="disabling.isToggleEventLogsDisabled()"
+        mat-button
+    >
+        Toggle Event Logs
+    </div>
+    <div
+        class="menu-button"
+        [class.disabled]="disabling.isToggleFeedbackDisabled()"
+        mat-button
+    >
+        Toggle Feedback
+    </div>
+    <div class="hr"></div>
+    <div
+        class="sub-menu-wrapper"
+        [class.disabled]="disabling.isExportDisabled()"
+    >
+        <div class="menu-button" mat-button>Export</div>
+        <div class="context-menu sub-menu">
+            <div class="menu-button" mat-button (click)="exporting.exportPn()">
                 to PN
-            </button>
-            <button
+            </div>
+            <div
+                class="menu-button"
                 mat-button
-                (click)="exportJson()"
-                [disabled]="isExportDisabled"
+                (click)="exporting.exportJson()"
             >
                 to JSON
-            </button>
-            <button mat-button (click)="exportPnml()" [disabled]="isExportDisabled">to PNML</button>
+            </div>
+            <div
+                class="menu-button"
+                mat-button
+                (click)="exporting.exportPnml()"
+            >
+                to PNML
+            </div>
         </div>
     </div>
 </div>

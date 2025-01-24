@@ -5,27 +5,27 @@ import { BehaviorSubject } from 'rxjs';
     providedIn: 'root',
 })
 export class ContextMenuService {
-    private readonly _visability: BehaviorSubject<string> =
+    private readonly _visability$: BehaviorSubject<string> =
         new BehaviorSubject<string>('hidden');
-    private readonly _position: BehaviorSubject<{ x: number; y: number }> =
+    private readonly _position$: BehaviorSubject<{ x: number; y: number }> =
         new BehaviorSubject<{ x: number; y: number }>({ x: 0, y: 0 });
 
     constructor() {}
 
-    get visibility() {
-        return this._visability.asObservable();
+    get visibility$() {
+        return this._visability$.asObservable();
     }
 
-    get position() {
-        return this._position.asObservable();
+    get position$() {
+        return this._position$.asObservable();
     }
 
     showAt(x: number, y: number) {
-        this._visability.next('visible');
-        this._position.next({ x, y });
+        this._visability$.next('visible');
+        this._position$.next({ x, y });
     }
 
     hide() {
-        this._visability.next('hidden');
+        this._visability$.next('hidden');
     }
 }

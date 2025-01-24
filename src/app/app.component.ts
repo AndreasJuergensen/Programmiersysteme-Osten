@@ -76,6 +76,6 @@ export class AppComponent {
     }
 
     get undoButtonIsDisabled(): boolean {
-        return this._petriNetManagementService.isInputPetriNet;
+        return false;
     }
 }

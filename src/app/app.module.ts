@@ -1,26 +1,24 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { AppComponent } from './app.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatIconModule } from '@angular/material/icon';
-import { ReactiveFormsModule } from '@angular/forms';
-import { FooterComponent } from './components/footer/footer.component';
+import { TextFieldModule } from '@angular/cdk/text-field';
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 import {
     provideHttpClient,
     withInterceptorsFromDi,
 } from '@angular/common/http';
-import { DrawingAreaModule } from './components/drawing-area/drawing-area.module';
-import { FormsModule } from '@angular/forms';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
-import { CutExecutionComponent } from './components/cut-execution/cut-execution.component';
-import { ExampleEventLogsComponent } from './components/example-event-logs/example-event-logs.component';
-import { TextFieldModule } from '@angular/cdk/text-field';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AppComponent } from './app.component';
+import { CutExecutionComponent } from './components/cut-execution/cut-execution.component';
+import { DrawingAreaModule } from './components/drawing-area/drawing-area.module';
+import { FooterComponent } from './components/footer/footer.component';
 
 @NgModule({
     declarations: [AppComponent, FooterComponent],
@@ -38,7 +36,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
         FormsModule,
         MatDialogModule,
         CutExecutionComponent,
-        ExampleEventLogsComponent,
         TextFieldModule,
         MatTooltipModule,
     ],
