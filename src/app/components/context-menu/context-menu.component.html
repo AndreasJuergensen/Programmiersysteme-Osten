@@ -91,19 +91,19 @@
             <div>Execute Cut</div>
         </div>
         <div class="context-menu sub-menu">
-            <div class="menu-button" mat-button>
+            <div class="menu-button" mat-button (click)="executingCut.executeParallelCut()">
                 <mat-icon>alt_route</mat-icon>
                 <div>Parallel Cut</div>
             </div>
-            <div class="menu-button" mat-button>
+            <div class="menu-button" mat-button (click)="executingCut.executeSequenceCut()">
                 <mat-icon>straight</mat-icon>
                 <div>Sequence Cut</div>
             </div>
-            <div class="menu-button" mat-button>
+            <div class="menu-button" mat-button (click)="executingCut.executeExclusiveCut()">
                 <mat-icon>call_split</mat-icon>
                 <div>Exclusive Cut</div>
             </div>
-            <div class="menu-button" mat-button>
+            <div class="menu-button" mat-button (click)="executingCut.executeLoopCut()">
                 <mat-icon>repeat</mat-icon>
                 <div>Loop Cut</div>
             </div>

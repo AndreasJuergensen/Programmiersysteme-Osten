@@ -16,7 +16,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
-import { CutExecutionComponent } from './components/cut-execution/cut-execution.component';
 import { DrawingAreaModule } from './components/drawing-area/drawing-area.module';
 import { FooterComponent } from './components/footer/footer.component';
 
@@ -35,7 +34,6 @@ import { FooterComponent } from './components/footer/footer.component';
         MatSnackBarModule,
         FormsModule,
         MatDialogModule,
-        CutExecutionComponent,
         TextFieldModule,
         MatTooltipModule,
     ],

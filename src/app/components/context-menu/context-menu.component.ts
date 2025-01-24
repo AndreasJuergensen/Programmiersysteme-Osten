@@ -13,6 +13,8 @@ import { PetriNetManagementService } from 'src/app/services/petri-net-management
 import { EventLogDialogComponent } from '../event-log-dialog/event-log-dialog.component';
 import { Subscription } from 'rxjs';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
+import { CutType, ExecuteCutService } from 'src/app/services/execute-cut.service';
+import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 
 @Component({
     selector: 'app-context-menu',
@@ -32,6 +34,7 @@ export class ContextMenuComponent implements OnInit {
     readonly dialogOpening: DialogOpening;
     readonly showingEventLog: ShowingEventLog;
     readonly resettingSelection: ResettingSelection;
+    readonly executingCut: ExecutingCut;
 
     constructor(
         private readonly contextMenuService: ContextMenuService,
@@ -41,6 +44,8 @@ export class ContextMenuComponent implements OnInit {
         readonly calculateDfgService: CalculateDfgService,
         readonly matDialog: MatDialog,
         readonly collectSelectedElementsService: CollectSelectedElementsService,
+        readonly executeCutService: ExecuteCutService,
+        readonly feedbackService: ShowFeedbackService,
     ) {
         this.contextMenuService.visibility$.subscribe((visibility) => {
             this.visibility = visibility;
@@ -74,7 +79,13 @@ export class ContextMenuComponent implements OnInit {
         this.resettingSelection = new ResettingSelection(
             collectSelectedElementsService,
             contextMenuService,
-        )
+        );
+        this.executingCut = new ExecutingCut(
+            executeCutService,
+            feedbackService,
+            collectSelectedElementsService,
+            contextMenuService,
+        );
     }
     ngOnInit(): void {
         window.addEventListener('scroll', () => {
@@ -82,6 +93,51 @@ export class ContextMenuComponent implements OnInit {
                 this.contextMenuService.hide();
             }
         });
+    }
+}
+
+class ExecutingCut {
+    constructor(
+        private executeCutService: ExecuteCutService,
+        private feedbackService: ShowFeedbackService,
+        private collectSelectedElementsService: CollectSelectedElementsService,
+        private contextMenuService: ContextMenuService,
+    ) {}
+
+    executeExclusiveCut(): void {
+        this.executeCut(CutType.ExclusiveCut);
+    }
+
+    executeSequenceCut(): void {
+        this.executeCut(CutType.SequenceCut);
+    }
+
+    executeParallelCut(): void {
+        this.executeCut(CutType.ParallelCut);
+    }
+
+    executeLoopCut(): void {
+        this.executeCut(CutType.LoopCut);
+    }
+
+    private executeCut(cutType: CutType): void {
+        if (
+            this.collectSelectedElementsService.currentCollectedArcsDFG ==
+            undefined
+        ) {
+            this.feedbackService.showMessage(
+                'No arc selected via the drawing area!',
+                true,
+                'You have to choose at least one arc the perform a cut on a dfg.',
+            );
+            return;
+        }
+        this.executeCutService.execute(
+            this.collectSelectedElementsService.currentCollectedArcsDFG,
+            this.collectSelectedElementsService.collectedArcs,
+            cutType,
+        );
+        this.contextMenuService.hide();
     }
 }
 
