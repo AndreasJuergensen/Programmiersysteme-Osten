@@ -13,8 +13,12 @@ import { PetriNetManagementService } from 'src/app/services/petri-net-management
 import { EventLogDialogComponent } from '../event-log-dialog/event-log-dialog.component';
 import { Subscription } from 'rxjs';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
-import { CutType, ExecuteCutService } from 'src/app/services/execute-cut.service';
+import {
+    CutType,
+    ExecuteCutService,
+} from 'src/app/services/execute-cut.service';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
+import { FallThroughHandlingService } from 'src/app/services/fall-through-handling.service';
 
 @Component({
     selector: 'app-context-menu',
@@ -35,6 +39,7 @@ export class ContextMenuComponent implements OnInit {
     readonly showingEventLog: ShowingEventLog;
     readonly resettingSelection: ResettingSelection;
     readonly executingCut: ExecutingCut;
+    readonly executingFallThrough: ExecutingFallThrough;
 
     constructor(
         private readonly contextMenuService: ContextMenuService,
@@ -46,6 +51,7 @@ export class ContextMenuComponent implements OnInit {
         readonly collectSelectedElementsService: CollectSelectedElementsService,
         readonly executeCutService: ExecuteCutService,
         readonly feedbackService: ShowFeedbackService,
+        readonly fallThroughHandlingService: FallThroughHandlingService,
     ) {
         this.contextMenuService.visibility$.subscribe((visibility) => {
             this.visibility = visibility;
@@ -86,6 +92,10 @@ export class ContextMenuComponent implements OnInit {
             collectSelectedElementsService,
             contextMenuService,
         );
+        this.executingFallThrough = new ExecutingFallThrough(
+            fallThroughHandlingService,
+            contextMenuService,
+        );
     }
     ngOnInit(): void {
         window.addEventListener('scroll', () => {
@@ -93,6 +103,23 @@ export class ContextMenuComponent implements OnInit {
                 this.contextMenuService.hide();
             }
         });
+    }
+}
+
+class ExecutingFallThrough {
+    constructor(
+        private fallThroughHandlingService: FallThroughHandlingService,
+        private contextMenuService: ContextMenuService,
+    ) {}
+
+    executeActivityOncePerTraceFallThrough(): void {
+        this.fallThroughHandlingService.executeActivityOncePerTraceFallThrough();
+        this.contextMenuService.hide();
+    }
+
+    executeFlowerModelFallThrough() {
+        this.fallThroughHandlingService.executeFlowerFallThrough();
+        this.contextMenuService.hide();
     }
 }
 

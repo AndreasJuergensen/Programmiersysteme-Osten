@@ -117,11 +117,11 @@
             <div>Execute Fall Through</div>
         </div>
         <div class="context-menu sub-menu">
-            <div class="menu-button" mat-button>
+            <div class="menu-button" mat-button (click)="executingFallThrough.executeActivityOncePerTraceFallThrough()">
                 <mat-icon>looks_one</mat-icon>
                 <div>Activity Once Per Trace Fall Through</div>
             </div>
-            <div class="menu-button" mat-button>
+            <div class="menu-button" mat-button (click)="executingFallThrough.executeFlowerModelFallThrough()">
                 <mat-icon>filter_vintage</mat-icon>
                 <div>Flower Model Fall Through</div>
             </div>
