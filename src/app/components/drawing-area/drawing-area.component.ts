@@ -31,6 +31,7 @@ import {
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
 import _ from 'lodash';
+import { ApplicationStateService } from 'src/app/services/application-state.service';
 
 @Component({
     selector: 'app-drawing-area',
@@ -65,7 +66,12 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         private calculatePetriNetService: CalculatePetriNetService,
         private positionForActivitiesService: PositionForActivitiesService,
         private readonly contextMenuService: ContextMenuService,
-    ) {}
+        applicationStateService: ApplicationStateService,
+    ) {
+        applicationStateService.showEventLogs$.subscribe((showEventLogs) => {
+            this.showEventLogs = showEventLogs;
+        });
+    }
 
     get activities(): Array<Activity> {
         return this._activities;

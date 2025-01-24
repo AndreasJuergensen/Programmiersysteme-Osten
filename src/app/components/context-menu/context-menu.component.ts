@@ -29,10 +29,11 @@ export class ContextMenuComponent implements OnInit {
     readonly examples: Examples;
     readonly undoing: Undoing;
     readonly dialogOpening: DialogOpening;
+    readonly showingEventLog: ShowingEventLog;
 
     constructor(
-        readonly exportService: ExportService,
         private readonly contextMenuService: ContextMenuService,
+        readonly exportService: ExportService,
         readonly applicationStateService: ApplicationStateService,
         readonly petriNetManagementService: PetriNetManagementService,
         readonly calculateDfgService: CalculateDfgService,
@@ -54,12 +55,18 @@ export class ContextMenuComponent implements OnInit {
         this.undoing = new Undoing(
             petriNetManagementService,
             contextMenuService,
+            this.disabling
         );
         this.dialogOpening = new DialogOpening(
             matDialog,
             calculateDfgService,
             petriNetManagementService,
             contextMenuService,
+        );
+        this.showingEventLog = new ShowingEventLog(
+            applicationStateService,
+            contextMenuService,
+            this.disabling,
         );
     }
     ngOnInit(): void {
@@ -68,6 +75,32 @@ export class ContextMenuComponent implements OnInit {
                 this.contextMenuService.hide();
             }
         });
+    }
+}
+
+class ShowingEventLog {
+    showEventLogs: boolean = false;
+
+    constructor(
+        private applicationStateService: ApplicationStateService,
+        private contextMenuService: ContextMenuService,
+        private disabling: Disabling,
+    ) {
+        this.applicationStateService.showEventLogs$.subscribe(
+            (showEventLogs) => {
+                this.showEventLogs = showEventLogs;
+            },
+        );
+    }
+
+    buttonText(): string {
+        return this.showEventLogs ? 'Hide Event Logs' : 'Show Event Logs';
+    }
+
+    toggleEventLogs() {
+        if (this.disabling.isToggleEventLogsDisabled()) return;
+        this.applicationStateService.toggleShowEventLogs();
+        this.contextMenuService.hide();
     }
 }
 
@@ -107,8 +140,11 @@ class Undoing {
     constructor(
         private petriNetManagementService: PetriNetManagementService,
         private contextMenuService: ContextMenuService,
+        private disabling: Disabling,
     ) {}
+
     undoLastUpdate() {
+        if (this.disabling.isUndoDisabled()) return;
         this.petriNetManagementService.updateToPreviousPetriNet();
         this.contextMenuService.hide();
     }

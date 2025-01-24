@@ -15,11 +15,11 @@
                 <svg:g
                     app-drawing-box
                     [box]="box"
-                    [showEventLogs]="showEventLogs.checked"
+                    [showEventLogs]="showEventLogs"
                 ></svg:g>
             </ng-container>
 
-            <ng-container *ngIf="!showEventLogs.checked">
+            <ng-container *ngIf="!showEventLogs">
                 <ng-container *ngFor="let boxArc of boxArcs">
                     <svg:g app-drawing-boxArc [boxArc]="boxArc"></svg:g>
                 </ng-container>
@@ -41,11 +41,5 @@
             </ng-container>
         </svg>
     </div>
-    <mat-checkbox
-        class="show-eventlog-checkbox"
-        (checked)="(showEventLogs)"
-        #showEventLogs
-        >Show Event Logs</mat-checkbox
-    >
 </div>
 <app-context-menu />

@@ -12,15 +12,19 @@ export class ApplicationStateService {
         new BehaviorSubject<boolean>(false);
     private _isInputPetriNet$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false);
+    private _showEventLogs$: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false);
 
     constructor(private petriNetManagementService: PetriNetManagementService) {
         this.petriNetManagementService.petriNet$.subscribe((petriNet) => {
             this._isPetriNetEmpty$.next(petriNet.isEmpty());
             this._isBasicPetriNet$.next(petriNet.isBasicPetriNet());
         });
-        this.petriNetManagementService.isInputPetriNet$.subscribe((isInputPetriNet) => {
-            this._isInputPetriNet$.next(isInputPetriNet);
-        });
+        this.petriNetManagementService.isInputPetriNet$.subscribe(
+            (isInputPetriNet) => {
+                this._isInputPetriNet$.next(isInputPetriNet);
+            },
+        );
     }
 
     get isPetriNetEmpty$() {
@@ -33,5 +37,13 @@ export class ApplicationStateService {
 
     get isInputPetriNet$() {
         return this._isInputPetriNet$.asObservable();
+    }
+
+    get showEventLogs$() {
+        return this._showEventLogs$.asObservable();
+    }
+
+    toggleShowEventLogs() {
+        this._showEventLogs$.next(!this._showEventLogs$.value);
     }
 }

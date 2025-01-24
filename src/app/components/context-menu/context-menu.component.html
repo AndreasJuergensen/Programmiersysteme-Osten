@@ -132,8 +132,13 @@
         class="menu-button"
         [class.disabled]="disabling.isToggleEventLogsDisabled()"
         mat-button
+        (click)="showingEventLog.toggleEventLogs()"
     >
-        <div>Toggle Event Logs</div>
+        <div>
+            {{
+                showingEventLog.buttonText()
+            }}
+        </div>
     </div>
     <div
         class="menu-button"
