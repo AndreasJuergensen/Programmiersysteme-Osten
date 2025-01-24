@@ -1,33 +1,36 @@
 <div (contextmenu)="onContextMenu($event)" (click)="onMenuClose()">
     <div id="drawingArea">
-        <svg
-            (mousedown)="mouseDown()"
-            (mouseup)="mouseUp()"
-            id="svg"
-            #svgElement
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <ng-container *ngFor="let arc of arcs">
-                <svg:g app-drawing-arc [arc]="arc"></svg:g>
-            </ng-container>
+            <svg
+                (mousedown)="mouseDown()"
+                (mouseup)="mouseUp()"
+                id="svg"
+                #svgElement
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <ng-container *ngFor="let arc of arcs">
+                    <svg:g app-drawing-arc [arc]="arc"></svg:g>
+                </ng-container>
 
-            <ng-container *ngFor="let box of boxes">
-                <svg:g
-                    app-drawing-box
-                    [box]="box"
-                    [showEventLogs]="showEventLogs"
-                ></svg:g>
-            </ng-container>
+                <ng-container *ngFor="let box of boxes">
+                    <svg:g
+                        app-drawing-box
+                        [box]="box"
+                        [showEventLogs]="showEventLogs"
+                    ></svg:g>
+                </ng-container>
 
             <ng-container *ngIf="!showEventLogs">
                 <ng-container *ngFor="let boxArc of boxArcs">
                     <svg:g app-drawing-boxArc [boxArc]="boxArc"></svg:g>
                 </ng-container>
 
-                <ng-container *ngFor="let activity of activities">
-                    <svg:g app-drawing-activity [activity]="activity"></svg:g>
+                    <ng-container *ngFor="let activity of activities">
+                        <svg:g
+                            app-drawing-activity
+                            [activity]="activity"
+                        ></svg:g>
+                    </ng-container>
                 </ng-container>
-            </ng-container>
 
         <ng-container *ngFor="let transition of transitions">
             <svg:g *ngIf="transition.name !== ''; else invisibleTransition" app-drawing-transition [transition]="transition"></svg:g>
@@ -36,10 +39,11 @@
             </ng-template>
         </ng-container>
 
-            <ng-container *ngFor="let place of places">
-                <svg:g app-drawing-place [place]="place"></svg:g>
-            </ng-container>
-        </svg>
+                <ng-container *ngFor="let place of places">
+                    <svg:g app-drawing-place [place]="place"></svg:g>
+                </ng-container>
+            </svg>
+        <div class="start-text" *ngIf="isEmpty">Right click here to start.</div>
     </div>
 </div>
 <app-context-menu />

@@ -32,6 +32,7 @@ import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
 import _ from 'lodash';
 import { ApplicationStateService } from 'src/app/services/application-state.service';
+import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
 
 @Component({
     selector: 'app-drawing-area',
@@ -61,15 +62,20 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     private _activityMoved = new Array<[activityId: string, dfgId: string]>();
 
     public showEventLogs: boolean = false;
+    public isEmpty: boolean = true;
 
     constructor(
         private calculatePetriNetService: CalculatePetriNetService,
         private positionForActivitiesService: PositionForActivitiesService,
         private readonly contextMenuService: ContextMenuService,
         applicationStateService: ApplicationStateService,
+        petriNetManagementService: PetriNetManagementService,
     ) {
         applicationStateService.showEventLogs$.subscribe((showEventLogs) => {
             this.showEventLogs = showEventLogs;
+        });
+        petriNetManagementService.petriNet$.subscribe((petriNet) => {
+            this.isEmpty = petriNet.isEmpty();
         });
     }
 
