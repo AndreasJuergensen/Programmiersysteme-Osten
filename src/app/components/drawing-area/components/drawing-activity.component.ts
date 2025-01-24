@@ -20,11 +20,9 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
             [attr.stroke-opacity]="strokeOpacity"
             [attr.stroke-width]="strokeWidth"
             [classList]="'draggable confine'"
-            (click)="onActivityClick($event, activity)"
             (mousedown)="startDrag($event)"
             (mousemove)="drag($event)"
-            (mouseup)="endDrag($event)"
-            (mouseleave)="endDrag($event)"
+            (mouseup)="endDrag($event, activity)"
         />
         <svg:text
             [attr.x]="activity.x"
@@ -75,6 +73,7 @@ export class DrawingActivityComponent {
     elementSelected: any;
     offset: any;
     transform: any;
+    mousePositionInitial: [number, number] = [0, 0];
     mouseClicked: boolean = false;
 
     bbox: any;
@@ -106,32 +105,13 @@ export class DrawingActivityComponent {
         );
     }
 
-    onActivityClick(event: Event, activity: Activity): void {
-        const rect = event.target as SVGRectElement;
-        const svg: SVGSVGElement = document.getElementsByTagName(
-            'svg',
-        )[0] as SVGSVGElement;
-        if (svg) {
-            const activities = svg.querySelectorAll('rect');
-            activities.forEach((activity) => {
-                if (rect === activity) {
-                    rect.classList.toggle('activity-marked');
-                } else {
-                    activity.classList.remove('activity-marked');
-                }
-            });
-        }
-        this._collectSelectedElementsService.updateSelectedActivity(
-            activity.id,
-        );
-    }
-
     startDrag(event: MouseEvent) {
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
         const target = event.target as SVGRectElement;
         this.mouseClicked = true;
+        this.mousePositionInitial = [event.clientX, event.clientY];
 
         if (target.classList.contains('draggable')) {
             this.offset = this.getMousePosition(event);
@@ -201,17 +181,42 @@ export class DrawingActivityComponent {
         }
     }
 
-    endDrag(event: MouseEvent) {
+    endDrag(event: MouseEvent, activity: Activity) {
         this.elementSelected = null;
+        const mousePositionCurrent = [event.clientX, event.clientY];
         if (this.mouseClicked) {
-            this._positionForActivitiesService.updateCoordinatesOfArcs(
-                this.activity.id,
-                this.activity.dfgId,
-                this.activity.x,
-                this.activity.y,
-            );
-            this.mouseClicked = false;
-            this._collectSelectedElementsService.resetSelectedArcs();
+            if (
+                mousePositionCurrent[0] !== this.mousePositionInitial[0] &&
+                mousePositionCurrent[1] !== this.mousePositionInitial[1]
+            ) {
+                this._positionForActivitiesService.updateCoordinatesOfArcs(
+                    this.activity.id,
+                    this.activity.dfgId,
+                    this.activity.x,
+                    this.activity.y,
+                );
+                this.mouseClicked = false;
+                console.log('ResetSelectedArcs');
+                this._collectSelectedElementsService.resetSelectedArcs();
+            } else {
+                const rect = event.target as SVGRectElement;
+                const svg: SVGSVGElement = document.getElementsByTagName(
+                    'svg',
+                )[0] as SVGSVGElement;
+                if (svg) {
+                    const activities = svg.querySelectorAll('rect');
+                    activities.forEach((activity) => {
+                        if (rect === activity) {
+                            rect.classList.toggle('activity-marked');
+                        } else {
+                            activity.classList.remove('activity-marked');
+                        }
+                    });
+                }
+                this._collectSelectedElementsService.updateSelectedActivity(
+                    activity.id,
+                );
+            }
         }
     }
 
