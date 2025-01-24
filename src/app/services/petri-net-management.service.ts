@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { Dfg } from '../classes/dfg/dfg';
 import { ShowFeedbackService } from './show-feedback.service';
 import _ from 'lodash';
+import { Arc } from '../components/drawing-area/models';
 
 @Injectable({
     providedIn: 'root',
@@ -122,5 +123,19 @@ export class PetriNetManagementService {
 
     get isInputPetriNet(): boolean {
         return this._isInputPetriNet;
+    }
+
+    public arcIsOverlayingArc(arc: Arc): boolean {
+        const overlayArc = this._petriNet.arcs.arcs.filter(
+            (arcInPetriNet) =>
+                arcInPetriNet.start.id === arc.end.id &&
+                arcInPetriNet.end.id === arc.start.id,
+        );
+
+        if (overlayArc.length > 0) {
+            return true;
+        }
+
+        return false;
     }
 }

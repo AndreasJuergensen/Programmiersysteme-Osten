@@ -20,56 +20,120 @@ export class ExampleEventLogsComponent {
         private _calculateDfgService: CalculateDfgService,
     ) {}
 
-    public generateEasyExample(): void {
+    public generateExclusiveExample(): void {
+        const traces: Trace[] = [
+            new Trace([new Activity('Order')]),
+            new Trace([new Activity('Request')]),
+        ];
+        const eventLog: EventLog = new EventLog(traces);
+        this.initializePetriNet(eventLog);
+    }
+
+    generateSequenceExample(): void {
+        const traces: Trace[] = [
+            new Trace([new Activity('Order'), new Activity('Confirm')]),
+        ];
+        const eventLog: EventLog = new EventLog(traces);
+        this.initializePetriNet(eventLog);
+    }
+
+    public generateParallelExample(): void {
+        const traces: Trace[] = [
+            new Trace([new Activity('Request'), new Activity('Order')]),
+            new Trace([new Activity('Order'), new Activity('Request')]),
+        ];
+        const eventLog: EventLog = new EventLog(traces);
+        this.initializePetriNet(eventLog);
+    }
+
+    generateLoopExample(): void {
         const traces: Trace[] = [
             new Trace([
-                new Activity('A'),
-                new Activity('B'),
-                new Activity('C'),
+                new Activity('Request'),
+                new Activity('Process'),
+                new Activity('Reject'),
+                new Activity('Request'),
+                new Activity('Process'),
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
         this.initializePetriNet(eventLog);
     }
 
-    public generateMediumExample(): void {
+    public generateAOPTExample(): void {
         const traces: Trace[] = [
+            new Trace([new Activity('Request'), new Activity('Order')]),
+            new Trace([new Activity('Order'), new Activity('Request')]),
             new Trace([
-                new Activity('A'),
-                new Activity('B'),
-                new Activity('C'),
+                new Activity('Order'),
+                new Activity('Request'),
+                new Activity('Confirm'),
             ]),
             new Trace([
-                new Activity('A'),
-                new Activity('Y'),
-                new Activity('Z'),
+                new Activity('Request'),
+                new Activity('Confirm'),
+                new Activity('Order'),
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
         this.initializePetriNet(eventLog);
     }
 
-    public generateComplexExample(): void {
+    public generateFlowerExample(): void {
         const traces: Trace[] = [
             new Trace([
-                new Activity('A'),
-                new Activity('B'),
-                new Activity('C'),
+                new Activity('Request'),
+                new Activity('Confirm'),
+                new Activity('Request'),
+                new Activity('Confirm'),
             ]),
             new Trace([
-                new Activity('U'),
-                new Activity('V'),
-                new Activity('W'),
-                new Activity('X'),
-                new Activity('Y'),
-                new Activity('Z'),
+                new Activity('Request'),
+                new Activity('Order'),
+                new Activity('Confirm'),
+            ]),
+        ];
+        const eventLog: EventLog = new EventLog(traces);
+        this.initializePetriNet(eventLog);
+    }
+
+    public generateFUHProcessMiningExample(): void {
+        const traces: Trace[] = [
+            new Trace([new Activity('SetPc'), new Activity('SetCfp')]),
+            new Trace([
+                new Activity('SuggestPc'),
+                new Activity('SetUpCfp'),
+                new Activity('SendInvites'),
+                new Activity('ReceiveAnswers'),
+                new Activity('FinalizePc'),
+                new Activity('FinalizeCfp'),
             ]),
             new Trace([
-                new Activity('U'),
-                new Activity('X'),
-                new Activity('Z'),
-                new Activity('A'),
-                new Activity('C'),
+                new Activity('SuggestPc'),
+                new Activity('SendInvites'),
+                new Activity('SetUpCfp'),
+                new Activity('ReceiveAnswers'),
+                new Activity('FinalizePc'),
+                new Activity('FinalizeCfp'),
+            ]),
+            new Trace([
+                new Activity('SuggestPc'),
+                new Activity('SendInvites'),
+                new Activity('ReceiveAnswers'),
+                new Activity('SetUpCfp'),
+                new Activity('FinalizePc'),
+                new Activity('FinalizeCfp'),
+            ]),
+            new Trace([
+                new Activity('SuggestPc'),
+                new Activity('SendInvites'),
+                new Activity('ReceiveAnswers'),
+                new Activity('UpdateInvitees'),
+                new Activity('SendInvites'),
+                new Activity('ReceiveAnswers'),
+                new Activity('FinalizePc'),
+                new Activity('SetUpCfp'),
+                new Activity('FinalizeCfp'),
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);

@@ -19,6 +19,7 @@ export class Trace {
     toString(): string {
         return this.traceXml.event
             .map(this.eventFactory)
+            .filter(event => event.isLifecycleComplete())
             .map((event) => event.toString())
             .join(' ');
     }

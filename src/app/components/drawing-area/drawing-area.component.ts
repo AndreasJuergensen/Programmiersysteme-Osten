@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import {
+    Component,
+    ElementRef,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from '@angular/core';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import {
@@ -23,6 +29,7 @@ import {
 } from './models';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
 import { InitializeArcFeedbackCalculationService } from 'src/app/services/initialize-arc-feedback-calculation.service';
+import { ContextMenuService } from 'src/app/services/context-menu.service';
 
 @Component({
     selector: 'app-drawing-area',
@@ -30,7 +37,10 @@ import { InitializeArcFeedbackCalculationService } from 'src/app/services/initia
     styleUrl: './drawing-area.component.css',
 })
 export class DrawingAreaComponent implements OnInit, OnDestroy {
+    @ViewChild('svgElement') svgElement!: ElementRef<SVGSVGElement>;
+
     private _sub: Subscription | undefined;
+    private observer!: MutationObserver;
 
     private _activities: Array<Activity> = new Array<Activity>();
     private _boxes: Array<Box> = new Array<Box>();
@@ -43,6 +53,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
     constructor(
         private calculatePetriNetService: CalculatePetriNetService,
+        private readonly contextMenuService: ContextMenuService,
         private petriNetManagementService: PetriNetManagementService,
         private initializeArcFeedbackCalculationService: InitializeArcFeedbackCalculationService,
     ) {}
@@ -200,10 +211,41 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 //     });
                 // });
             });
+
+        this.observer = new MutationObserver((mutations) => {
+            this.recalculateSVGSize();
+        });
+
+        const container = document.getElementById('svg');
+        if (container) {
+            this.observer.observe(container, {
+                childList: true,
+                subtree: false,
+                attributes: false,
+            });
+        }
     }
 
     ngOnDestroy(): void {
         this._sub?.unsubscribe();
+        if (this.observer) {
+            this.observer.disconnect();
+        }
+    }
+
+    private recalculateSVGSize() {
+        if (this.svgElement) {
+            const svg = this.svgElement.nativeElement;
+            const boundingBox = svg.getBBox();
+            svg.setAttribute(
+                'width',
+                (boundingBox.width + boundingBox.x).toString(),
+            );
+            svg.setAttribute(
+                'height',
+                (boundingBox.height + boundingBox.y).toString(),
+            );
+        }
     }
 
     mouseDown(): void {
@@ -224,5 +266,14 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         if (svg) {
             svg.classList.remove('mouseDown');
         }
+    }
+
+    onContextMenu(event: MouseEvent) {
+        event.preventDefault();
+        this.contextMenuService.showAt(event.clientX + 4, event.clientY + 4);
+    }
+
+    onMenuClose() {
+        this.contextMenuService.hide();
     }
 }

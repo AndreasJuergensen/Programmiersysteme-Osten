@@ -1,15 +1,23 @@
 svg {
-    width: 100%;
-    height: 800px;
-    border-style: dotted;
-    border-color: lightgray;
     -webkit-user-select: none; /* Safari */
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE10+/Edge */
     user-select: none; /* Standard */
+    margin-right: 10vh;
+    margin-bottom: 5vh;
 }
 
 .show-eventlog-checkbox {
     position: absolute;
     bottom: 0px;
+    right: 0;
+}
+
+#drawingArea {
+    width: 100%;
+    height: 60vh;
+    box-sizing: border-box;
+    overflow: auto;
+    scrollbar-color: gray lightgray;
+    border: 3px dotted lightgray;
 }
