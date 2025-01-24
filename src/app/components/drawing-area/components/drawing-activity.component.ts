@@ -196,7 +196,6 @@ export class DrawingActivityComponent {
                     this.activity.y,
                 );
                 this.mouseClicked = false;
-                console.log('ResetSelectedArcs');
                 this._collectSelectedElementsService.resetSelectedArcs();
             } else {
                 const rect = event.target as SVGRectElement;

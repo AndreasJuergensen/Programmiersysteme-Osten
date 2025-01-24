@@ -320,8 +320,6 @@ export class CalculateCoordinatesService {
             p.shift();
         });
 
-        console.log(allPaths);
-
         return allPaths;
     }
 }
