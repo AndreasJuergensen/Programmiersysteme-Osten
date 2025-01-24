@@ -4,6 +4,8 @@ import { PetriNetTransition } from '../petrinet/petri-net-transitions';
 import { Activities, Activity } from './activities';
 import { ArcJson, Arcs, CategorizedArcs, DfgArc } from './arcs';
 import { ExclusiveCut, LoopCut, ParallelCut, SequenceCut } from './cut';
+import { Worker } from 'worker_threads';
+import path from 'path';
 
 export interface DfgJson {
     activities: string[];
@@ -23,10 +25,10 @@ export class Dfg implements PetriNetTransition {
     ) {
         this.id = 'DFG' + ++Dfg.idCount;
 
-        if (Dfg._arcCalculationFlag) {
-            this.initializePossibleCut();
-            this.initializeArcSubsets();
-        }
+        // if (Dfg._arcCalculationFlag) {
+        //     this.initializePossibleCut();
+        //     this.initializeArcSubsets();
+        // }
     }
 
     public static get arcCalculationFlag(): boolean {
@@ -48,6 +50,7 @@ export class Dfg implements PetriNetTransition {
         console.log(`Starting processing for DFG: ${this.id}`);
         this.initializePossibleCut();
         this.initializeArcSubsets();
+        console.log('es geht weiter');
     }
 
     private initializePossibleCut(): void {

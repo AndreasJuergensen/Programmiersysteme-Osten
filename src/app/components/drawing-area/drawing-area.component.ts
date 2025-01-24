@@ -1,5 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import {
     ActivityNode,
     BoxNode,
@@ -20,6 +21,8 @@ import {
     Transition,
     TransitionToPlaceArc,
 } from './models';
+import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
+import { InitializeArcFeedbackCalculationService } from 'src/app/services/initialize-arc-feedback-calculation.service';
 
 @Component({
     selector: 'app-drawing-area',
@@ -38,7 +41,11 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
     public showEventLogs: boolean = false;
 
-    constructor(private calculatePetriNetService: CalculatePetriNetService) {}
+    constructor(
+        private calculatePetriNetService: CalculatePetriNetService,
+        private petriNetManagementService: PetriNetManagementService,
+        private initializeArcFeedbackCalculationService: InitializeArcFeedbackCalculationService,
+    ) {}
 
     get activities(): Array<Activity> {
         return this._activities;
@@ -65,8 +72,12 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this._sub = this.calculatePetriNetService.graph$.subscribe(
-            (graph: Graph) => {
+        this._sub = this.calculatePetriNetService.graph$
+            .pipe(
+                // Filter out empty graphs or graphs with no nodes
+                filter((graphes: Graph) => graphes.nodes.length > 0),
+            )
+            .subscribe((graph: Graph) => {
                 const places: Array<Place> = new Array<Place>();
                 const activities: Array<Activity> = new Array<Activity>();
                 const transitions: Array<Transition> = new Array<Transition>();
@@ -175,8 +186,20 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 this._places = places;
                 this._arcs = arcs;
                 this._boxArcs = boxArcs;
-            },
-        );
+
+                // this.initializeArcFeedbackCalculationService.initialize();
+                // this.petriNetManagementService.petriNet$.forEach((petriNet) => {
+                //     console.log(petriNet);
+                //     this.initializeArcFeedbackCalculationService.initialize(
+                //         petriNet,
+                //     );
+                // });
+                // this.petriNetManagementService.petriNet$.forEach((petriNet) => {
+                //     petriNet.getDFGs().forEach((dfg) => {
+                //         dfg.startProcessing();
+                //     });
+                // });
+            });
     }
 
     ngOnDestroy(): void {

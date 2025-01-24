@@ -63,9 +63,9 @@ export class CollectSelectedElementsService {
         }
     }
 
-    public async setCorrectArcs(selectedCut: CutType): Promise<void> {
+    public setCorrectArcs(selectedCut: CutType): void {
         const validatedArcs: CategorizedArcs =
-            await this._currentCollectedArcsDFG!.validateSelectedArcs(
+            this._currentCollectedArcsDFG!.validateSelectedArcs(
                 this._collectedArcs,
                 selectedCut,
             );

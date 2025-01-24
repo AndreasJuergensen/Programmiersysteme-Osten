@@ -47,6 +47,13 @@
         >
             Flower Model Fall Through
         </button>
+        <button
+            mat-flat-button
+            [disabled]="actionButtonsAreDisabled"
+            (click)="process()"
+        >
+            Process
+        </button>
     </div>
     <hr />
     <div class="flexRowAlignSpaceEvenlyStart">
