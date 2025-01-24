@@ -75,6 +75,15 @@
     </div>
     <div class="hr"></div>
     <div
+        class="menu-button"
+        [class.disabled]="disabling.isResetSelectionDisabled()"
+        mat-button
+        (click)="resettingSelection.resetSelection()"
+    >
+        <mat-icon>refresh</mat-icon>
+        <div>Reset selection</div>
+    </div>
+    <div
         class="sub-menu-wrapper"
         [class.disabled]="disabling.isExecuteCutDisabled()"
     >
@@ -135,9 +144,7 @@
         (click)="showingEventLog.toggleEventLogs()"
     >
         <div>
-            {{
-                showingEventLog.buttonText()
-            }}
+            {{ showingEventLog.buttonText() }}
         </div>
     </div>
     <div

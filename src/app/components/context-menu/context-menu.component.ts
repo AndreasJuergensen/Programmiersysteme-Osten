@@ -12,6 +12,7 @@ import { ExportService } from 'src/app/services/export.service';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
 import { EventLogDialogComponent } from '../event-log-dialog/event-log-dialog.component';
 import { Subscription } from 'rxjs';
+import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 
 @Component({
     selector: 'app-context-menu',
@@ -30,6 +31,7 @@ export class ContextMenuComponent implements OnInit {
     readonly undoing: Undoing;
     readonly dialogOpening: DialogOpening;
     readonly showingEventLog: ShowingEventLog;
+    readonly resettingSelection: ResettingSelection;
 
     constructor(
         private readonly contextMenuService: ContextMenuService,
@@ -38,6 +40,7 @@ export class ContextMenuComponent implements OnInit {
         readonly petriNetManagementService: PetriNetManagementService,
         readonly calculateDfgService: CalculateDfgService,
         readonly matDialog: MatDialog,
+        readonly collectSelectedElementsService: CollectSelectedElementsService,
     ) {
         this.contextMenuService.visibility$.subscribe((visibility) => {
             this.visibility = visibility;
@@ -55,7 +58,7 @@ export class ContextMenuComponent implements OnInit {
         this.undoing = new Undoing(
             petriNetManagementService,
             contextMenuService,
-            this.disabling
+            this.disabling,
         );
         this.dialogOpening = new DialogOpening(
             matDialog,
@@ -68,6 +71,10 @@ export class ContextMenuComponent implements OnInit {
             contextMenuService,
             this.disabling,
         );
+        this.resettingSelection = new ResettingSelection(
+            collectSelectedElementsService,
+            contextMenuService,
+        )
     }
     ngOnInit(): void {
         window.addEventListener('scroll', () => {
@@ -75,6 +82,18 @@ export class ContextMenuComponent implements OnInit {
                 this.contextMenuService.hide();
             }
         });
+    }
+}
+
+class ResettingSelection {
+    constructor(
+        private collectSelectedElementsService: CollectSelectedElementsService,
+        private contextMenuService: ContextMenuService,
+    ) {}
+
+    resetSelection() {
+        this.collectSelectedElementsService.resetSelectedElements();
+        this.contextMenuService.hide();
     }
 }
 
@@ -332,6 +351,10 @@ class Disabling {
 
     isExportDisabled(): boolean {
         return this.isPetriNetEmpty || !this.isBasicPetriNet;
+    }
+
+    isResetSelectionDisabled(): boolean {
+        return this.isPetriNetEmpty || this.isBasicPetriNet;
     }
 
     isExecuteCutDisabled(): boolean {
