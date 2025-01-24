@@ -317,9 +317,6 @@ export class CalculateCoordinatesService {
         allPaths.forEach((p) => {
             p.shift();
         });
-
-        console.log(allPaths);
-
         return allPaths;
     }
 }

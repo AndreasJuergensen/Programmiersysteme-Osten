@@ -46,18 +46,17 @@ export class Dfg implements PetriNetTransition {
         );
     }
 
-    public startProcessing(): void {
+    public async startProcessing(): Promise<void> {
         console.log(`Starting processing for DFG: ${this.id}`);
         this.initializePossibleCut();
         this.initializeArcSubsets();
-        console.log('es geht weiter');
     }
 
-    private initializePossibleCut(): void {
+    private async initializePossibleCut(): Promise<void> {
         this._currentPossibleCut = this.calculatePossibleCut();
     }
 
-    private initializeArcSubsets(): void {
+    private async initializeArcSubsets(): Promise<void> {
         if (!this.getPossibleCut()) {
             const noSubsets: Array<DfgArc> = [];
 
@@ -208,7 +207,6 @@ export class Dfg implements PetriNetTransition {
 
         switch (this.getPossibleCut()) {
             case CutType.ExclusiveCut:
-                console.log('exclusive');
                 const filteredExclusiveArcs = filteredArcs.removeArcsBy(
                     filteredArcs.getNonStartAndStopArcs(),
                 );
@@ -218,7 +216,6 @@ export class Dfg implements PetriNetTransition {
                     );
                 break;
             case CutType.SequenceCut:
-                console.log('sequence');
                 const filteredSequenceArcs = filteredArcs.removeArcsBy(
                     filteredArcs.getReverseArcs(),
                 );
@@ -228,7 +225,6 @@ export class Dfg implements PetriNetTransition {
                     );
                 break;
             case CutType.ParallelCut:
-                console.log('parallel');
                 const filteredParallelArcs = filteredArcs.removeArcsBy(
                     filteredArcs.getNonReversedArcs(),
                 );
@@ -238,7 +234,6 @@ export class Dfg implements PetriNetTransition {
                     );
                 break;
             case CutType.LoopCut:
-                console.log('loop');
                 const filteredLoopArcs = filteredArcs.removeArcsBy(
                     filteredArcs.getStartAndStopArcs(),
                 );

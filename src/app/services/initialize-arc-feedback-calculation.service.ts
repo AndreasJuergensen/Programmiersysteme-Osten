@@ -15,8 +15,15 @@ export class InitializeArcFeedbackCalculationService {
     }
 
     public async initialize(): Promise<void> {
-        this._petriNet.getDFGs().forEach((dfg) => {
-            dfg.startProcessing();
+        console.log('initialize');
+
+        console.log(this._petriNet);
+        await new Promise<void>(() => {
+            setTimeout(() => {
+                this._petriNet.getDFGs().forEach((dfg) => {
+                    dfg.startProcessing();
+                });
+            }, 0);
         });
     }
 }

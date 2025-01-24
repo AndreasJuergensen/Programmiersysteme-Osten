@@ -73,8 +73,8 @@ export class AppComponent {
         this._petriNetManagementService.updateToPreviousPetriNet();
     }
 
-    process() {
-        this._initializeArcFeedbackCalculationService.initialize();
+    async process() {
+        await this._initializeArcFeedbackCalculationService.initialize();
     }
     get actionButtonsAreDisabled(): boolean {
         return !this._petriNetManagementService.isModifiable;

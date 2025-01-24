@@ -58,11 +58,9 @@ export class CalculatePetriNetService {
      */
     public calculatePetriNet(petriNet: PetriNet): Graph {
         const dfgs: Array<Dfg> = new Array<Dfg>();
-        console.log('start Petri Net calculation');
 
         //Schritt 1: Suche DFGs
         petriNet.transitions.transitions.forEach((value, key) => {
-            console.log('step 1');
             if (value instanceof Dfg) {
                 dfgs.push(value);
             }
@@ -70,7 +68,6 @@ export class CalculatePetriNetService {
 
         //Schritt 2: Berechne Graphen der DFGs und deren Größe
         dfgs.map((dfg) => {
-            console.log('step 2');
             const dfgAsGraph =
                 this.calculateCoodinatesService.calculateCoordinates(dfg);
 
@@ -85,7 +82,6 @@ export class CalculatePetriNetService {
         });
 
         //Schritt 3:
-        console.log('step 3');
         const nodes: Array<Node> = this.generateNodes(
             petriNet,
             this._dfgGraphsAndBoxes,
