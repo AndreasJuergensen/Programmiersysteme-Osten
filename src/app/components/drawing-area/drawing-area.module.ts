@@ -5,6 +5,7 @@ import { ContextMenuComponent } from '../context-menu/context-menu.component';
 import {
     DrawingActivityComponent,
     DrawingArcComponent,
+    DrawingBoxArcComponent,
     DrawingPlaceComponent,
     DrawingTransitionsComponent,
 } from './components';
@@ -17,6 +18,7 @@ import { DrawingAreaComponent } from './drawing-area.component';
         DrawingActivityComponent,
         DrawingBoxComponent,
         DrawingArcComponent,
+        DrawingBoxArcComponent,
         DrawingPlaceComponent,
         DrawingTransitionsComponent,
     ],

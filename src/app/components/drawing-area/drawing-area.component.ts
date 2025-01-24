@@ -48,7 +48,10 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
     public showEventLogs: boolean = false;
 
-    constructor(private calculatePetriNetService: CalculatePetriNetService, private readonly contextMenuService: ContextMenuService) {}
+    constructor(
+        private calculatePetriNetService: CalculatePetriNetService,
+        private readonly contextMenuService: ContextMenuService,
+    ) {}
 
     get activities(): Array<Activity> {
         return this._activities;
