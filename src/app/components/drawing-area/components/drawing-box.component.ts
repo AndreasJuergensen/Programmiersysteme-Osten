@@ -38,13 +38,11 @@ import { CollectSelectedElementsService } from 'src/app/services/collect-selecte
                         width: 100%; 
                         overflow-y: auto; 
                         padding: 10px; 
-                        box-sizing: border-box;"
+                        box-sizing: border-box;
+                        white-space: pre-line;
+                        user-select: all;"
                 >
-                    <ng-container *ngFor="let trace of box.traces">
-                        <p style="margin: 0px;user-select: text;">
-                            {{ trace }}
-                        </p>
-                    </ng-container>
+                    {{ box.eventLog }}
                 </div>
             </foreignObject>
         </ng-container>
