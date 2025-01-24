@@ -23,52 +23,12 @@ export class AppComponent {
         private _fallThroughHandlingService: FallThroughHandlingService,
     ) {}
 
-    public openDialog(): void {
-        const config: MatDialogConfig = { width: '800px' };
-        const dialogRef = this._matDialog.open<
-            EventLogDialogComponent,
-            MatDialogConfig,
-            EventLog
-        >(EventLogDialogComponent, config);
-
-        const sub: Subscription = dialogRef.afterClosed().subscribe({
-            next: (eventLog) => {
-                if (eventLog === undefined) {
-                    return;
-                }
-
-                Dfg.resetIdCount();
-                const dfg: Dfg = this._calculateDfgService.calculate(eventLog);
-                this._petriNetManagementService.initialize(dfg);
-            },
-            complete: () => sub.unsubscribe(),
-        });
-    }
-
-    public openHelp(): void {
-        // hier könnte man ggfs. nähere Informationen zur Anwendung platzieren
-        // oder dynmaisch je nach aktuellem Bearbeitungsstand des Users unterschiedlcihe
-        // Hilfestellungen geben
-
-        const helpMessage = `
-      Willkommen im Hilfe-Bereich! 
-      Hier finden Sie Informationen und Anleitungen zur Nutzung dieser Anwendung. 
-      Wenn Sie weitere Fragen haben, kontaktieren Sie bitte unseren Support.
-    `;
-
-        this._feedbackService.openHelpDialog(helpMessage);
-    }
-
     activityOncePerTraceExecution(): void {
         this._fallThroughHandlingService.executeActivityOncePerTraceFallThrough();
     }
 
     flowerExecution() {
         this._fallThroughHandlingService.executeFlowerFallThrough();
-    }
-
-    undoLastUpdate() {
-        this._petriNetManagementService.updateToPreviousPetriNet();
     }
 
     get actionButtonsAreDisabled(): boolean {

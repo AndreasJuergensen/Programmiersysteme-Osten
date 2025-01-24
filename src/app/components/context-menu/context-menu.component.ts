@@ -1,11 +1,7 @@
-import {
-    Component,
-    Input,
-    OnChanges,
-    OnInit,
-    SimpleChanges,
-} from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { Activity } from 'src/app/classes/dfg/activities';
 import { Dfg } from 'src/app/classes/dfg/dfg';
 import { EventLog, Trace } from 'src/app/classes/event-log';
@@ -14,11 +10,13 @@ import { CalculateDfgService } from 'src/app/services/calculate-dfg.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { ExportService } from 'src/app/services/export.service';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
+import { EventLogDialogComponent } from '../event-log-dialog/event-log-dialog.component';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-context-menu',
     standalone: true,
-    imports: [MatButtonModule],
+    imports: [MatButtonModule, MatIconModule],
     templateUrl: './context-menu.component.html',
     styleUrl: './context-menu.component.css',
 })
@@ -29,6 +27,8 @@ export class ContextMenuComponent implements OnInit {
     readonly disabling: Disabling;
     readonly exporting: Exporting;
     readonly examples: Examples;
+    readonly undoing: Undoing;
+    readonly dialogOpening: DialogOpening;
 
     constructor(
         readonly exportService: ExportService,
@@ -36,6 +36,7 @@ export class ContextMenuComponent implements OnInit {
         readonly applicationStateService: ApplicationStateService,
         readonly petriNetManagementService: PetriNetManagementService,
         readonly calculateDfgService: CalculateDfgService,
+        readonly matDialog: MatDialog,
     ) {
         this.contextMenuService.visibility$.subscribe((visibility) => {
             this.visibility = visibility;
@@ -50,6 +51,16 @@ export class ContextMenuComponent implements OnInit {
             calculateDfgService,
             contextMenuService,
         );
+        this.undoing = new Undoing(
+            petriNetManagementService,
+            contextMenuService,
+        );
+        this.dialogOpening = new DialogOpening(
+            matDialog,
+            calculateDfgService,
+            petriNetManagementService,
+            contextMenuService,
+        );
     }
     ngOnInit(): void {
         window.addEventListener('scroll', () => {
@@ -57,6 +68,49 @@ export class ContextMenuComponent implements OnInit {
                 this.contextMenuService.hide();
             }
         });
+    }
+}
+
+class DialogOpening {
+    constructor(
+        private matDialog: MatDialog,
+        private calculateDfgService: CalculateDfgService,
+        private petriNetManagementService: PetriNetManagementService,
+        private contextMenuService: ContextMenuService,
+    ) {}
+
+    openDialog(): void {
+        this.contextMenuService.hide();
+        const config: MatDialogConfig = { width: '800px' };
+        const dialogRef = this.matDialog.open<
+            EventLogDialogComponent,
+            MatDialogConfig,
+            EventLog
+        >(EventLogDialogComponent, config);
+
+        const sub: Subscription = dialogRef.afterClosed().subscribe({
+            next: (eventLog) => {
+                if (eventLog === undefined) {
+                    return;
+                }
+
+                Dfg.resetIdCount();
+                const dfg: Dfg = this.calculateDfgService.calculate(eventLog);
+                this.petriNetManagementService.initialize(dfg);
+            },
+            complete: () => sub.unsubscribe(),
+        });
+    }
+}
+
+class Undoing {
+    constructor(
+        private petriNetManagementService: PetriNetManagementService,
+        private contextMenuService: ContextMenuService,
+    ) {}
+    undoLastUpdate() {
+        this.petriNetManagementService.updateToPreviousPetriNet();
+        this.contextMenuService.hide();
     }
 }
 

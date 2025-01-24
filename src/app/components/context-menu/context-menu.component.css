@@ -15,7 +15,6 @@
         cursor: pointer;
         display: flex;
         align-items: center;
-        justify-content: space-between;
         width: 100%;
         box-sizing: border-box;
         white-space: nowrap;
@@ -23,6 +22,12 @@
         &:hover {
             background-color: #af899b;
             color: #ffe9fb;
+        }
+        mat-icon {
+            margin-right: 8px;
+        }
+        div {
+            flex-grow: 1;
         }
     }
 
