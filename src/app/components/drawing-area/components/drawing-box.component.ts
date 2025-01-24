@@ -41,7 +41,7 @@ import { CollectSelectedElementsService } from 'src/app/services/collect-selecte
                         box-sizing: border-box;"
                 >
                     <ng-container *ngFor="let trace of box.traces">
-                        <p style="margin: 0px;">
+                        <p style="margin: 0px;user-select: text;">
                             {{ trace }}
                         </p>
                     </ng-container>

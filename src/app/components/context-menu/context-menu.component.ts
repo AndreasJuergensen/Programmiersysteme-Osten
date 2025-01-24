@@ -457,6 +457,7 @@ class Disabling {
     }
 
     isToggleFeedbackDisabled(): boolean {
-        return this.isPetriNetEmpty;
+        // return this.isPetriNetEmpty;
+        return true;
     }
 }
