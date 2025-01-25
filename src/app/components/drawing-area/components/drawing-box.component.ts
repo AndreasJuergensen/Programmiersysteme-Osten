@@ -46,7 +46,7 @@ import { Box } from '../models';
             stroke-opacity: 0.5;
         }
         rect.box-marked {
-            stroke:rgb(228, 54, 115);
+            stroke: #ebce97;
             stroke-width: 5;
         }
         .event-log {

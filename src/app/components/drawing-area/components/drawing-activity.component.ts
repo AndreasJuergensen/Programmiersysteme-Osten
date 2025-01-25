@@ -41,7 +41,7 @@ import { Activity } from '../models';
         }
         rect.activity-marked {
             stroke-width: 3;
-            stroke: rgb(228, 54, 115);
+            stroke: #ebce97;
         }
         .draggable {
             cursor: move;
