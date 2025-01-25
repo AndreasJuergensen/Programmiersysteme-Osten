@@ -13,7 +13,7 @@ import { ApplicationStateService } from 'src/app/services/application-state.serv
 import { CalculateDfgService } from 'src/app/services/calculate-dfg.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { ExportService } from 'src/app/services/export.service';
-import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
+import { PetriNetManagementService, RecentEventLog } from 'src/app/services/petri-net-management.service';
 import { EventLogDialogComponent } from '../event-log-dialog/event-log-dialog.component';
 import { Subscription } from 'rxjs';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
@@ -231,7 +231,7 @@ class ShowingEventLog {
 }
 
 class DialogOpening {
-    private _recentEventLogs: string[] = [];
+    private _recentEventLogs: RecentEventLog[] = [];
     constructor(
         private matDialog: MatDialog,
         private calculateDfgService: CalculateDfgService,
@@ -249,6 +249,7 @@ class DialogOpening {
 
     private openDialog(data?: {
         eventLog: string;
+        filename?: string;
     }): MatDialogRef<EventLogDialogComponent, EventLog> {
         this.contextMenuService.hide();
         const config: MatDialogConfig = { width: '800px', data: data };
@@ -263,7 +264,7 @@ class DialogOpening {
                 if (!eventLog) return;
                 Dfg.resetIdCount();
                 const dfg: Dfg = this.calculateDfgService.calculate(eventLog);
-                this.petriNetManagementService.initialize(dfg);
+                this.petriNetManagementService.initialize(dfg, data?.filename);
             },
             complete: () => sub.unsubscribe(),
         });
@@ -284,7 +285,7 @@ class DialogOpening {
         this.contextMenuService.hide();
         const file: File = event.target.files[0];
         file?.text().then((content) => {
-            this.openDialog({ eventLog: this.parseXesService.parse(content) });
+            this.openDialog({ eventLog: this.parseXesService.parse(content), filename: file?.name });
         });
     }
 
@@ -297,16 +298,8 @@ class DialogOpening {
         this.petriNetManagementService.initialize(dfg);
     }
 
-    recentEventLogs(): string[] {
+    recentEventLogs(): RecentEventLog[] {
         return this._recentEventLogs;
-    }
-
-    display(eventLog: string): string {
-        if (eventLog.length <= 30) {
-            return eventLog;
-        }
-        const suffix = '... [' + eventLog.length + ']';
-        return eventLog.substring(0, 30 - suffix.length) + suffix;
     }
 }
 

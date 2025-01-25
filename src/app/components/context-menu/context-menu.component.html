@@ -114,11 +114,11 @@
                             class="menu-button"
                             mat-button
                             (click)="
-                                dialogOpening.openFromHistory(recentEventLog)
+                                dialogOpening.openFromHistory(recentEventLog.eventLog)
                             "
                         >
                             <div>
-                                {{ dialogOpening.display(recentEventLog) }}
+                                {{ recentEventLog.name }}
                             </div>
                         </div>
                     </ng-container>
