@@ -15,13 +15,14 @@ export class PetriNetManagementService {
     private _isModifiable: boolean = false;
     private _isInputPetriNet$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(true);
-
     private _petriNet$: BehaviorSubject<PetriNet> =
         new BehaviorSubject<PetriNet>(this._petriNet);
+    private _initialEventLog: string = '';
 
     constructor(private _showFeedbackService: ShowFeedbackService) {}
 
     public initialize(dfg: Dfg): void {
+        this._initialEventLog = dfg.eventLog.toString();
         this._petriNet = new PetriNet(dfg);
         this._previousPetriNets = [];
         this._isInputPetriNet$.next(true);
@@ -138,5 +139,9 @@ export class PetriNetManagementService {
         }
 
         return false;
+    }
+
+    get initialEventLog(): string {
+        return this._initialEventLog;
     }
 }
