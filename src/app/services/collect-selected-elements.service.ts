@@ -75,17 +75,14 @@ export class CollectSelectedElementsService {
     }
 
     public resetSelectedElements(): void {
-        this._collectedArcs = new Arcs();
-        this._currentCollectedArcsDFG = undefined;
-        this._selectedActivity = undefined;
-        this._selectedDFGBox = undefined;
-
-        this.resetClickedArcs();
+        this.resetSelectedArcs();
         this.resetSelectedActivity();
         this.resetSelectedDFGBox();
     }
 
-    private resetClickedArcs(): void {
+    resetSelectedArcs(): void {
+        this._collectedArcs = new Arcs();
+        this._currentCollectedArcsDFG = undefined;
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
@@ -102,7 +99,8 @@ export class CollectSelectedElementsService {
         }
     }
 
-    private resetSelectedActivity(): void {
+    resetSelectedActivity(): void {
+        this._selectedActivity = undefined;
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
@@ -115,7 +113,8 @@ export class CollectSelectedElementsService {
         }
     }
 
-    private resetSelectedDFGBox(): void {
+    resetSelectedDFGBox(): void {
+        this._selectedDFGBox = undefined;
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;

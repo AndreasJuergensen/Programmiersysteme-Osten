@@ -4,6 +4,8 @@ import { environment } from 'src/environments/environment';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
+import { Subscription } from 'rxjs';
+import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
 
 @Component({
     selector: 'svg:g[app-drawing-arc]',
@@ -44,7 +46,7 @@ import { PetriNetManagementService } from 'src/app/services/petri-net-management
         </svg:defs>
 
         <svg:path
-            [attr.d]="pathForLine(arc)"
+            [attr.d]="setPath(arc)"
             [attr.stroke]="'black'"
             [attr.stroke-width]="width"
             [attr.fill]="'none'"
@@ -60,12 +62,13 @@ export class DrawingArcComponent {
         private collectSelectedElementsService: CollectSelectedElementsService,
         private feedbackService: ShowFeedbackService,
         private petriNetManagementService: PetriNetManagementService,
+        private positionForActivitiesService: PositionForActivitiesService,
     ) {}
 
     readonly width: number = environment.drawingElements.arcs.width;
     readonly color: string = environment.drawingElements.arcs.color;
 
-    pathForLine(arc: Arc): string {
+    setPath(arc: Arc): string {
         if (!this.pathNecessary(arc)) {
             return `M ${arc.x1} ${arc.y1} L ${arc.x2} ${arc.y2}`;
         }
