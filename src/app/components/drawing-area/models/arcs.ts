@@ -68,7 +68,7 @@ export class DfgArc extends Arc {
         heightHalf: number,
         strokeHalf: number,
     ): number {
-        const distanceToRoundedCorner: number = 26;
+        const distanceToRoundedCorner: number = 19;
         const alphaDegAbs = Math.abs(this.alphaDeg);
         let calculatedLength: number;
         switch (alphaDegAbs) {

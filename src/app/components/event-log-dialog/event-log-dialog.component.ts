@@ -53,7 +53,7 @@ export class EventLogDialogComponent implements OnInit {
         private eventLogValidationService: EventLogValidationService,
         private parseXesService: ParseXesService,
         private cdr: ChangeDetectorRef,
-        @Inject(MAT_DIALOG_DATA) public data: any,
+        @Inject(MAT_DIALOG_DATA) private data: any,
     ) {}
 
     public fileName: string = '';
@@ -145,17 +145,5 @@ export class EventLogDialogComponent implements OnInit {
         this.eventLogControl.updateValueAndValidity();
 
         textarea.focus();
-    }
-    public onFileSelected(event: any): void {
-        const file: File = event.target.files[0];
-
-        if (file) {
-            this.fileName = file.name;
-            file.text().then((content) => {
-                this.eventLogControl.setValue(
-                    this.parseXesService.parse(content),
-                );
-            });
-        }
     }
 }

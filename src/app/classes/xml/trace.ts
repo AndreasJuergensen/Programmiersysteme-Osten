@@ -1,4 +1,4 @@
-import { Event, EventXml } from "./event";
+import { Event, EventXml, eventFromXml } from "./event";
 
 export interface TraceXml {
     event: EventXml[];
@@ -9,7 +9,7 @@ export class Trace {
         private readonly traceXml: TraceXml,
         private readonly eventFactory: (
             eventXml: EventXml,
-        ) => Event = Event.fromXml,
+        ) => Event = eventFromXml,
     ) {}
 
     static fromXml(traceXml: TraceXml): Trace {

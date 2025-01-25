@@ -18,11 +18,16 @@ export class PetriNetManagementService {
     private _petriNet$: BehaviorSubject<PetriNet> =
         new BehaviorSubject<PetriNet>(this._petriNet);
     private _initialEventLog: string = '';
+    private _recentEventLogs$: BehaviorSubject<string[]> = new BehaviorSubject<
+        string[]
+    >([]);
 
     constructor(private _showFeedbackService: ShowFeedbackService) {}
 
     public initialize(dfg: Dfg): void {
-        this._initialEventLog = dfg.eventLog.toString();
+        const eventLog: string = dfg.eventLog.toString();
+        this._initialEventLog = eventLog;
+        this.updateRecentEventLogs(eventLog);
         this._petriNet = new PetriNet(dfg);
         this._previousPetriNets = [];
         this._isInputPetriNet$.next(true);
@@ -36,6 +41,13 @@ export class PetriNetManagementService {
             this._isModifiable = true;
         }
         this._petriNet$.next(this._petriNet);
+    }
+
+    private updateRecentEventLogs(eventLog: string): void {
+        const recentEventLogs = [...this._recentEventLogs$.value];
+        const newLength = recentEventLogs.unshift(eventLog);
+        if (newLength > 5) recentEventLogs.pop();
+        this._recentEventLogs$.next(recentEventLogs);
     }
 
     public updatePnByExclusiveCut(
@@ -143,5 +155,9 @@ export class PetriNetManagementService {
 
     get initialEventLog(): string {
         return this._initialEventLog;
+    }
+
+    get recentEventLogs$() {
+        return this._recentEventLogs$.asObservable();
     }
 }
