@@ -21,7 +21,7 @@ export interface Event {
     toString(): string;
 }
 
-export function fromXml(eventXml: EventXml): Event {
+export function eventFromXml(eventXml: EventXml): Event {
     if (Array.isArray(eventXml.string)) {
         return new EventWithMultipleProperties(eventXml as EventXmlWithMultipleProperties);
     } else {

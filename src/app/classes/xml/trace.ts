@@ -1,4 +1,4 @@
-import { Event, EventXml, fromXml as eventFromXml } from "./event";
+import { Event, EventXml, eventFromXml } from "./event";
 
 export interface TraceXml {
     event: EventXml[];
