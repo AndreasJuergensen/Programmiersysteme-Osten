@@ -15,8 +15,7 @@ export class Dfg implements PetriNetTransition {
     private _currentPossibleCut: CutType | undefined;
     private _arcSubsets: Array<Array<DfgArc>> = [];
     private static _arcCalculationFlag: boolean = false;
-    private _isCurrentPossibleCutCalculationCompleted: boolean = false;
-    private _isArcSubsetsCalculationCompleted: boolean = false;
+    private _isFeedbackCalculationCompleted: boolean = false;
 
     constructor(
         private readonly _activities: Activities,
@@ -39,28 +38,6 @@ export class Dfg implements PetriNetTransition {
         console.log(
             `Arc calculation flag toggled to: ${this._arcCalculationFlag}`,
         );
-    }
-
-    public initializePossibleCut(): void {
-        this.calculatePossibleCut().then((possibleCutType) => {
-            this._currentPossibleCut = possibleCutType;
-            this._isCurrentPossibleCutCalculationCompleted = true;
-            this.initializeArcSubsets();
-        });
-    }
-
-    private initializeArcSubsets(): void {
-        if (!this.getPossibleCut()) {
-            this._arcSubsets = [];
-            this._isArcSubsetsCalculationCompleted = true;
-        } else {
-            this.filterArcsByCutAndCallSubsetGeneration().then(
-                (generatedSubsets) => {
-                    this._arcSubsets = generatedSubsets;
-                    this._isArcSubsetsCalculationCompleted = true;
-                },
-            );
-        }
     }
 
     public getPossibleCut(): CutType | undefined {
@@ -168,116 +145,6 @@ export class Dfg implements PetriNetTransition {
             }
         }
         return false;
-    }
-
-    async calculatePossibleCut(): Promise<CutType | undefined> {
-        const allActivities: Activities = new Activities()
-            .addAll(this.activities)
-            .removePlayAndStop();
-
-        for (let mask = 1; mask < 1 << allActivities.getLength(); mask++) {
-            const a1: Activities = new Activities();
-            const a2: Activities = new Activities();
-            for (let i = 0; i < allActivities.getLength(); i++) {
-                const activity: Activity = allActivities.getActivityByIndex(i);
-                if ((mask & (1 << i)) !== 0) {
-                    a1.addActivity(activity);
-                } else {
-                    a2.addActivity(activity);
-                }
-            }
-            if (this.canBeCutIn(a1, a2).cutIsPossible) {
-                return this.canBeCutIn(a1, a2).matchingCut!;
-            }
-        }
-
-        return undefined;
-    }
-
-    async filterArcsByCutAndCallSubsetGeneration(): Promise<
-        Array<Array<DfgArc>>
-    > {
-        const filteredArcs = this._arcs.removeArcsBy(
-            this._arcs.getSelfLoopArcs(),
-        );
-        //ein return am Ende
-        switch (this.getPossibleCut()!) {
-            case CutType.ExclusiveCut:
-                const filteredExclusiveArcs = filteredArcs.removeArcsBy(
-                    filteredArcs.getNonStartAndStopArcs(),
-                );
-                return this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
-                    filteredExclusiveArcs.getArcs(),
-                );
-            case CutType.SequenceCut:
-                const filteredSequenceArcs = filteredArcs.removeArcsBy(
-                    filteredArcs.getReverseArcs(),
-                );
-                return this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
-                    filteredSequenceArcs.getArcs(),
-                );
-            case CutType.ParallelCut:
-                const filteredParallelArcs = filteredArcs.removeArcsBy(
-                    filteredArcs.getNonReversedArcs(),
-                );
-                return this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
-                    filteredParallelArcs.getArcs(),
-                );
-            case CutType.LoopCut:
-                const filteredLoopArcs = filteredArcs.removeArcsBy(
-                    filteredArcs.getStartAndStopArcs(),
-                );
-                return this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
-                    filteredLoopArcs.getArcs(),
-                );
-        }
-    }
-
-    generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
-        arcs: Array<DfgArc>,
-    ): Array<Array<DfgArc>> {
-        const subsets: Array<Array<DfgArc>> = [];
-
-        let cutFeasibilityResults: {
-            cutIsPossible: boolean;
-            matchingCut: CutType | null;
-            a1: Activities;
-            a2: Activities;
-        }[] = [];
-        const totalSubsets = 1 << arcs.length;
-        const matchingCut: CutType = this.getPossibleCut()!;
-
-        for (let i = 0; i < totalSubsets; i++) {
-            const subset: Array<DfgArc> = [];
-
-            for (let j = 0; j < arcs.length; j++) {
-                if (i & (1 << j)) {
-                    subset.push(arcs[j]);
-                }
-            }
-            cutFeasibilityResults = this.canBeCutBy(
-                new Arcs(subset),
-                matchingCut,
-            );
-            if (
-                cutFeasibilityResults.filter(
-                    (cut) =>
-                        cut.cutIsPossible === true &&
-                        cut.matchingCut === matchingCut,
-                ).length === 1
-            ) {
-                subsets.push(subset);
-            }
-        }
-
-        return subsets;
-    }
-
-    isFeedbackCalculationCompleted(): boolean {
-        return (
-            this._isArcSubsetsCalculationCompleted &&
-            this._isCurrentPossibleCutCalculationCompleted
-        );
     }
 
     validateSelectedArcs(
@@ -476,6 +343,22 @@ export class Dfg implements PetriNetTransition {
         return this._eventLog;
     }
 
+    set currentPossibleCut(cut: CutType | undefined) {
+        this._currentPossibleCut = cut;
+    }
+
+    set arcSubsets(subsets: Array<Array<DfgArc>>) {
+        this._arcSubsets = subsets;
+    }
+
+    get isFeedbackCalculationCompleted(): boolean {
+        return this._isFeedbackCalculationCompleted;
+    }
+
+    set isFeedbackCalculationCompleted(value: boolean) {
+        this._isFeedbackCalculationCompleted = value;
+    }
+
     asJson(): DfgJson {
         return {
             activities: this._activities.asJson(),
@@ -543,11 +426,34 @@ export class DfgBuilder {
     }
 
     build(): Dfg {
-        const dfg: Dfg = new Dfg(this.activities, this.arcs, this.eventlog);
-        console.log('before');
-
-        dfg.initializePossibleCut();
-        console.log('after');
+        const dfg = new Dfg(this.activities, this.arcs, this.eventlog);
+        const worker = new Worker(
+            new URL('./asyncCalculation.worker', import.meta.url),
+        );
+        worker.onmessage = ({
+            data,
+        }: {
+            data: {
+                currentPossibleCut: CutType | undefined;
+                arcSubsets: {
+                    end: { _name: string };
+                    start: { _name: string };
+                }[][];
+            };
+        }) => {
+            dfg.currentPossibleCut = data.currentPossibleCut;
+            dfg.arcSubsets = data.arcSubsets.map((subset) =>
+                subset.map(
+                    (arc) =>
+                        new DfgArc(
+                            new Activity(arc.start._name),
+                            new Activity(arc.end._name),
+                        ),
+                ),
+            );
+            dfg.isFeedbackCalculationCompleted = true;
+        };
+        worker.postMessage(dfg);
         return dfg;
     }
 }

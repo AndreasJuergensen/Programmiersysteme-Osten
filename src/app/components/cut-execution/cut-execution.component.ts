@@ -90,7 +90,7 @@ export class CutExecutionComponent implements OnInit {
             } else {
                 this.resetRadioSelection();
                 if (
-                    this._collectSelectedElementsService.currentCollectedArcsDFG.isFeedbackCalculationCompleted()
+                    this._collectSelectedElementsService.currentCollectedArcsDFG.isFeedbackCalculationCompleted
                 ) {
                     this._collectSelectedElementsService.setArcFeedback(
                         selectedValue,
