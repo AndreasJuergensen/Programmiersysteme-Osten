@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { FallThroughHandlingService } from './services/fall-through-handling.service';
+import { PetriNetManagementService } from './services/petri-net-management.service';
 
 @Component({
     selector: 'app-root',

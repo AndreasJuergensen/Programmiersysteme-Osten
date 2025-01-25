@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import {
     FormControl,
     FormsModule,
@@ -7,7 +7,11 @@ import {
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+    MAT_DIALOG_DATA,
+    MatDialogModule,
+    MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -49,6 +53,7 @@ export class EventLogDialogComponent implements OnInit {
         private eventLogValidationService: EventLogValidationService,
         private parseXesService: ParseXesService,
         private cdr: ChangeDetectorRef,
+        @Inject(MAT_DIALOG_DATA) public data: any,
     ) {}
 
     public fileName: string = '';
@@ -56,6 +61,7 @@ export class EventLogDialogComponent implements OnInit {
     ngOnInit(): void {
         this.eventLogControl.markAsTouched();
         this.eventLogControl.updateValueAndValidity();
+        this.data && this.eventLogControl.setValue(this.data.eventLog);
     }
 
     private validateFormControlInput(

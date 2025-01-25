@@ -214,9 +214,9 @@ class DialogOpening {
         private contextMenuService: ContextMenuService,
     ) {}
 
-    openDialog(): void {
+    private openDialog(data?: { eventLog: string }): void {
         this.contextMenuService.hide();
-        const config: MatDialogConfig = { width: '800px' };
+        const config: MatDialogConfig = { width: '800px', data: data };
         const dialogRef = this.matDialog.open<
             EventLogDialogComponent,
             MatDialogConfig,
@@ -225,15 +225,22 @@ class DialogOpening {
 
         const sub: Subscription = dialogRef.afterClosed().subscribe({
             next: (eventLog) => {
-                if (eventLog === undefined) {
-                    return;
-                }
-
+                if (!eventLog) return;
                 Dfg.resetIdCount();
                 const dfg: Dfg = this.calculateDfgService.calculate(eventLog);
                 this.petriNetManagementService.initialize(dfg);
             },
             complete: () => sub.unsubscribe(),
+        });
+    }
+
+    openEmptyDialog(): void {
+        this.openDialog();
+    }
+
+    openPrefilledDialog(): void {
+        this.openDialog({
+            eventLog: this.petriNetManagementService.initialEventLog,
         });
     }
 }
@@ -459,5 +466,9 @@ class Disabling {
     isToggleFeedbackDisabled(): boolean {
         // return this.isPetriNetEmpty;
         return true;
+    }
+
+    isEditEventLogDisabled(): boolean {
+        return this.isPetriNetEmpty;
     }
 }

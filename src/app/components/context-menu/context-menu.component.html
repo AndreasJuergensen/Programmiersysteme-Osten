@@ -69,9 +69,13 @@
             </div>
         </div>
     </div>
-    <div class="menu-button" mat-button (click)="dialogOpening.openDialog()">
+    <div class="menu-button" mat-button (click)="dialogOpening.openEmptyDialog()">
         <mat-icon>playlist_add</mat-icon>
         <div>Import Event Log...</div>
+    </div>
+    <div class="menu-button" [class.disabled]="disabling.isEditEventLogDisabled()" mat-button (click)="dialogOpening.openPrefilledDialog()">
+        <mat-icon>edit_note</mat-icon>
+        <div>Edit Event Log...</div>
     </div>
     <div class="hr"></div>
     <div
