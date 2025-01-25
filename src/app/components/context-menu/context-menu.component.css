@@ -8,6 +8,7 @@
     user-select: none;
 
     .menu-button {
+        height: 40px;
         padding: 8px;
         border: none;
         border-radius: 4px;
@@ -56,6 +57,31 @@
         }
     }
 
+    .sub-sub-menu-wrapper {
+        position: relative;
+
+        & > .menu-button {
+            cursor: default;
+            &::after {
+                content: ">";
+                margin-left: 8px;
+            }
+        }
+
+        .sub-sub-menu {
+            display: none;
+        }
+
+        &:not(.disabled):hover {
+            .sub-sub-menu {
+                display: flex !important;
+                position: absolute;
+                top: 0;
+                left: 100%;
+            }
+        }
+    }
+
     .hr {
         height: 0px;
         border-top: 1px solid #d42f7c;
@@ -63,10 +89,15 @@
     }
 
     .disabled,
-    .sub-menu-wrapper.disabled .menu-button {
+    .sub-menu-wrapper.disabled .menu-button,
+    .sub-sub-menu-wrapper.disabled .menu-button {
         cursor: not-allowed;
         color: #ffe9fb;
         /* color: white; */
         background-color: #efc9db !important;
     }
+}
+
+.file-input {
+    display: none;
 }

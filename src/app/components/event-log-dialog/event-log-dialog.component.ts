@@ -146,16 +146,4 @@ export class EventLogDialogComponent implements OnInit {
 
         textarea.focus();
     }
-    public onFileSelected(event: any): void {
-        const file: File = event.target.files[0];
-
-        if (file) {
-            this.fileName = file.name;
-            file.text().then((content) => {
-                this.eventLogControl.setValue(
-                    this.parseXesService.parse(content),
-                );
-            });
-        }
-    }
 }

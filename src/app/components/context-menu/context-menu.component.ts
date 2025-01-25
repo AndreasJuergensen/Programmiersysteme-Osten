@@ -19,11 +19,13 @@ import {
 } from 'src/app/services/execute-cut.service';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 import { FallThroughHandlingService } from 'src/app/services/fall-through-handling.service';
+import { NgFor } from '@angular/common';
+import { ParseXesService } from 'src/app/services/parse-xes.service';
 
 @Component({
     selector: 'app-context-menu',
     standalone: true,
-    imports: [MatButtonModule, MatIconModule],
+    imports: [MatButtonModule, MatIconModule, NgFor],
     templateUrl: './context-menu.component.html',
     styleUrl: './context-menu.component.css',
 })
@@ -52,6 +54,7 @@ export class ContextMenuComponent implements OnInit {
         readonly executeCutService: ExecuteCutService,
         readonly feedbackService: ShowFeedbackService,
         readonly fallThroughHandlingService: FallThroughHandlingService,
+        readonly parseXesService: ParseXesService
     ) {
         this.contextMenuService.visibility$.subscribe((visibility) => {
             this.visibility = visibility;
@@ -60,7 +63,10 @@ export class ContextMenuComponent implements OnInit {
             this.position = { x: position.x + 'px', y: position.y + 'px' };
         });
         this.exporting = new Exporting(exportService, contextMenuService);
-        this.disabling = new Disabling(applicationStateService);
+        this.disabling = new Disabling(
+            applicationStateService,
+            petriNetManagementService,
+        );
         this.examples = new Examples(
             petriNetManagementService,
             calculateDfgService,
@@ -76,6 +82,7 @@ export class ContextMenuComponent implements OnInit {
             calculateDfgService,
             petriNetManagementService,
             contextMenuService,
+            parseXesService
         );
         this.showingEventLog = new ShowingEventLog(
             applicationStateService,
@@ -207,12 +214,20 @@ class ShowingEventLog {
 }
 
 class DialogOpening {
+    private _recentEventLogs: string[] = [];
     constructor(
         private matDialog: MatDialog,
         private calculateDfgService: CalculateDfgService,
         private petriNetManagementService: PetriNetManagementService,
         private contextMenuService: ContextMenuService,
-    ) {}
+        private parseXesService: ParseXesService,
+    ) {
+        petriNetManagementService.recentEventLogs$.subscribe(
+            (recentEventLogs) => {
+                this._recentEventLogs = recentEventLogs;
+            },
+        );
+    }
 
     private openDialog(data?: { eventLog: string }): void {
         this.contextMenuService.hide();
@@ -242,6 +257,29 @@ class DialogOpening {
         this.openDialog({
             eventLog: this.petriNetManagementService.initialEventLog,
         });
+    }
+
+    fileUpload(event: any) {
+        this.contextMenuService.hide();
+        const file: File = event.target.files[0];
+        file?.text().then((content) => {
+            this.openDialog({ eventLog: this.parseXesService.parse(content) });
+        });
+    }
+
+    openFromHistory(eventLog: string) {
+        this.openDialog({ eventLog: eventLog });
+    }
+
+    recentEventLogs(): string[] {
+        return this._recentEventLogs;
+    }
+
+    display(eventLog: string): string {
+        if (eventLog.length < 30) {
+            return eventLog;
+        }
+        return eventLog.substring(0, 20) + '... [' + eventLog.length + ']';
     }
 }
 
@@ -420,21 +458,30 @@ class Disabling {
     private isPetriNetEmpty: boolean = true;
     private isBasicPetriNet: boolean = false;
     private isInputPetriNet: boolean = false;
+    private hasRecentEventLogs: boolean = false;
 
-    constructor(private applicationStateService: ApplicationStateService) {
-        this.applicationStateService.isPetriNetEmpty$.subscribe(
+    constructor(
+        readonly applicationStateService: ApplicationStateService,
+        readonly petriNetManagementService: PetriNetManagementService,
+    ) {
+        applicationStateService.isPetriNetEmpty$.subscribe(
             (isPetriNetEmpty) => {
                 this.isPetriNetEmpty = isPetriNetEmpty;
             },
         );
-        this.applicationStateService.isBasicPetriNet$.subscribe(
+        applicationStateService.isBasicPetriNet$.subscribe(
             (isBasicPetriNet) => {
                 this.isBasicPetriNet = isBasicPetriNet;
             },
         );
-        this.applicationStateService.isInputPetriNet$.subscribe(
+        applicationStateService.isInputPetriNet$.subscribe(
             (isInputPetriNet) => {
                 this.isInputPetriNet = isInputPetriNet;
+            },
+        );
+        petriNetManagementService.recentEventLogs$.subscribe(
+            (recentEventLogs) => {
+                this.hasRecentEventLogs = recentEventLogs.length !== 0;
             },
         );
     }
@@ -470,5 +517,9 @@ class Disabling {
 
     isEditEventLogDisabled(): boolean {
         return this.isPetriNetEmpty;
+    }
+
+    isRecentEventLogsDisabled(): boolean {
+        return !this.hasRecentEventLogs;
     }
 }

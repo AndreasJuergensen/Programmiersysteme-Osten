@@ -69,11 +69,68 @@
             </div>
         </div>
     </div>
-    <div class="menu-button" mat-button (click)="dialogOpening.openEmptyDialog()">
-        <mat-icon>playlist_add</mat-icon>
-        <div>Import Event Log...</div>
+    <div class="sub-menu-wrapper">
+        <div class="menu-button" mat-button>
+            <mat-icon>playlist_add</mat-icon>
+            <div>New Event Log</div>
+        </div>
+        <div class="context-menu sub-menu">
+            <div
+                class="menu-button"
+                (click)="dialogOpening.openEmptyDialog()"
+                mat-button
+            >
+                <mat-icon>text_fields</mat-icon>
+                <div>Open Input Dialog...</div>
+            </div>
+            <input
+                type="file"
+                class="file-input"
+                onclick="this.value = null"
+                (change)="dialogOpening.fileUpload($event)"
+                accept=".xes"
+                #fileUpload
+            />
+            <div class="menu-button" (click)="fileUpload.click()" mat-button>
+                <mat-icon>upload</mat-icon>
+                <div>Import Event Log from XES-File...</div>
+            </div>
+            <div
+                class="sub-sub-menu-wrapper"
+                [class.disabled]="disabling.isRecentEventLogsDisabled()"
+            >
+                <div class="menu-button" mat-button>
+                    <mat-icon>history</mat-icon>
+                    <div>Recent Event Logs</div>
+                </div>
+                <div class="context-menu sub-sub-menu">
+                    <ng-container
+                        *ngFor="
+                            let recentEventLog of dialogOpening.recentEventLogs()
+                        "
+                    >
+                        <div
+                            class="menu-button"
+                            mat-button
+                            (click)="
+                                dialogOpening.openFromHistory(recentEventLog)
+                            "
+                        >
+                            <div>
+                                {{ dialogOpening.display(recentEventLog) }}
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="menu-button" [class.disabled]="disabling.isEditEventLogDisabled()" mat-button (click)="dialogOpening.openPrefilledDialog()">
+    <div
+        class="menu-button"
+        [class.disabled]="disabling.isEditEventLogDisabled()"
+        mat-button
+        (click)="dialogOpening.openPrefilledDialog()"
+    >
         <mat-icon>edit_note</mat-icon>
         <div>Edit Event Log...</div>
     </div>
@@ -99,7 +156,11 @@
                 <mat-icon>call_split</mat-icon>
                 <div>Exclusive Cut</div>
             </div>
-            <div class="menu-button" mat-button (click)="executingCut.executeSequenceCut()">
+            <div
+                class="menu-button"
+                mat-button
+                (click)="executingCut.executeSequenceCut()"
+            >
                 <mat-icon>straight</mat-icon>
                 <div>Sequence Cut</div>
             </div>
@@ -107,7 +168,11 @@
                 <mat-icon>alt_route</mat-icon>
                 <div>Parallel Cut</div>
             </div>
-            <div class="menu-button" mat-button (click)="executingCut.executeLoopCut()">
+            <div
+                class="menu-button"
+                mat-button
+                (click)="executingCut.executeLoopCut()"
+            >
                 <mat-icon>repeat</mat-icon>
                 <div>Loop Cut</div>
             </div>
@@ -121,11 +186,21 @@
             <div>Execute Fall Through</div>
         </div>
         <div class="context-menu sub-menu">
-            <div class="menu-button" mat-button (click)="executingFallThrough.executeActivityOncePerTraceFallThrough()">
+            <div
+                class="menu-button"
+                mat-button
+                (click)="
+                    executingFallThrough.executeActivityOncePerTraceFallThrough()
+                "
+            >
                 <mat-icon>looks_one</mat-icon>
                 <div>Activity Once Per Trace Fall Through</div>
             </div>
-            <div class="menu-button" mat-button (click)="executingFallThrough.executeFlowerModelFallThrough()">
+            <div
+                class="menu-button"
+                mat-button
+                (click)="executingFallThrough.executeFlowerModelFallThrough()"
+            >
                 <mat-icon>filter_vintage</mat-icon>
                 <div>Flower Model Fall Through</div>
             </div>
