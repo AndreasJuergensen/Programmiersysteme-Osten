@@ -68,25 +68,35 @@ export class DfgArc extends Arc {
         heightHalf: number,
         strokeHalf: number,
     ): number {
+        const distanceToRoundedCorner: number = 26;
         const alphaDegAbs = Math.abs(this.alphaDeg);
+        let calculatedLength: number;
         switch (alphaDegAbs) {
             case 0:
-                return widthHalf + strokeHalf;
+                calculatedLength = widthHalf + strokeHalf;
+                break;
             case 45:
-                return Math.sqrt(
+                calculatedLength = Math.sqrt(
                     Math.pow(widthHalf + strokeHalf, 2) +
                         Math.pow(heightHalf + strokeHalf, 2),
                 );
+                break;
             case 90:
-                return heightHalf + strokeHalf;
-
+                calculatedLength = heightHalf + strokeHalf;
+                break;
             default:
+                alphaDegAbs < 45
+                    ? (calculatedLength =
+                          (widthHalf + strokeHalf) /
+                          Math.cos(Math.abs(this.alphaRad)))
+                    : (calculatedLength =
+                          (heightHalf + strokeHalf) /
+                          Math.sin(Math.abs(this.alphaRad)));
                 break;
         }
-
-        return alphaDegAbs < 45
-            ? (widthHalf + strokeHalf) / Math.cos(Math.abs(this.alphaRad))
-            : (heightHalf + strokeHalf) / Math.sin(Math.abs(this.alphaRad));
+        return calculatedLength < distanceToRoundedCorner
+            ? calculatedLength
+            : distanceToRoundedCorner;
     }
 }
 
