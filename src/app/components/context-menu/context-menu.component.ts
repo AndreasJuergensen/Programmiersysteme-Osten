@@ -264,7 +264,7 @@ class DialogOpening {
                 if (!eventLog) return;
                 Dfg.resetIdCount();
                 const dfg: Dfg = this.calculateDfgService.calculate(eventLog);
-                this.petriNetManagementService.initialize(dfg, data?.filename);
+                this.petriNetManagementService.initialize(dfg, (eventLog.toString() === data?.eventLog ? data?.filename : undefined));
             },
             complete: () => sub.unsubscribe(),
         });
@@ -289,13 +289,13 @@ class DialogOpening {
         });
     }
 
-    openFromHistory(eventLog: string) {
+    openFromHistory(eventLog: RecentEventLog) {
         this.contextMenuService.hide();
         Dfg.resetIdCount();
         const dfg: Dfg = this.calculateDfgService.calculate(
-            this.eventLogParserService.parse(eventLog),
+            this.eventLogParserService.parse(eventLog.eventLog),
         );
-        this.petriNetManagementService.initialize(dfg);
+        this.petriNetManagementService.initialize(dfg, eventLog.name);
     }
 
     recentEventLogs(): RecentEventLog[] {
