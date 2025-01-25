@@ -66,6 +66,7 @@
     .sub-menu-wrapper.disabled .menu-button {
         cursor: not-allowed;
         color: #ffe9fb;
+        /* color: white; */
         background-color: #efc9db !important;
     }
 }
