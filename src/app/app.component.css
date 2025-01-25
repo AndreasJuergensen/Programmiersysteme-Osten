@@ -1,5 +1,5 @@
-.red {
-    color: #efc9db;
+.heart {
+    color: #d42f7c;
 }
 
 h1 {
@@ -8,6 +8,7 @@ h1 {
     font-size: 30px;
     margin-top: 0;
     margin-bottom: 50px;
+    vertical-align: middle;
 }
 
 a {

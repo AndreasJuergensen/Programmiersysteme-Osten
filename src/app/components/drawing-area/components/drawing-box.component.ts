@@ -33,15 +33,7 @@ import { CollectSelectedElementsService } from 'src/app/services/collect-selecte
                 [attr.height]="box.height"
                 [attr.overflow-y]="'auto'"
             >
-                <div
-                    style="height: 100%; 
-                        width: 100%; 
-                        overflow-y: auto; 
-                        padding: 10px; 
-                        box-sizing: border-box;
-                        white-space: pre-line;
-                        user-select: all;"
-                >
+                <div class="event-log">
                     {{ box.eventLog }}
                 </div>
             </foreignObject>
@@ -56,6 +48,19 @@ import { CollectSelectedElementsService } from 'src/app/services/collect-selecte
         rect.box-marked {
             stroke: #085c5c;
             stroke-width: 7;
+        }
+        .event-log {
+            height: 100%;
+            width: 100%;
+            overflow-y: auto;
+            padding: 10px;
+            box-sizing: border-box;
+            white-space: pre-line;
+            user-select: text;
+            &::selection {
+                color: #d42f7c;
+                background-color: #efc9db;
+            }
         }
     `,
 })

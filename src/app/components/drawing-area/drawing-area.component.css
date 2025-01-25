@@ -13,7 +13,7 @@ svg {
     box-sizing: border-box;
     overflow: auto;
     scrollbar-color: gray lightgray;
-    border: 3px dotted lightgray;
+    border: 3px dotted #d42f7c;
     position: relative;
 
     .start-text {
