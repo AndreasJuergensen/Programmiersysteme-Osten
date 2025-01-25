@@ -71,6 +71,7 @@ export class CalculateCoordinatesService {
                 playActivity.name,
                 initialXCoordinate,
                 initialYCoordinate,
+                dfg.id,
             ),
         );
 
@@ -105,6 +106,7 @@ export class CalculateCoordinatesService {
                     stackElement.activity.name,
                     stackElement.source_x + i * gapX,
                     yCoordinate,
+                    dfg.id,
                 );
                 nodes.push(activityAsNode);
 
@@ -317,8 +319,6 @@ export class CalculateCoordinatesService {
         allPaths.forEach((p) => {
             p.shift();
         });
-
-        console.log(allPaths);
 
         return allPaths;
     }
