@@ -21,7 +21,7 @@ import { Place } from '../models';
             [attr.stroke-width]="strokeWidth"
         />
         <svg:text
-            [attr.x]="place.x"
+            [attr.x]="place.x - place.id.length * 4.8"
             [attr.y]="place.y + radius + strokeWidth / 2 + 20"
         >
             {{ place.id }}

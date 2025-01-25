@@ -1,12 +1,11 @@
-import { ExecuteCutService } from './execute-cut.service';
-import { Dfg } from '../classes/dfg/dfg';
-import { Arcs } from '../classes/dfg/arcs';
-import { CalculateDfgService } from './calculate-dfg.service';
-import { EventLog, Trace } from '../classes/event-log';
+import { instance, mock } from 'ts-mockito';
 import { Activity } from '../classes/dfg/activities';
+import { Arcs } from '../classes/dfg/arcs';
+import { Dfg } from '../classes/dfg/dfg';
+import { EventLog, Trace } from '../classes/event-log';
+import { CalculateDfgService } from './calculate-dfg.service';
+import { CutType, ExecuteCutService } from './execute-cut.service';
 import { PetriNetManagementService } from './petri-net-management.service';
-import { CutType } from '../components/cut-execution/cut-execution.component';
-import { mock, instance } from 'ts-mockito';
 import { ShowFeedbackService } from './show-feedback.service';
 
 describe('ExecuteCutService', () => {

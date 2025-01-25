@@ -13,17 +13,24 @@ export class PetriNetManagementService {
     private _petriNet: PetriNet = new PetriNet();
     private _previousPetriNets: PetriNet[] = [];
     private _isModifiable: boolean = false;
-    private _isInputPetriNet: boolean = true;
-
+    private _isInputPetriNet$: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(true);
     private _petriNet$: BehaviorSubject<PetriNet> =
         new BehaviorSubject<PetriNet>(this._petriNet);
+    private _initialEventLog: string = '';
+    private _recentEventLogs$: BehaviorSubject<string[]> = new BehaviorSubject<
+        string[]
+    >([]);
 
     constructor(private _showFeedbackService: ShowFeedbackService) {}
 
     public initialize(dfg: Dfg): void {
+        const eventLog: string = dfg.eventLog.toString();
+        this._initialEventLog = eventLog;
+        this.updateRecentEventLogs(eventLog);
         this._petriNet = new PetriNet(dfg);
         this._previousPetriNets = [];
-        this._isInputPetriNet = true;
+        this._isInputPetriNet$.next(true);
         if (this._petriNet.isBasicPetriNet()) {
             this._isModifiable = false;
             this._showFeedbackService.showMessage(
@@ -34,6 +41,13 @@ export class PetriNetManagementService {
             this._isModifiable = true;
         }
         this._petriNet$.next(this._petriNet);
+    }
+
+    private updateRecentEventLogs(eventLog: string): void {
+        const recentEventLogs = [...this._recentEventLogs$.value];
+        const newLength = recentEventLogs.unshift(eventLog);
+        if (newLength > 5) recentEventLogs.pop();
+        this._recentEventLogs$.next(recentEventLogs);
     }
 
     public updatePnByExclusiveCut(
@@ -94,9 +108,9 @@ export class PetriNetManagementService {
             this._isModifiable = true;
         }
         if (this._previousPetriNets.length === 0) {
-            this._isInputPetriNet = true;
+            this._isInputPetriNet$.next(true);
         } else {
-            this._isInputPetriNet = false;
+            this._isInputPetriNet$.next(false);
         }
         this._petriNet$.next(this._petriNet);
     }
@@ -121,8 +135,8 @@ export class PetriNetManagementService {
         return this._isModifiable;
     }
 
-    get isInputPetriNet(): boolean {
-        return this._isInputPetriNet;
+    get isInputPetriNet$() {
+        return this._isInputPetriNet$.asObservable();
     }
 
     public arcIsOverlayingArc(arc: Arc): boolean {
@@ -137,5 +151,13 @@ export class PetriNetManagementService {
         }
 
         return false;
+    }
+
+    get initialEventLog(): string {
+        return this._initialEventLog;
+    }
+
+    get recentEventLogs$() {
+        return this._recentEventLogs$.asObservable();
     }
 }

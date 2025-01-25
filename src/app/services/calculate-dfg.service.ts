@@ -12,7 +12,6 @@ export class CalculateDfgService {
         const dfgBuilder: DfgBuilder = new DfgBuilder();
 
         dfgBuilder.addEventLog(eventLog);
-
         eventLog
             .getAllTraces()
             .flatMap((trace) => trace.getAllActivities())

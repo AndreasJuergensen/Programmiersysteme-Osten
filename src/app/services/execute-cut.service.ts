@@ -5,9 +5,15 @@ import { Arcs } from '../classes/dfg/arcs';
 import { Activities } from '../classes/dfg/activities';
 import { EventLog } from '../classes/event-log';
 import { PetriNetManagementService } from './petri-net-management.service';
-import { CutType } from '../components/cut-execution/cut-execution.component';
 import { ShowFeedbackService } from './show-feedback.service';
 import { PetriNet } from '../classes/petrinet/petri-net';
+
+export enum CutType {
+    ExclusiveCut = 'ExclusiveCut',
+    SequenceCut = 'SequenceCut',
+    ParallelCut = 'ParallelCut',
+    LoopCut = 'LoopCut',
+}
 
 @Injectable({
     providedIn: 'root',

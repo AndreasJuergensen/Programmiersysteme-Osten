@@ -45,29 +45,6 @@
             </mat-error>
         </mat-form-field>
         <mat-dialog-actions align="end">
-            <input
-                type="file"
-                class="file-input"
-                (change)="onFileSelected($event)"
-                accept=".xes"
-                #fileUpload
-            />
-            <div class="file-upload-wrapper">
-                <div class="file-upload">
-                    <button
-                        mat-mini-fab
-                        color="primary"
-                        class="upload-btn"
-                        (click)="fileUpload.click()"
-                        type="button"
-                    >
-                        <mat-icon>attach_file</mat-icon>
-                    </button>
-                    <div class="filename">
-                        {{ fileName || "Upload XES-File to import Event Log" }}
-                    </div>
-                </div>
-            </div>
             <button
                 mat-fab
                 extended

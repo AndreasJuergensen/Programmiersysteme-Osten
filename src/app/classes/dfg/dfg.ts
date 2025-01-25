@@ -1,4 +1,4 @@
-import { CutType } from 'src/app/components/cut-execution/cut-execution.component';
+import { CutType } from 'src/app/services/execute-cut.service';
 import { EventLog } from '../event-log';
 import { PetriNetTransition } from '../petrinet/petri-net-transitions';
 import { Activities, Activity } from './activities';

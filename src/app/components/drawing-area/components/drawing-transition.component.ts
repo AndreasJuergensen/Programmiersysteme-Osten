@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { Transition } from '../models';
 import { environment } from 'src/environments/environment';
+import { Transition } from '../models';
 
 @Component({
     selector: 'svg:g[app-drawing-transition]',
@@ -17,7 +17,7 @@ import { environment } from 'src/environments/environment';
             [attr.stroke-width]="strokeWidth"
         />
         <svg:text
-            [attr.x]="transition.x"
+            [attr.x]="transition.x - transition.name.length * 4.8"
             [attr.y]="transition.y + (height + strokeWidth) / 2 + 20"
         >
             {{ transition.name }}
@@ -25,7 +25,7 @@ import { environment } from 'src/environments/environment';
     `,
     styles: ``,
 })
-export class DrawingTransitionsComponent {
+export class DrawingTransitionComponent {
     @Input({ required: true }) transition!: Transition;
 
     readonly height: number = environment.drawingElements.transitions.height;

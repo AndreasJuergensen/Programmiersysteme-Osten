@@ -2,57 +2,14 @@
     <!--  Header  -->
     <div class="flexRowAlignCenterCenter">
         <a href="https://www.fernuni-hagen.de/ilovepetrinets/"
-            ><h1>I <span class="red">❤</span> Petri Nets</h1></a
-        >
+            ><h1>I <span class="heart">❤</span> Petri Nets</h1>
+        </a>
     </div>
     <h2>
         <i>Fachpraktikum Programmiersysteme WiSe24/25</i> by<br />
-        ..., ..., ..., ... and ...
+        Aileen Ketzler, Andreas Jürgensen, Daniel Haid, Fabian Ehlers and Fabian
+        Riede
     </h2>
-
-    <!--    Main content    -->
     <app-drawing-area></app-drawing-area>
-
-    <div class="flexRowAlignSpaceEvenlyStart">
-        <app-example-event-logs></app-example-event-logs>
-
-        <button mat-fab extended (click)="openDialog()">
-            <mat-icon>playlist_add</mat-icon>
-            Input Event Log
-        </button>
-        <button
-            mat-fab
-            extended
-            [disabled]="undoButtonIsDisabled"
-            (click)="undoLastUpdate()"
-        >
-            <mat-icon>undo</mat-icon>
-            Undo Last Split
-        </button>
-    </div>
-    <hr />
-    <div class="flexRowAlignSpaceEvenlyStart">
-        <app-cut-execution></app-cut-execution>
-        <button
-            mat-flat-button
-            [disabled]="actionButtonsAreDisabled"
-            (click)="activityOncePerTraceExecution()"
-        >
-            Activity Once Per Trace Fall Through
-        </button>
-        <button
-            mat-flat-button
-            [disabled]="actionButtonsAreDisabled"
-            (click)="flowerExecution()"
-        >
-            Flower Model Fall Through
-        </button>
-    </div>
-    <hr />
-    <div class="flexRowAlignSpaceEvenlyStart">
-        <button mat-flat-button (click)="openHelp()">Help</button>
-    </div>
-    <!--  Footer  -->
-    <hr />
     <app-footer></app-footer>
 </div>

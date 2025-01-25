@@ -10,6 +10,7 @@ import {
     ActivityNode,
     BoxNode,
     Graph,
+    InvisibleTransitionNode,
     PlaceNode,
     TransitionNode,
 } from 'src/app/classes/graph';
@@ -22,12 +23,16 @@ import {
     DfgArc,
     Place,
     PlaceToBoxArc,
+    PlaceToInvisibleTransitionArc,
     PlaceToTransitionArc,
     Transition,
     TransitionToPlaceArc,
 } from './models';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
+import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
+import _ from 'lodash';
+import { ApplicationStateService } from 'src/app/services/application-state.service';
 
 @Component({
     selector: 'app-drawing-area',
@@ -39,6 +44,10 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
     private _sub: Subscription | undefined;
     private observer!: MutationObserver;
+    private _sub2: Subscription | undefined;
+    private _sub3: Subscription | undefined;
+
+    private _graph: Graph | undefined;
 
     private _activities: Array<Activity> = new Array<Activity>();
     private _boxes: Array<Box> = new Array<Box>();
@@ -47,12 +56,28 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     private _arcs: Array<Arc> = new Array<Arc>();
     private _boxArcs: Array<Arc> = new Array<Arc>();
 
+    private _originalPositionOfActivities: Array<Activity> =
+        new Array<Activity>();
+    private _lastPositionOfActivities: Array<Activity> = new Array<Activity>();
+    private _activityMoved = new Array<[activityId: string, dfgId: string]>();
+
     public showEventLogs: boolean = false;
+    public isEmpty: boolean = true;
 
     constructor(
         private calculatePetriNetService: CalculatePetriNetService,
+        private positionForActivitiesService: PositionForActivitiesService,
         private readonly contextMenuService: ContextMenuService,
-    ) {}
+        applicationStateService: ApplicationStateService,
+        petriNetManagementService: PetriNetManagementService,
+    ) {
+        applicationStateService.showEventLogs$.subscribe((showEventLogs) => {
+            this.showEventLogs = showEventLogs;
+        });
+        petriNetManagementService.petriNet$.subscribe((petriNet) => {
+            this.isEmpty = petriNet.isEmpty();
+        });
+    }
 
     get activities(): Array<Activity> {
         return this._activities;
@@ -81,12 +106,13 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this._sub = this.calculatePetriNetService.graph$.subscribe(
             (graph: Graph) => {
+                this._graph = graph;
                 const places: Array<Place> = new Array<Place>();
                 const activities: Array<Activity> = new Array<Activity>();
                 const transitions: Array<Transition> = new Array<Transition>();
                 const boxes: Array<Box> = new Array<Box>();
 
-                graph.nodes.forEach((node) => {
+                this._graph.nodes.forEach((node) => {
                     if (node instanceof ActivityNode) {
                         activities.push(new Activity(node as ActivityNode));
                     }
@@ -96,9 +122,15 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                     }
 
                     if (node instanceof TransitionNode) {
-                        transitions.push(
-                            new Transition(node as TransitionNode),
-                        );
+                        if (node instanceof InvisibleTransitionNode) {
+                            transitions.push(
+                                new Transition(node as InvisibleTransitionNode),
+                            );
+                        } else {
+                            transitions.push(
+                                new Transition(node as TransitionNode),
+                            );
+                        }
                     }
 
                     if (node instanceof BoxNode) {
@@ -109,7 +141,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 const arcs: Array<Arc> = new Array<Arc>();
                 const boxArcs: Array<Arc> = new Array<Arc>();
 
-                graph.edges.forEach((edge) => {
+                this._graph.edges.forEach((edge) => {
                     if (edge.source instanceof ActivityNode) {
                         const startActivity = activities.find(
                             (activity) =>
@@ -164,13 +196,23 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                                 (transition) =>
                                     transition.id === edge.target.id,
                             )!;
-
-                            arcs.push(
-                                new PlaceToTransitionArc(
-                                    startPlace,
-                                    endTransition,
-                                ),
-                            );
+                            if (
+                                edge.target instanceof InvisibleTransitionNode
+                            ) {
+                                arcs.push(
+                                    new PlaceToInvisibleTransitionArc(
+                                        startPlace,
+                                        endTransition,
+                                    ),
+                                );
+                            } else {
+                                arcs.push(
+                                    new PlaceToTransitionArc(
+                                        startPlace,
+                                        endTransition,
+                                    ),
+                                );
+                            }
                         }
 
                         if (edge.target instanceof BoxNode) {
@@ -189,6 +231,11 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 this._places = places;
                 this._arcs = arcs;
                 this._boxArcs = boxArcs;
+
+                this._originalPositionOfActivities = _.cloneDeep(activities);
+                this._lastPositionOfActivities = _.cloneDeep(activities);
+
+                this.positionForActivitiesService.passBoxObjects(boxes);
             },
         );
 
@@ -203,6 +250,93 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 subtree: false,
                 attributes: false,
             });
+        }
+
+        this._sub2 =
+            this.positionForActivitiesService.movingActivityInGraph$.subscribe(
+                (activity) => {
+                    const activityId = activity[0];
+                    const dfgId = activity[1];
+                    const xTranslate = activity[2];
+                    const yTranslate = activity[3];
+
+                    const movedActivity = this._activities.find(
+                        (activity) =>
+                            activity.id === activityId &&
+                            activity.dfgId === dfgId,
+                    );
+
+                    if (movedActivity) {
+                        if (
+                            this._activityMoved.filter(
+                                (activity) =>
+                                    activity[0] === movedActivity.id &&
+                                    activity[1] === movedActivity.dfgId,
+                            ).length === 0
+                        ) {
+                            const originalX =
+                                this._originalPositionOfActivities.find(
+                                    (activity) =>
+                                        activity.id === activityId &&
+                                        activity.dfgId === dfgId,
+                                )!.x;
+
+                            const originalY =
+                                this._originalPositionOfActivities.find(
+                                    (activity) =>
+                                        activity.id === activityId &&
+                                        activity.dfgId === dfgId,
+                                )!.y;
+
+                            movedActivity.x = originalX + xTranslate;
+                            movedActivity.y = originalY + yTranslate;
+                            this.updateDfgArcs();
+                        } else {
+                            const lastX = this._lastPositionOfActivities.find(
+                                (activity) =>
+                                    activity.id === activityId &&
+                                    activity.dfgId === dfgId,
+                            )!.x;
+
+                            const lastY = this._lastPositionOfActivities.find(
+                                (activity) =>
+                                    activity.id === activityId &&
+                                    activity.dfgId === dfgId,
+                            )!.y;
+
+                            movedActivity.x = lastX + xTranslate;
+                            movedActivity.y = lastY + yTranslate;
+                            this.updateDfgArcs();
+                        }
+                    }
+                },
+            );
+
+        this._sub3 =
+            this.positionForActivitiesService.updateArcCoordinates$.subscribe(
+                (activity) => {
+                    this.updateActivtyMoved(activity[0], activity[1]);
+                    const entryCurrentActivity =
+                        this._lastPositionOfActivities.find(
+                            (activity2) =>
+                                activity2.id === activity[0] &&
+                                activity2.dfgId === activity[1],
+                        );
+                    if (entryCurrentActivity) {
+                        entryCurrentActivity.x = activity[2];
+                        entryCurrentActivity.y = activity[3];
+                    }
+                },
+            );
+    }
+
+    updateActivtyMoved(activityID: string, dfgId: string) {
+        const activityEntry = this._activityMoved.filter(
+            (activity) => activity[0] === activityID && activity[1] === dfgId,
+        );
+
+        if (activityEntry.length === 0) {
+            this._activityMoved.push([activityID, dfgId]);
         }
     }
 
@@ -226,6 +360,32 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 (boundingBox.height + boundingBox.y).toString(),
             );
         }
+    }
+
+    updateDfgArcs(): void {
+        const boxArcs: Array<Arc> = new Array<Arc>();
+
+        this._graph?.edges.forEach((edge) => {
+            if (edge.source instanceof ActivityNode) {
+                const startActivity = this._activities.find(
+                    (activity) =>
+                        activity.id === edge.source.id &&
+                        activity.x === edge.source.x &&
+                        activity.y === edge.source.y,
+                )!;
+
+                const endActivity = this._activities.find(
+                    (activity) =>
+                        activity.id === edge.target.id &&
+                        activity.x === edge.target.x &&
+                        activity.y === edge.target.y,
+                )!;
+
+                boxArcs.push(new DfgArc(startActivity, endActivity));
+            }
+        });
+
+        this._boxArcs = boxArcs;
     }
 
     mouseDown(): void {

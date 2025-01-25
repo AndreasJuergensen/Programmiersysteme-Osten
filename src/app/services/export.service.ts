@@ -11,24 +11,11 @@ import { PetriNetManagementService } from './petri-net-management.service';
 })
 export class ExportService {
     private _petriNet: PetriNet = new PetriNet();
-    private _isPetriNetExportable$: BehaviorSubject<boolean> =
-        new BehaviorSubject<boolean>(false);
 
     constructor(private petriNetManagementService: PetriNetManagementService) {
         this.petriNetManagementService.petriNet$.subscribe((petriNet) => {
             this._petriNet = petriNet;
-            this._isPetriNetExportable$.next(
-                this.isPetriNetExportable(petriNet),
-            );
         });
-    }
-
-    get isPetriNetExportable$(): Observable<boolean> {
-        return this._isPetriNetExportable$.asObservable();
-    }
-
-    private isPetriNetExportable(petriNet: PetriNet): boolean {
-        return petriNet.isBasicPetriNet() && !petriNet.isEmpty();
     }
 
     private export(file: File, fileName: string) {

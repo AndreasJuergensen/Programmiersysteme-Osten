@@ -53,6 +53,14 @@ export abstract class Node {
         return this._y;
     }
 
+    set x(x: number) {
+        this._x = x;
+    }
+
+    set y(y: number) {
+        this._y = y;
+    }
+
     equals(other: Node): boolean {
         return (
             this._id === other._id &&
@@ -85,7 +93,20 @@ export abstract class Node {
 // This dummy is used for box intersection calculation
 export class DummyNode extends Node {}
 
-export class ActivityNode extends Node {}
+export class ActivityNode extends Node {
+    constructor(
+        _id: string,
+        _x: number,
+        _y: number,
+        private _dfgId: string,
+    ) {
+        super(_id, _x, _y);
+    }
+
+    get dfg(): string {
+        return this._dfgId;
+    }
+}
 
 export class PlaceNode extends Node {}
 
@@ -104,6 +125,8 @@ export class TransitionNode extends Node {
     }
 }
 
+export class InvisibleTransitionNode extends TransitionNode {}
+
 export class BoxNode extends Node {
     constructor(
         _id: string,
@@ -111,7 +134,7 @@ export class BoxNode extends Node {
         _y: number,
         private _width: number,
         private _height: number,
-        private _eventLog: string
+        private _eventLog: string,
     ) {
         super(_id, _x, _y);
     }

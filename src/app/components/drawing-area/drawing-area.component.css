@@ -7,17 +7,18 @@ svg {
     margin-bottom: 5vh;
 }
 
-.show-eventlog-checkbox {
-    position: absolute;
-    bottom: 0px;
-    right: 0;
-}
-
 #drawingArea {
     width: 100%;
-    height: 60vh;
+    height: 80vh;
     box-sizing: border-box;
     overflow: auto;
     scrollbar-color: gray lightgray;
-    border: 3px dotted lightgray;
+    border: 3px dotted #d42f7c;
+    position: relative;
+
+    .start-text {
+        text-align: center;
+        margin-top: 25vh;
+        transform: translateY(-50%);
+    }
 }
