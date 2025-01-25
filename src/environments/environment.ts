@@ -32,8 +32,8 @@ export const environment = {
             strokeWidth: 2,
         },
         invisibleTransitions: {
-            width: 20,
-            height: 40,
+            width: 15,
+            height: 30,
             bgColor: 'black',
             bgOpacity: '1',
             strokeColor: 'black',
