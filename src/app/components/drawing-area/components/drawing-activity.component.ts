@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Activity, Box } from '../models';
 import { environment } from 'src/environments/environment';
-import { FallThroughHandlingService } from 'src/app/services/fall-through-handling.service';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import { Subscription } from 'rxjs';
 import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
@@ -14,8 +13,8 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
             [attr.y]="activity.y - height / 2"
             [attr.height]="height"
             [attr.width]="width"
-            [attr.rx]="10"
-            [attr.ry]="10"
+            [attr.rx]="radius"
+            [attr.ry]="radius"
             [attr.fill]="bgColor"
             [attr.fill-opacity]="bgOpacity"
             [attr.stroke]="strokeColor"
@@ -59,6 +58,7 @@ export class DrawingActivityComponent {
 
     readonly width: number = environment.drawingElements.activities.height;
     readonly height: number = environment.drawingElements.activities.height;
+    readonly radius: number = environment.drawingElements.activities.radius;
 
     readonly bgColor: string = environment.drawingElements.activities.bgColor;
     readonly bgOpacity: string =

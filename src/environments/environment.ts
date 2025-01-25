@@ -8,6 +8,7 @@ export const environment = {
         activities: {
             width: 40,
             height: 40,
+            radius: 7,
             bgColor: 'white',
             bgOpacity: '1',
             strokeColor: 'black',
