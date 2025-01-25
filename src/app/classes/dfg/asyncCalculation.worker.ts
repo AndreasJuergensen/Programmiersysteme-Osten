@@ -1,4 +1,4 @@
-import { CutType } from 'src/app/components/cut-execution/cut-execution.component';
+import { CutType } from 'src/app/services/execute-cut.service';
 import { EventLog } from '../event-log';
 import { Activities, Activity } from './activities';
 import { Arcs, DfgArc } from './arcs';
@@ -6,9 +6,19 @@ import { Dfg } from './dfg';
 
 addEventListener('message', ({ data }: { data: DfgData }) => {
     const activities: Activities = new Activities(
-        data._activities.activities.map((activity) => new Activity(activity._name)),
+        data._activities.activities.map(
+            (activity) => new Activity(activity._name),
+        ),
     );
-    const arcs: Arcs = new Arcs(data._arcs.arcs.map((arc) => new DfgArc(new Activity(arc.start._name), new Activity(arc.end._name))));
+    const arcs: Arcs = new Arcs(
+        data._arcs.arcs.map(
+            (arc) =>
+                new DfgArc(
+                    new Activity(arc.start._name),
+                    new Activity(arc.end._name),
+                ),
+        ),
+    );
     const eventLog: EventLog = new EventLog();
     const dfg: Dfg = new Dfg(activities, arcs, eventLog);
     const possibleCut = calculatePossibleCut(dfg);
@@ -25,8 +35,8 @@ export interface ReturnData {
 }
 
 interface DfgData {
-    _activities: {activities: { _name: string }[]};
-    _arcs: {arcs: {end: {_name: string}, start: {_name: string}}[]};
+    _activities: { activities: { _name: string }[] };
+    _arcs: { arcs: { end: { _name: string }; start: { _name: string } }[] };
     _eventLog: any;
 }
 

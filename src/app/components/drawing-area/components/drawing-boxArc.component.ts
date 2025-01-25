@@ -28,22 +28,6 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
                 ></svg:path>
             </svg:marker>
             <svg:marker
-                id="arrowhead-red"
-                viewBox="0 0 10 10"
-                markerWidth="10"
-                markerHeight="10"
-                refX="5"
-                refY="5"
-                orient="auto-start-reverse"
-            >
-                <svg:path
-                    d="M 1,1 L 9,5 L 1,9 Z"
-                    [attr.fill]="'red'"
-                    [attr.stroke]="'red'"
-                    [attr.stroke-width]="width"
-                ></svg:path>
-            </svg:marker>
-            <svg:marker
                 id="arrowhead-deepskyblue"
                 viewBox="0 0 10 10"
                 markerWidth="10"
@@ -56,6 +40,23 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
                     d="M 1,1 L 9,5 L 1,9 Z"
                     [attr.fill]="'deepskyblue'"
                     [attr.stroke]="'deepskyblue'"
+                    [attr.stroke-width]="width"
+                ></svg:path>
+            </svg:marker>
+
+            <svg:marker
+                id="arrowhead-red"
+                viewBox="0 0 10 10"
+                markerWidth="10"
+                markerHeight="10"
+                refX="5"
+                refY="5"
+                orient="auto-start-reverse"
+            >
+                <svg:path
+                    d="M 1,1 L 9,5 L 1,9 Z"
+                    [attr.fill]="'red'"
+                    [attr.stroke]="'red'"
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>
@@ -141,6 +142,7 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
 })
 export class DrawingBoxArcComponent {
     @Input({ required: true }) boxArc!: Arc;
+    // @Input({ required: true }) showArcFeedback!: boolean;
 
     constructor(
         private collectSelectedElementsService: CollectSelectedElementsService,
@@ -208,7 +210,12 @@ export class DrawingBoxArcComponent {
                     if (
                         this.collectSelectedElementsService.isArcinSameDFG(arc)
                     ) {
-                        if (!path.classList.contains('active')) {
+                        if (
+                            !path.classList.contains('active') &&
+                            !path.classList.contains('correct') &&
+                            !path.classList.contains('possbiblyCorrect') &&
+                            !path.classList.contains('wrong')
+                        ) {
                             path.classList.toggle('active');
                             path.setAttribute(
                                 'marker-end',
@@ -267,12 +274,18 @@ export class DrawingBoxArcComponent {
             }
             if (line.classList.contains('correct')) {
                 line.classList.remove('correct');
+                line.classList.remove('hovered');
+                line.setAttribute('marker-end', 'url(#arrowhead)');
             }
             if (line.classList.contains('possbiblyCorrect')) {
                 line.classList.remove('possbiblyCorrect');
+                line.classList.remove('hovered');
+                line.setAttribute('marker-end', 'url(#arrowhead)');
             }
             if (line.classList.contains('wrong')) {
                 line.classList.remove('wrong');
+                line.classList.remove('hovered');
+                line.setAttribute('marker-end', 'url(#arrowhead)');
             }
             this.collectSelectedElementsService.updateCollectedArcs(arc);
         } else {

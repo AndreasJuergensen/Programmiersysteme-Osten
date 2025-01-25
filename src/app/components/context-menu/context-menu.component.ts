@@ -47,6 +47,7 @@ export class ContextMenuComponent implements OnInit {
     readonly resettingSelection: ResettingSelection;
     readonly executingCut: ExecutingCut;
     readonly executingFallThrough: ExecutingFallThrough;
+    readonly showingArcFeedback: ShowingArcFeedback;
 
     constructor(
         private readonly contextMenuService: ContextMenuService,
@@ -109,6 +110,12 @@ export class ContextMenuComponent implements OnInit {
         this.executingFallThrough = new ExecutingFallThrough(
             fallThroughHandlingService,
             contextMenuService,
+        );
+        this.showingArcFeedback = new ShowingArcFeedback(
+            applicationStateService,
+            contextMenuService,
+            this.disabling,
+            collectSelectedElementsService,
         );
     }
     ngOnInit(): void {
@@ -225,6 +232,38 @@ class ShowingEventLog {
     toggleEventLogs() {
         if (this.disabling.isToggleEventLogsDisabled()) return;
         this.applicationStateService.toggleShowEventLogs();
+        this.contextMenuService.hide();
+    }
+}
+
+class ShowingArcFeedback {
+    showArcFeedback: boolean = false;
+    constructor(
+        private applicationStateService: ApplicationStateService,
+        private contextMenuService: ContextMenuService,
+        private disabling: Disabling,
+        private collectSelectedElementsService: CollectSelectedElementsService,
+    ) {
+        this.applicationStateService.showArcFeedback$.subscribe(
+            (showArcFeedback) => {
+                this.showArcFeedback = showArcFeedback;
+            },
+        );
+    }
+
+    buttonText(): string {
+        return this.showArcFeedback ? 'Hide Arc Feedback' : 'Show Arc Feedback';
+    }
+
+    toggleArcFeedback() {
+        if (this.disabling.isToggleFeedbackDisabled()) return;
+        this.applicationStateService.toggleShowArcFeedback();
+        if (this.showArcFeedback) {
+            this.collectSelectedElementsService.enableArcFeedback();
+        } else {
+            this.collectSelectedElementsService.disableArcFeedback();
+        }
+
         this.contextMenuService.hide();
     }
 }
@@ -538,7 +577,7 @@ class Disabling {
 
     isToggleFeedbackDisabled(): boolean {
         // return this.isPetriNetEmpty;
-        return true;
+        return this.isPetriNetEmpty || this.isBasicPetriNet;
     }
 
     isEditEventLogDisabled(): boolean {

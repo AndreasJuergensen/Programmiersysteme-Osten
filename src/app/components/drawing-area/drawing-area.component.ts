@@ -63,6 +63,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
     public showEventLogs: boolean = false;
     public isEmpty: boolean = true;
+    public showArcFeedback: boolean = false;
 
     constructor(
         private calculatePetriNetService: CalculatePetriNetService,
@@ -77,6 +78,11 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         petriNetManagementService.petriNet$.subscribe((petriNet) => {
             this.isEmpty = petriNet.isEmpty();
         });
+        applicationStateService.showArcFeedback$.subscribe(
+            (showArcFeedback) => {
+                this.showArcFeedback = showArcFeedback;
+            },
+        );
     }
 
     get activities(): Array<Activity> {

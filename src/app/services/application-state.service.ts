@@ -14,6 +14,8 @@ export class ApplicationStateService {
         new BehaviorSubject<boolean>(false);
     private _showEventLogs$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false);
+    private _showArcFeedback$: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false);
 
     constructor(private petriNetManagementService: PetriNetManagementService) {
         this.petriNetManagementService.petriNet$.subscribe((petriNet) => {
@@ -43,7 +45,15 @@ export class ApplicationStateService {
         return this._showEventLogs$.asObservable();
     }
 
+    get showArcFeedback$() {
+        return this._showArcFeedback$.asObservable();
+    }
+
     toggleShowEventLogs() {
         this._showEventLogs$.next(!this._showEventLogs$.value);
+    }
+
+    toggleShowArcFeedback() {
+        this._showArcFeedback$.next(!this._showArcFeedback$.value);
     }
 }

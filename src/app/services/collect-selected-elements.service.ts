@@ -4,8 +4,8 @@ import { PetriNet } from '../classes/petrinet/petri-net';
 import { Dfg } from '../classes/dfg/dfg';
 import { Arc } from '../components/drawing-area/models';
 import { PetriNetManagementService } from './petri-net-management.service';
-import { CutType } from '../components/cut-execution/cut-execution.component';
 import { Activity } from '../classes/dfg/activities';
+import { CutType } from './execute-cut.service';
 
 @Injectable({
     providedIn: 'root',
@@ -73,8 +73,6 @@ export class CollectSelectedElementsService {
         this._correctArcs = validatedArcs.correctArcs;
         this._PossiblyCorrectArcs = validatedArcs.possiblyCorrectArcs;
         this._wrongArcs = validatedArcs.wrongArcs;
-
-        this.markArcs();
     }
 
     updateSelectedDFG(clickedBoxName: string): void {
@@ -148,7 +146,7 @@ export class CollectSelectedElementsService {
         }
     }
 
-    private markArcs(): void {
+    public enableArcFeedback(): void {
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
@@ -189,6 +187,12 @@ export class CollectSelectedElementsService {
                     );
 
                 if (isCollectedArc && isCorrectArc) {
+                    if (path.classList.contains('possiblyCorrect')) {
+                        path.classList.remove('possiblyCorrect');
+                    }
+                    if (path.classList.contains('wrong')) {
+                        path.classList.remove('wrong');
+                    }
                     path.classList.add('correct');
                     if (path.classList.contains('visiblePath')) {
                         path.setAttribute(
@@ -197,6 +201,12 @@ export class CollectSelectedElementsService {
                         );
                     }
                 } else if (isCollectedArc && isPossibleCorrectArc) {
+                    if (path.classList.contains('correct')) {
+                        path.classList.remove('correct');
+                    }
+                    if (path.classList.contains('wrong')) {
+                        path.classList.remove('wrong');
+                    }
                     path.classList.add('possbiblyCorrect');
                     if (path.classList.contains('visiblePath')) {
                         path.setAttribute(
@@ -205,10 +215,37 @@ export class CollectSelectedElementsService {
                         );
                     }
                 } else if (isCollectedArc && isWrongArc) {
+                    if (path.classList.contains('correct')) {
+                        path.classList.remove('correct');
+                    }
+                    if (path.classList.contains('possbiblyCorrect')) {
+                        path.classList.remove('possbiblyCorrect');
+                    }
                     path.classList.add('wrong');
                     if (path.classList.contains('visiblePath')) {
                         path.setAttribute('marker-end', 'url(#arrowhead-red)');
                     }
+                }
+            });
+        }
+    }
+
+    public disableArcFeedback(): void {
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
+
+        if (svg) {
+            const paths = svg.querySelectorAll('path');
+            paths.forEach((path) => {
+                if (path.classList.contains('correct')) {
+                    path.classList.remove('correct');
+                }
+                if (path.classList.contains('possbiblyCorrect')) {
+                    path.classList.remove('possbiblyCorrect');
+                }
+                if (path.classList.contains('wrong')) {
+                    path.classList.remove('wrong');
                 }
             });
         }

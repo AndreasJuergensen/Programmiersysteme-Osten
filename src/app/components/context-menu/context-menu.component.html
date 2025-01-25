@@ -152,7 +152,11 @@
             <div>Execute Cut</div>
         </div>
         <div class="context-menu sub-menu">
-            <div class="menu-button" mat-button (click)="executingCut.executeExclusiveCut()">
+            <div
+                class="menu-button"
+                mat-button
+                (click)="executingCut.executeExclusiveCut()"
+            >
                 <mat-icon>call_split</mat-icon>
                 <div>Exclusive Cut</div>
             </div>
@@ -164,7 +168,11 @@
                 <mat-icon>straight</mat-icon>
                 <div>Sequence Cut</div>
             </div>
-            <div class="menu-button" mat-button (click)="executingCut.executeParallelCut()">
+            <div
+                class="menu-button"
+                mat-button
+                (click)="executingCut.executeParallelCut()"
+            >
                 <mat-icon>alt_route</mat-icon>
                 <div>Parallel Cut</div>
             </div>
@@ -230,8 +238,9 @@
         class="menu-button"
         [class.disabled]="disabling.isToggleFeedbackDisabled()"
         mat-button
+        (click)="showingArcFeedback.toggleArcFeedback()"
     >
-        <div>Toggle Feedback</div>
+        <div>{{ showingArcFeedback.buttonText() }}</div>
     </div>
     <div class="hr"></div>
     <div
