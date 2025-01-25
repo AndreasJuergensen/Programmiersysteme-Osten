@@ -1,14 +1,14 @@
 export const environment = {
     production: false,
     drawingGrid: {
-        gapX: 125,
-        gapY: 125,
+        gapX: 150,
+        gapY: 150,
     },
     drawingElements: {
         activities: {
-            width: 40,
-            height: 40,
             radius: 7,
+            width: 30,
+            height: 30,
             bgColor: 'white',
             bgOpacity: '1',
             strokeColor: 'black',
@@ -23,8 +23,8 @@ export const environment = {
             strokeWidth: 4,
         },
         transitions: {
-            width: 40,
-            height: 40,
+            width: 30,
+            height: 30,
             bgColor: 'white',
             bgOpacity: '1',
             strokeColor: 'black',
@@ -41,7 +41,7 @@ export const environment = {
             strokeWidth: 2,
         },
         places: {
-            radius: 20,
+            radius: 15,
             bgColor: 'white',
             bgOpacity: '1',
             strokeColor: 'black',
