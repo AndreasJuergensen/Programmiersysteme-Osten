@@ -13,7 +13,10 @@ import { ApplicationStateService } from 'src/app/services/application-state.serv
 import { CalculateDfgService } from 'src/app/services/calculate-dfg.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { ExportService } from 'src/app/services/export.service';
-import { PetriNetManagementService, RecentEventLog } from 'src/app/services/petri-net-management.service';
+import {
+    PetriNetManagementService,
+    RecentEventLog,
+} from 'src/app/services/petri-net-management.service';
 import { EventLogDialogComponent } from '../event-log-dialog/event-log-dialog.component';
 import { Subscription } from 'rxjs';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
@@ -122,11 +125,17 @@ export class ContextMenuComponent implements OnInit {
         );
     }
     ngOnInit(): void {
-        window.addEventListener('scroll', () => {
+        const hide = () => {
             if (this.visibility === 'visible') {
                 this.contextMenuService.hide();
             }
-        });
+        };
+        document
+            .getElementsByTagName('body')[0]
+            .addEventListener('scroll', hide);
+        document
+            .getElementById('drawingArea')
+            ?.addEventListener('scroll', hide);
     }
 }
 
@@ -264,7 +273,12 @@ class DialogOpening {
                 if (!eventLog) return;
                 Dfg.resetIdCount();
                 const dfg: Dfg = this.calculateDfgService.calculate(eventLog);
-                this.petriNetManagementService.initialize(dfg, (eventLog.toString() === data?.eventLog ? data?.filename : undefined));
+                this.petriNetManagementService.initialize(
+                    dfg,
+                    eventLog.toString() === data?.eventLog
+                        ? data?.filename
+                        : undefined,
+                );
             },
             complete: () => sub.unsubscribe(),
         });
@@ -285,7 +299,10 @@ class DialogOpening {
         this.contextMenuService.hide();
         const file: File = event.target.files[0];
         file?.text().then((content) => {
-            this.openDialog({ eventLog: this.parseXesService.parse(content), filename: file?.name });
+            this.openDialog({
+                eventLog: this.parseXesService.parse(content),
+                filename: file?.name,
+            });
         });
     }
 
