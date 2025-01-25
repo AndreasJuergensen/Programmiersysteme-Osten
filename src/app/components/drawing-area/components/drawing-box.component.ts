@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { Box } from '../models';
-import { environment } from 'src/environments/environment';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
+import { environment } from 'src/environments/environment';
+import { Box } from '../models';
 
 @Component({
     selector: 'svg:g[app-drawing-box]',
@@ -20,7 +20,7 @@ import { CollectSelectedElementsService } from 'src/app/services/collect-selecte
             (click)="onBoxClick($event, box)"
         />
         <svg:text
-            [attr.x]="box.x"
+            [attr.x]="box.x - box.id.length * 4.8"
             [attr.y]="box.y + (box.height + strokeWidth) / 2 + 20"
         >
             {{ box.id }}

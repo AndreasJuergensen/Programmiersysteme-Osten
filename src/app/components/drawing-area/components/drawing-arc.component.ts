@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
-import { Arc } from '../models';
-import { environment } from 'src/environments/environment';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
-import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
 import { Subscription } from 'rxjs';
 import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
+import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
+import { environment } from 'src/environments/environment';
+import { Arc } from '../models';
 
 @Component({
     selector: 'svg:g[app-drawing-arc]',
