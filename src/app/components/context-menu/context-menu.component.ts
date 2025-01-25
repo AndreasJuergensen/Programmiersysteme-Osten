@@ -1,6 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import {
+    MatDialog,
+    MatDialogConfig,
+    MatDialogRef,
+} from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Activity } from 'src/app/classes/dfg/activities';
 import { Dfg } from 'src/app/classes/dfg/dfg';
@@ -21,6 +25,7 @@ import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 import { FallThroughHandlingService } from 'src/app/services/fall-through-handling.service';
 import { NgFor } from '@angular/common';
 import { ParseXesService } from 'src/app/services/parse-xes.service';
+import { EventLogParserService } from 'src/app/services/event-log-parser.service';
 
 @Component({
     selector: 'app-context-menu',
@@ -54,7 +59,8 @@ export class ContextMenuComponent implements OnInit {
         readonly executeCutService: ExecuteCutService,
         readonly feedbackService: ShowFeedbackService,
         readonly fallThroughHandlingService: FallThroughHandlingService,
-        readonly parseXesService: ParseXesService
+        readonly parseXesService: ParseXesService,
+        readonly eventLogParserService: EventLogParserService,
     ) {
         this.contextMenuService.visibility$.subscribe((visibility) => {
             this.visibility = visibility;
@@ -82,7 +88,8 @@ export class ContextMenuComponent implements OnInit {
             calculateDfgService,
             petriNetManagementService,
             contextMenuService,
-            parseXesService
+            parseXesService,
+            eventLogParserService,
         );
         this.showingEventLog = new ShowingEventLog(
             applicationStateService,
@@ -221,6 +228,7 @@ class DialogOpening {
         private petriNetManagementService: PetriNetManagementService,
         private contextMenuService: ContextMenuService,
         private parseXesService: ParseXesService,
+        private eventLogParserService: EventLogParserService,
     ) {
         petriNetManagementService.recentEventLogs$.subscribe(
             (recentEventLogs) => {
@@ -229,7 +237,9 @@ class DialogOpening {
         );
     }
 
-    private openDialog(data?: { eventLog: string }): void {
+    private openDialog(data?: {
+        eventLog: string;
+    }): MatDialogRef<EventLogDialogComponent, EventLog> {
         this.contextMenuService.hide();
         const config: MatDialogConfig = { width: '800px', data: data };
         const dialogRef = this.matDialog.open<
@@ -247,6 +257,7 @@ class DialogOpening {
             },
             complete: () => sub.unsubscribe(),
         });
+        return dialogRef;
     }
 
     openEmptyDialog(): void {
@@ -268,7 +279,12 @@ class DialogOpening {
     }
 
     openFromHistory(eventLog: string) {
-        this.openDialog({ eventLog: eventLog });
+        this.contextMenuService.hide();
+        Dfg.resetIdCount();
+        const dfg: Dfg = this.calculateDfgService.calculate(
+            this.eventLogParserService.parse(eventLog),
+        );
+        this.petriNetManagementService.initialize(dfg);
     }
 
     recentEventLogs(): string[] {
@@ -276,10 +292,11 @@ class DialogOpening {
     }
 
     display(eventLog: string): string {
-        if (eventLog.length < 30) {
+        if (eventLog.length <= 30) {
             return eventLog;
         }
-        return eventLog.substring(0, 20) + '... [' + eventLog.length + ']';
+        const suffix = '... [' + eventLog.length + ']';
+        return eventLog.substring(0, 30 - suffix.length) + suffix;
     }
 }
 

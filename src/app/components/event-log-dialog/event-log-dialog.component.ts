@@ -53,7 +53,7 @@ export class EventLogDialogComponent implements OnInit {
         private eventLogValidationService: EventLogValidationService,
         private parseXesService: ParseXesService,
         private cdr: ChangeDetectorRef,
-        @Inject(MAT_DIALOG_DATA) public data: any,
+        @Inject(MAT_DIALOG_DATA) private data: any,
     ) {}
 
     public fileName: string = '';
