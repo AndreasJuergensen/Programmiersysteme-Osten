@@ -29,9 +29,12 @@
                 </ng-container>
             </ng-container>
 
-            <ng-container *ngFor="let transition of transitions">
-                <svg:g app-drawing-transition [transition]="transition"></svg:g>
-            </ng-container>
+        <ng-container *ngFor="let transition of transitions">
+            <svg:g *ngIf="transition.name !== ''; else invisibleTransition" app-drawing-transition [transition]="transition"></svg:g>
+            <ng-template #invisibleTransition>
+                <svg:g app-drawing-invisible-transition [invisibleTransition]="transition"></svg:g>
+            </ng-template>
+        </ng-container>
 
             <ng-container *ngFor="let place of places">
                 <svg:g app-drawing-place [place]="place"></svg:g>

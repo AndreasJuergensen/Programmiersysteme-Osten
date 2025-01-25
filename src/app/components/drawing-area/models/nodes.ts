@@ -64,6 +64,8 @@ export class Transition extends Node {
     }
 }
 
+export class InvisibleTransition extends Transition {}
+
 export class Box extends Node {
     private readonly _width: number;
     private readonly _height: number;
@@ -90,6 +92,8 @@ export class Box extends Node {
     }
 
     get traces(): string[] {
-        return this._eventLog.replaceAll("+", "+###SPLIT###").split('###SPLIT###');
+        return this._eventLog
+            .replaceAll('+', '+###SPLIT###')
+            .split('###SPLIT###');
     }
 }

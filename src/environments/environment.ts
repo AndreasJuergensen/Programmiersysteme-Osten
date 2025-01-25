@@ -8,6 +8,7 @@ export const environment = {
         activities: {
             width: 40,
             height: 40,
+            radius: 7,
             bgColor: 'white',
             bgOpacity: '1',
             strokeColor: 'black',
@@ -25,6 +26,15 @@ export const environment = {
             width: 40,
             height: 40,
             bgColor: 'white',
+            bgOpacity: '1',
+            strokeColor: 'black',
+            strokeOpacity: '1',
+            strokeWidth: 2,
+        },
+        invisibleTransitions: {
+            width: 20,
+            height: 40,
+            bgColor: 'black',
             bgOpacity: '1',
             strokeColor: 'black',
             strokeOpacity: '1',

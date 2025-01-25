@@ -25,7 +25,7 @@ import { environment } from 'src/environments/environment';
     `,
     styles: ``,
 })
-export class DrawingTransitionsComponent {
+export class DrawingTransitionComponent {
     @Input({ required: true }) transition!: Transition;
 
     readonly height: number = environment.drawingElements.transitions.height;

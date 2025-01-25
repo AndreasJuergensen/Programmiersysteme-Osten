@@ -125,6 +125,8 @@ export class TransitionNode extends Node {
     }
 }
 
+export class InvisibleTransitionNode extends TransitionNode {}
+
 export class BoxNode extends Node {
     constructor(
         _id: string,
