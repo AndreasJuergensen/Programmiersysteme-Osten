@@ -189,10 +189,10 @@ export class PlaceToTransitionArc extends Arc {
         const y1 = this.start.y;
 
         const offsetArrow = 5;
-        const widthHalf = environment.drawingElements.activities.width / 2;
-        const heightHalf = environment.drawingElements.activities.height / 2;
+        const widthHalf = environment.drawingElements.transitions.width / 2;
+        const heightHalf = environment.drawingElements.transitions.height / 2;
         const strokeHalf =
-            environment.drawingElements.activities.strokeWidth / 2;
+            environment.drawingElements.transitions.strokeWidth / 2;
 
         let lengthToBorder = this.calculateLengthToTransitionBorder(
             widthHalf,
@@ -234,6 +234,67 @@ export class PlaceToTransitionArc extends Arc {
         return alphaDegAbs < 45
             ? (widthHalf + strokeHalf) / Math.cos(Math.abs(this.alphaRad))
             : (heightHalf + strokeHalf) / Math.sin(Math.abs(this.alphaRad));
+    }
+}
+
+export class PlaceToInvisibleTransitionArc extends Arc {
+    constructor(start: Place, end: Transition) {
+        super(start, end);
+        this.calculateCoordinates();
+    }
+
+    override calculateCoordinates(): void {
+        const x1 = this.start.x;
+        const y1 = this.start.y;
+
+        const offsetArrow = 5;
+        const widthHalf =
+            environment.drawingElements.invisibleTransitions.width / 2;
+        const heightQuarter =
+            environment.drawingElements.invisibleTransitions.height / 4;
+        const strokeHalf =
+            environment.drawingElements.invisibleTransitions.strokeWidth / 2;
+
+        let lengthToBorder = this.calculateLengthToTransitionBorder(
+            widthHalf,
+            heightQuarter,
+            strokeHalf,
+        );
+
+        const realLength = this.length - lengthToBorder - offsetArrow;
+        const deltaX = realLength * Math.cos(Math.abs(this.alphaRad));
+        const deltaY = realLength * Math.sin(Math.abs(this.alphaRad));
+
+        this.x1 = x1;
+        this.x2 = x1 + this.sgnX * deltaX;
+        this.y1 = y1;
+        this.y2 = y1 + this.sgnY * deltaY;
+    }
+
+    private calculateLengthToTransitionBorder(
+        widthHalf: number,
+        heightQuarter: number,
+        strokeHalf: number,
+    ): number {
+        const alphaDegAbs = Math.abs(this.alphaDeg);
+        switch (alphaDegAbs) {
+            case 0:
+                return widthHalf + strokeHalf;
+            case 45:
+                return Math.sqrt(
+                    Math.pow(widthHalf + strokeHalf, 2) +
+                        Math.pow(heightQuarter + strokeHalf, 2),
+                );
+            case 90:
+                return heightQuarter + strokeHalf;
+
+            default:
+                break;
+        }
+
+        return alphaDegAbs < 45
+            ? (widthHalf + strokeHalf) / Math.cos(Math.abs(this.alphaRad))
+            : (heightQuarter + strokeHalf) / Math.sin(Math.abs(this.alphaRad));
     }
 }
 

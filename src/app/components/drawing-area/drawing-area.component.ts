@@ -10,6 +10,7 @@ import {
     ActivityNode,
     BoxNode,
     Graph,
+    InvisibleTransitionNode,
     PlaceNode,
     TransitionNode,
 } from 'src/app/classes/graph';
@@ -22,6 +23,7 @@ import {
     DfgArc,
     Place,
     PlaceToBoxArc,
+    PlaceToInvisibleTransitionArc,
     PlaceToTransitionArc,
     Transition,
     TransitionToPlaceArc,
@@ -108,9 +110,15 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                     }
 
                     if (node instanceof TransitionNode) {
-                        transitions.push(
-                            new Transition(node as TransitionNode),
-                        );
+                        if (node instanceof InvisibleTransitionNode) {
+                            transitions.push(
+                                new Transition(node as InvisibleTransitionNode),
+                            );
+                        } else {
+                            transitions.push(
+                                new Transition(node as TransitionNode),
+                            );
+                        }
                     }
 
                     if (node instanceof BoxNode) {
@@ -176,13 +184,23 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                                 (transition) =>
                                     transition.id === edge.target.id,
                             )!;
-
-                            arcs.push(
-                                new PlaceToTransitionArc(
-                                    startPlace,
-                                    endTransition,
-                                ),
-                            );
+                            if (
+                                edge.target instanceof InvisibleTransitionNode
+                            ) {
+                                arcs.push(
+                                    new PlaceToInvisibleTransitionArc(
+                                        startPlace,
+                                        endTransition,
+                                    ),
+                                );
+                            } else {
+                                arcs.push(
+                                    new PlaceToTransitionArc(
+                                        startPlace,
+                                        endTransition,
+                                    ),
+                                );
+                            }
                         }
 
                         if (edge.target instanceof BoxNode) {

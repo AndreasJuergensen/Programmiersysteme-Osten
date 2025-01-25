@@ -7,6 +7,7 @@ import {
     PetriNetStackElement,
     BoxNode,
     TransitionNode,
+    InvisibleTransitionNode,
 } from '../classes/graph';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Dfg } from '../classes/dfg/dfg';
@@ -296,12 +297,22 @@ export class CalculatePetriNetService {
                 y,
                 graphWithBoxDimension[1],
                 graphWithBoxDimension[2],
-                dfg.eventLog.toString()
+                dfg.eventLog.toString(),
             );
         }
 
         if (stackElement.node instanceof Transition) {
             const transition = stackElement.node as Transition;
+            if (transition.name === '') {
+                return new InvisibleTransitionNode(
+                    transition.id,
+                    stackElement.source_x +
+                        gapX +
+                        stackElement.additionalXOffset,
+                    yCoordinate,
+                    transition.name,
+                );
+            }
             return new TransitionNode(
                 transition.id,
                 stackElement.source_x + gapX + stackElement.additionalXOffset,
