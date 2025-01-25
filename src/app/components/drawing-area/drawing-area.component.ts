@@ -6,7 +6,6 @@ import {
     ViewChild,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
 import {
     ActivityNode,
     BoxNode,
@@ -28,7 +27,6 @@ import {
     TransitionToPlaceArc,
 } from './models';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
-import { InitializeArcFeedbackCalculationService } from 'src/app/services/initialize-arc-feedback-calculation.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 
 @Component({
@@ -54,8 +52,6 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     constructor(
         private calculatePetriNetService: CalculatePetriNetService,
         private readonly contextMenuService: ContextMenuService,
-        private petriNetManagementService: PetriNetManagementService,
-        private initializeArcFeedbackCalculationService: InitializeArcFeedbackCalculationService,
     ) {}
 
     get activities(): Array<Activity> {
@@ -83,12 +79,8 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this._sub = this.calculatePetriNetService.graph$
-            .pipe(
-                // Filter out empty graphs or graphs with no nodes
-                filter((graphes: Graph) => graphes.nodes.length > 0),
-            )
-            .subscribe((graph: Graph) => {
+        this._sub = this.calculatePetriNetService.graph$.subscribe(
+            (graph: Graph) => {
                 const places: Array<Place> = new Array<Place>();
                 const activities: Array<Activity> = new Array<Activity>();
                 const transitions: Array<Transition> = new Array<Transition>();
@@ -197,20 +189,8 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 this._places = places;
                 this._arcs = arcs;
                 this._boxArcs = boxArcs;
-
-                // this.initializeArcFeedbackCalculationService.initialize();
-                // this.petriNetManagementService.petriNet$.forEach((petriNet) => {
-                //     console.log(petriNet);
-                //     this.initializeArcFeedbackCalculationService.initialize(
-                //         petriNet,
-                //     );
-                // });
-                // this.petriNetManagementService.petriNet$.forEach((petriNet) => {
-                //     petriNet.getDFGs().forEach((dfg) => {
-                //         dfg.startProcessing();
-                //     });
-                // });
-            });
+            },
+        );
 
         this.observer = new MutationObserver((mutations) => {
             this.recalculateSVGSize();

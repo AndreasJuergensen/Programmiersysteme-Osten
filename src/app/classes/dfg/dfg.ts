@@ -4,8 +4,6 @@ import { PetriNetTransition } from '../petrinet/petri-net-transitions';
 import { Activities, Activity } from './activities';
 import { ArcJson, Arcs, CategorizedArcs, DfgArc } from './arcs';
 import { ExclusiveCut, LoopCut, ParallelCut, SequenceCut } from './cut';
-import { Worker } from 'worker_threads';
-import path from 'path';
 
 export interface DfgJson {
     activities: string[];
@@ -17,6 +15,8 @@ export class Dfg implements PetriNetTransition {
     private _currentPossibleCut: CutType | undefined;
     private _arcSubsets: Array<Array<DfgArc>> = [];
     private static _arcCalculationFlag: boolean = false;
+    private _isCurrentPossibleCutCalculationCompleted: boolean = false;
+    private _isArcSubsetsCalculationCompleted: boolean = false;
 
     constructor(
         private readonly _activities: Activities,
@@ -24,11 +24,6 @@ export class Dfg implements PetriNetTransition {
         private readonly _eventLog: EventLog,
     ) {
         this.id = 'DFG' + ++Dfg.idCount;
-
-        // if (Dfg._arcCalculationFlag) {
-        //     this.initializePossibleCut();
-        //     this.initializeArcSubsets();
-        // }
     }
 
     public static get arcCalculationFlag(): boolean {
@@ -46,26 +41,25 @@ export class Dfg implements PetriNetTransition {
         );
     }
 
-    public async startProcessing(): Promise<void> {
-        console.log(`Starting processing for DFG: ${this.id}`);
-        this.initializePossibleCut();
-        this.initializeArcSubsets();
+    public initializePossibleCut(): void {
+        this.calculatePossibleCut().then((possibleCutType) => {
+            this._currentPossibleCut = possibleCutType;
+            this._isCurrentPossibleCutCalculationCompleted = true;
+            this.initializeArcSubsets();
+        });
     }
 
-    private async initializePossibleCut(): Promise<void> {
-        this._currentPossibleCut = this.calculatePossibleCut();
-    }
-
-    private async initializeArcSubsets(): Promise<void> {
+    private initializeArcSubsets(): void {
         if (!this.getPossibleCut()) {
-            const noSubsets: Array<DfgArc> = [];
-
-            this._arcSubsets =
-                this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
-                    noSubsets,
-                );
+            this._arcSubsets = [];
+            this._isArcSubsetsCalculationCompleted = true;
         } else {
-            this.filterArcsByCutAndCallSubsetGeneration();
+            this.filterArcsByCutAndCallSubsetGeneration().then(
+                (generatedSubsets) => {
+                    this._arcSubsets = generatedSubsets;
+                    this._isArcSubsetsCalculationCompleted = true;
+                },
+            );
         }
     }
 
@@ -176,7 +170,7 @@ export class Dfg implements PetriNetTransition {
         return false;
     }
 
-    calculatePossibleCut(): CutType | undefined {
+    async calculatePossibleCut(): Promise<CutType | undefined> {
         const allActivities: Activities = new Activities()
             .addAll(this.activities)
             .removePlayAndStop();
@@ -200,48 +194,42 @@ export class Dfg implements PetriNetTransition {
         return undefined;
     }
 
-    filterArcsByCutAndCallSubsetGeneration(): void {
+    async filterArcsByCutAndCallSubsetGeneration(): Promise<
+        Array<Array<DfgArc>>
+    > {
         const filteredArcs = this._arcs.removeArcsBy(
             this._arcs.getSelfLoopArcs(),
         );
-
-        switch (this.getPossibleCut()) {
+        //ein return am Ende
+        switch (this.getPossibleCut()!) {
             case CutType.ExclusiveCut:
                 const filteredExclusiveArcs = filteredArcs.removeArcsBy(
                     filteredArcs.getNonStartAndStopArcs(),
                 );
-                this._arcSubsets =
-                    this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
-                        filteredExclusiveArcs.getArcs(),
-                    );
-                break;
+                return this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
+                    filteredExclusiveArcs.getArcs(),
+                );
             case CutType.SequenceCut:
                 const filteredSequenceArcs = filteredArcs.removeArcsBy(
                     filteredArcs.getReverseArcs(),
                 );
-                this._arcSubsets =
-                    this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
-                        filteredSequenceArcs.getArcs(),
-                    );
-                break;
+                return this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
+                    filteredSequenceArcs.getArcs(),
+                );
             case CutType.ParallelCut:
                 const filteredParallelArcs = filteredArcs.removeArcsBy(
                     filteredArcs.getNonReversedArcs(),
                 );
-                this._arcSubsets =
-                    this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
-                        filteredParallelArcs.getArcs(),
-                    );
-                break;
+                return this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
+                    filteredParallelArcs.getArcs(),
+                );
             case CutType.LoopCut:
                 const filteredLoopArcs = filteredArcs.removeArcsBy(
                     filteredArcs.getStartAndStopArcs(),
                 );
-                this._arcSubsets =
-                    this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
-                        filteredLoopArcs.getArcs(),
-                    );
-                break;
+                return this.generateAllArcSubsetsAndCheckForPossibleCorrectArcs(
+                    filteredLoopArcs.getArcs(),
+                );
         }
     }
 
@@ -249,10 +237,6 @@ export class Dfg implements PetriNetTransition {
         arcs: Array<DfgArc>,
     ): Array<Array<DfgArc>> {
         const subsets: Array<Array<DfgArc>> = [];
-
-        if (!this.getPossibleCut()) {
-            return subsets;
-        }
 
         let cutFeasibilityResults: {
             cutIsPossible: boolean;
@@ -287,6 +271,13 @@ export class Dfg implements PetriNetTransition {
         }
 
         return subsets;
+    }
+
+    isFeedbackCalculationCompleted(): boolean {
+        return (
+            this._isArcSubsetsCalculationCompleted &&
+            this._isCurrentPossibleCutCalculationCompleted
+        );
     }
 
     validateSelectedArcs(
@@ -552,6 +543,11 @@ export class DfgBuilder {
     }
 
     build(): Dfg {
-        return new Dfg(this.activities, this.arcs, this.eventlog);
+        const dfg: Dfg = new Dfg(this.activities, this.arcs, this.eventlog);
+        console.log('before');
+
+        dfg.initializePossibleCut();
+        console.log('after');
+        return dfg;
     }
 }

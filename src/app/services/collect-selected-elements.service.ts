@@ -63,7 +63,7 @@ export class CollectSelectedElementsService {
         }
     }
 
-    public setCorrectArcs(selectedCut: CutType): void {
+    public setArcFeedback(selectedCut: CutType): void {
         const validatedArcs: CategorizedArcs =
             this._currentCollectedArcsDFG!.validateSelectedArcs(
                 this._collectedArcs,

@@ -63,14 +63,14 @@ export class CutExecutionComponent implements OnInit {
         return Dfg.arcCalculationFlag;
     }
 
-    toggleArcCalculation(): void {
-        Dfg.toggleArcCalculationFlag();
-        if (Dfg.arcCalculationFlag === true) {
-            this._petriNet.getDFGs().forEach((dfg) => {
-                dfg.startProcessing();
-            });
-        }
-    }
+    // toggleArcCalculation(): void {
+    //     Dfg.toggleArcCalculationFlag();
+    //     if (Dfg.arcCalculationFlag === true) {
+    //         this._petriNet.getDFGs().forEach((dfg) => {
+    //             dfg.startProcessing();
+    //         });
+    //     }
+    // }
 
     onCutClick(): void {
         const selectedValue = this.radioForm.get('selectedCut')?.value;
@@ -89,9 +89,13 @@ export class CutExecutionComponent implements OnInit {
                 this.resetRadioSelection();
             } else {
                 this.resetRadioSelection();
-                this._collectSelectedElementsService.setCorrectArcs(
-                    selectedValue,
-                );
+                if (
+                    this._collectSelectedElementsService.currentCollectedArcsDFG.isFeedbackCalculationCompleted()
+                ) {
+                    this._collectSelectedElementsService.setArcFeedback(
+                        selectedValue,
+                    );
+                }
             }
         } else if (
             !selectedValue &&

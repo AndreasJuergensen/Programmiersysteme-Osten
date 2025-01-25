@@ -8,7 +8,6 @@ import { Dfg } from './classes/dfg/dfg';
 import { PetriNetManagementService } from './services/petri-net-management.service';
 import { ShowFeedbackService } from './services/show-feedback.service';
 import { FallThroughHandlingService } from './services/fall-through-handling.service';
-import { InitializeArcFeedbackCalculationService } from './services/initialize-arc-feedback-calculation.service';
 
 @Component({
     selector: 'app-root',
@@ -22,7 +21,6 @@ export class AppComponent {
         private _petriNetManagementService: PetriNetManagementService,
         private _feedbackService: ShowFeedbackService,
         private _fallThroughHandlingService: FallThroughHandlingService,
-        private _initializeArcFeedbackCalculationService: InitializeArcFeedbackCalculationService,
     ) {}
 
     public openDialog(): void {
@@ -71,20 +69,6 @@ export class AppComponent {
 
     undoLastUpdate() {
         this._petriNetManagementService.updateToPreviousPetriNet();
-    }
-
-    // async process() {
-    //     await this._initializeArcFeedbackCalculationService.initialize();
-    // }
-
-    async process(): Promise<void> {
-        try {
-            console.log('Starting processing...');
-            await this._initializeArcFeedbackCalculationService.initialize();
-            console.log('Processing completed!');
-        } catch (error) {
-            console.error('Error during processing:', error);
-        }
     }
 
     get actionButtonsAreDisabled(): boolean {
