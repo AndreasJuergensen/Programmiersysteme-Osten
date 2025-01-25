@@ -23,6 +23,7 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
             (mousedown)="startDrag($event)"
             (mousemove)="drag($event)"
             (mouseup)="endDrag($event, activity)"
+            (mouseleave)="endDrag($event, activity)"
         />
         <svg:text
             [attr.x]="activity.x"
@@ -149,7 +150,7 @@ export class DrawingActivityComponent {
 
     drag(event: MouseEvent) {
         const target = event.target as SVGRectElement;
-        if (this.elementSelected !== null) {
+        if (this.elementSelected !== null && this.mouseClicked === true) {
             event.preventDefault();
             const coord = this.getMousePosition(event);
 
@@ -215,6 +216,7 @@ export class DrawingActivityComponent {
                 this._collectSelectedElementsService.updateSelectedActivity(
                     activity.id,
                 );
+                this.mouseClicked = false;
             }
         }
     }

@@ -21,7 +21,7 @@
 
             <ng-container *ngIf="!showEventLogs.checked">
                 <ng-container *ngFor="let boxArc of boxArcs">
-                    <svg:g app-drawing-arc [arc]="boxArc"></svg:g>
+                    <svg:g app-drawing-boxArc [boxArc]="boxArc"></svg:g>
                 </ng-container>
 
                 <ng-container *ngFor="let activity of activities">
