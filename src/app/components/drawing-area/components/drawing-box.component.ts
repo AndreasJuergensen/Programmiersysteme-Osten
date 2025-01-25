@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { Box } from '../models';
-import { environment } from 'src/environments/environment';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
+import { environment } from 'src/environments/environment';
+import { Box } from '../models';
 
 @Component({
     selector: 'svg:g[app-drawing-box]',
@@ -20,7 +20,7 @@ import { CollectSelectedElementsService } from 'src/app/services/collect-selecte
             (click)="onBoxClick($event, box)"
         />
         <svg:text
-            [attr.x]="box.x"
+            [attr.x]="box.x - box.id.length * 4.8"
             [attr.y]="box.y + (box.height + strokeWidth) / 2 + 20"
         >
             {{ box.id }}
@@ -33,18 +33,8 @@ import { CollectSelectedElementsService } from 'src/app/services/collect-selecte
                 [attr.height]="box.height"
                 [attr.overflow-y]="'auto'"
             >
-                <div
-                    style="height: 100%; 
-                        width: 100%; 
-                        overflow-y: auto; 
-                        padding: 10px; 
-                        box-sizing: border-box;"
-                >
-                    <ng-container *ngFor="let trace of box.traces">
-                        <p style="margin: 0px;">
-                            {{ trace }}
-                        </p>
-                    </ng-container>
+                <div class="event-log">
+                    {{ box.eventLog }}
                 </div>
             </foreignObject>
         </ng-container>
@@ -58,6 +48,19 @@ import { CollectSelectedElementsService } from 'src/app/services/collect-selecte
         rect.box-marked {
             stroke: #085c5c;
             stroke-width: 7;
+        }
+        .event-log {
+            height: 100%;
+            width: 100%;
+            overflow-y: auto;
+            padding: 10px;
+            box-sizing: border-box;
+            white-space: pre-line;
+            user-select: text;
+            &::selection {
+                color: #d42f7c;
+                background-color: #efc9db;
+            }
         }
     `,
 })

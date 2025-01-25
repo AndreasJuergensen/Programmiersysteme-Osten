@@ -12,14 +12,4 @@
     <div style="display: flex; justify-content: center">
         <p>{{ data.message }}</p>
     </div>
-    <div style="display: flex; justify-content: center">
-        <button
-            mat-stroked-button="primary"
-            *ngIf="data.isError"
-            (click)="openForm()"
-            style="cursor: pointer; color: rgb(53, 153, 23)"
-        >
-            Informationen zum Fehler
-        </button>
-    </div>
 </div>

@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { Activity, Box } from '../models';
-import { environment } from 'src/environments/environment';
-import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import { Subscription } from 'rxjs';
+import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
+import { environment } from 'src/environments/environment';
+import { Activity } from '../models';
 
 @Component({
     selector: 'svg:g[app-drawing-activity]',
@@ -27,7 +27,7 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
             (mouseleave)="endDrag($event, activity)"
         />
         <svg:text
-            [attr.x]="activity.x"
+            [attr.x]="activity.x - activity.id.length * 4.8"
             [attr.y]="activity.y + (height + strokeWidth) / 2 + 20"
         >
             {{ activity.id }}
