@@ -51,19 +51,7 @@ import { PetriNetManagementService } from 'src/app/services/petri-net-management
             marker-end="url(#arrowhead)"
         ></svg:path>
     `,
-    styles: `
-        // path:hover {
-        //     cursor: pointer;
-        // }
-
-        // path.active {
-        //     stroke: red !important;
-        // }
-
-        // path.hovered {
-        //     stroke: red !important;
-        // }
-    `,
+    styles: ``,
 })
 export class DrawingArcComponent {
     @Input({ required: true }) arc!: Arc;
