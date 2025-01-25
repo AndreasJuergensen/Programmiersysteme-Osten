@@ -37,6 +37,7 @@ import { EventLogParserService } from 'src/app/services/event-log-parser.service
 export class ContextMenuComponent implements OnInit {
     @Input() visibility!: string;
     @Input() position!: { x: string; y: string };
+    isRightToLeft: boolean = false;
 
     readonly disabling: Disabling;
     readonly exporting: Exporting;
@@ -66,7 +67,16 @@ export class ContextMenuComponent implements OnInit {
             this.visibility = visibility;
         });
         this.contextMenuService.position$.subscribe((position) => {
-            this.position = { x: position.x + 'px', y: position.y + 'px' };
+            const xPosition =
+                position.x > window.innerWidth - 230
+                    ? position.x - 230
+                    : position.x + 2;
+            const yPosition =
+                position.y > window.innerHeight - 407
+                    ? window.innerHeight - 407
+                    : position.y;
+            this.position = { x: xPosition + 'px', y: yPosition + 'px' };
+            this.isRightToLeft = position.x > window.innerWidth - 620;
         });
         this.exporting = new Exporting(exportService, contextMenuService);
         this.disabling = new Disabling(
