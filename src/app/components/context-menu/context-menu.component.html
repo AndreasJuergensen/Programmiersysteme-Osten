@@ -239,13 +239,8 @@
         [class.disabled]="disabling.isToggleFeedbackDisabled()"
         mat-button
         (click)="showingArcFeedback.toggleArcFeedback()"
-        [matTooltip]="
-            disabling.isCalculationInProgress()
-                ? 'Calculation in progress...'
-                : ''
-        "
-        [matTooltipDisabled]="!disabling.isCalculationInProgress()"
-        matTooltipPosition="above"
+        [matTooltip]="showingArcFeedback.getTooltipContent()"
+        matTooltipPosition="right"
     >
         <div>{{ showingArcFeedback.buttonText() }}</div>
     </div>

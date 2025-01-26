@@ -23,15 +23,22 @@ import {
 } from 'src/app/services/execute-cut.service';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 import { FallThroughHandlingService } from 'src/app/services/fall-through-handling.service';
-import { NgFor } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { ParseXesService } from 'src/app/services/parse-xes.service';
 import { EventLogParserService } from 'src/app/services/event-log-parser.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-context-menu',
     standalone: true,
-    imports: [MatButtonModule, MatIconModule, NgFor, MatTooltipModule],
+    imports: [
+        MatButtonModule,
+        MatIconModule,
+        NgFor,
+        MatTooltipModule,
+        CommonModule,
+    ],
     templateUrl: './context-menu.component.html',
     styleUrl: './context-menu.component.css',
 })
@@ -288,6 +295,19 @@ class ShowingArcFeedback {
         }
 
         this.contextMenuService.hide();
+    }
+
+    getTooltipContent(): string {
+        if (this.disabling.isCalculationInProgress()) {
+            return 'Calculation in progress...';
+        } else if (!this.disabling.isToggleFeedbackDisabled()) {
+            return (
+                'Green arcs = definitely right\n' +
+                'Orange arcs = possibly right\n' +
+                'Red arcs = wrong\n'
+            );
+        }
+        return '';
     }
 }
 
