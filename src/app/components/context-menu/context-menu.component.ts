@@ -206,7 +206,7 @@ class ExecutingCut {
             );
             return;
         }
-        this.collectSelectedElementsService.setArcFeedback(cutType);
+
         if (
             !this.executeCutService.execute(
                 this.collectSelectedElementsService.currentCollectedArcsDFG,
@@ -216,7 +216,10 @@ class ExecutingCut {
             this.showArcFeedback
         ) {
             this.collectSelectedElementsService.enableArcFeedback();
-            if (!this.isArcFeedbackReady) {
+            if (this.isArcFeedbackReady) {
+                this.collectSelectedElementsService.setArcFeedback(cutType);
+                this.collectSelectedElementsService.enableArcFeedback();
+            } else {
                 this.feedbackService.showMessage(
                     'Arc Feedback Calculation still in progess.',
                     true,
