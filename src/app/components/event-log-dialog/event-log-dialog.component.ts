@@ -13,14 +13,12 @@ import {
     MatDialogRef,
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { EventLog } from 'src/app/classes/event-log';
 import { EventLogParserService } from 'src/app/services/event-log-parser.service';
 import { CommonModule } from '@angular/common';
 import { EventLogValidationService } from 'src/app/services/event-log-validation.service';
 import { ParseXesService } from 'src/app/services/parse-xes.service';
-import { Dfg } from 'src/app/classes/dfg/dfg';
 
 @Component({
     selector: 'app-event-log-dialog',
@@ -34,7 +32,6 @@ import { Dfg } from 'src/app/classes/dfg/dfg';
         ReactiveFormsModule,
         CommonModule,
         MatTooltipModule,
-        MatIcon,
     ],
     templateUrl: './event-log-dialog.component.html',
     styleUrl: './event-log-dialog.component.css',
@@ -63,14 +60,6 @@ export class EventLogDialogComponent implements OnInit {
         this.eventLogControl.markAsTouched();
         this.eventLogControl.updateValueAndValidity();
         this.data && this.eventLogControl.setValue(this.data.eventLog);
-    }
-
-    get arcCalculationFlag(): boolean {
-        return Dfg.arcCalculationFlag;
-    }
-
-    toggleArcCalculation(): void {
-        Dfg.toggleArcCalculationFlag();
     }
 
     private validateFormControlInput(

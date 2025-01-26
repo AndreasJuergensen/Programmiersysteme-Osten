@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PetriNetManagementService } from './petri-net-management.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, combineLatest, map } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -16,11 +16,24 @@ export class ApplicationStateService {
         new BehaviorSubject<boolean>(false);
     private _showArcFeedback$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false);
+    private _isArcFeedbackReady$: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false);
 
     constructor(private petriNetManagementService: PetriNetManagementService) {
         this.petriNetManagementService.petriNet$.subscribe((petriNet) => {
             this._isPetriNetEmpty$.next(petriNet.isEmpty());
             this._isBasicPetriNet$.next(petriNet.isBasicPetriNet());
+        });
+        this.petriNetManagementService.petriNet$.subscribe((petriNet) => {
+            const dfgObservables = petriNet
+                .getDFGs()
+                .map((dfg) => dfg.arcFeedbackCalculationState$);
+
+            combineLatest(dfgObservables)
+                .pipe(map((states) => states.every((state) => state)))
+                .subscribe((allReady) => {
+                    this._isArcFeedbackReady$.next(allReady);
+                });
         });
         this.petriNetManagementService.isInputPetriNet$.subscribe(
             (isInputPetriNet) => {
@@ -47,6 +60,10 @@ export class ApplicationStateService {
 
     get showArcFeedback$() {
         return this._showArcFeedback$.asObservable();
+    }
+
+    get isArcFeedbackReady$() {
+        return this._isArcFeedbackReady$.asObservable();
     }
 
     toggleShowEventLogs() {

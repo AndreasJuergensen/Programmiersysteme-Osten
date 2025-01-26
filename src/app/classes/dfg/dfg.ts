@@ -4,6 +4,7 @@ import { PetriNetTransition } from '../petrinet/petri-net-transitions';
 import { Activities, Activity } from './activities';
 import { ArcJson, Arcs, CategorizedArcs, DfgArc } from './arcs';
 import { ExclusiveCut, LoopCut, ParallelCut, SequenceCut } from './cut';
+import { BehaviorSubject } from 'rxjs';
 
 export interface DfgJson {
     activities: string[];
@@ -14,8 +15,10 @@ export class Dfg implements PetriNetTransition {
     public id: string;
     private _currentPossibleCut: CutType | undefined;
     private _arcSubsets: Array<Array<DfgArc>> = [];
-    private static _arcCalculationFlag: boolean = false;
-    private _isFeedbackCalculationCompleted: boolean = false;
+    private _isArcFeedbackCalculationCompleted: boolean = false;
+
+    private _arcFeedbackCalculationState$: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false);
 
     constructor(
         private readonly _activities: Activities,
@@ -25,19 +28,17 @@ export class Dfg implements PetriNetTransition {
         this.id = 'DFG' + ++Dfg.idCount;
     }
 
-    public static get arcCalculationFlag(): boolean {
-        return this._arcCalculationFlag;
+    set arcFeedbackCalculationState(value: boolean) {
+        this._isArcFeedbackCalculationCompleted = value;
+        this._arcFeedbackCalculationState$.next(value);
     }
 
-    public static set arcCalculationFlag(value: boolean) {
-        this._arcCalculationFlag = value;
+    get arcFeedbackCalculationState(): boolean {
+        return this._isArcFeedbackCalculationCompleted;
     }
 
-    public static toggleArcCalculationFlag(): void {
-        this._arcCalculationFlag = !this._arcCalculationFlag;
-        console.log(
-            `Arc calculation flag toggled to: ${this._arcCalculationFlag}`,
-        );
+    get arcFeedbackCalculationState$() {
+        return this._arcFeedbackCalculationState$.asObservable();
     }
 
     public getPossibleCut(): CutType | undefined {
@@ -352,11 +353,11 @@ export class Dfg implements PetriNetTransition {
     }
 
     get isFeedbackCalculationCompleted(): boolean {
-        return this._isFeedbackCalculationCompleted;
+        return this._isArcFeedbackCalculationCompleted;
     }
 
     set isFeedbackCalculationCompleted(value: boolean) {
-        this._isFeedbackCalculationCompleted = value;
+        this._isArcFeedbackCalculationCompleted = value;
     }
 
     asJson(): DfgJson {
@@ -451,7 +452,7 @@ export class DfgBuilder {
                         ),
                 ),
             );
-            dfg.isFeedbackCalculationCompleted = true;
+            dfg.arcFeedbackCalculationState = true;
         };
         worker.postMessage(dfg);
         return dfg;

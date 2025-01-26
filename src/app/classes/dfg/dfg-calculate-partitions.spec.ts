@@ -1,4 +1,4 @@
-import { CutType } from 'src/app/components/cut-execution/cut-execution.component';
+import { CutType } from 'src/app/services/execute-cut.service';
 import { Activities } from './activities';
 import { Arcs } from './arcs';
 import { Dfg, DfgBuilder } from './dfg';

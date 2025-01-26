@@ -26,11 +26,12 @@ import { FallThroughHandlingService } from 'src/app/services/fall-through-handli
 import { NgFor } from '@angular/common';
 import { ParseXesService } from 'src/app/services/parse-xes.service';
 import { EventLogParserService } from 'src/app/services/event-log-parser.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
     selector: 'app-context-menu',
     standalone: true,
-    imports: [MatButtonModule, MatIconModule, NgFor],
+    imports: [MatButtonModule, MatIconModule, NgFor, MatTooltipModule],
     templateUrl: './context-menu.component.html',
     styleUrl: './context-menu.component.css',
 })
@@ -106,6 +107,7 @@ export class ContextMenuComponent implements OnInit {
             feedbackService,
             collectSelectedElementsService,
             contextMenuService,
+            applicationStateService,
         );
         this.executingFallThrough = new ExecutingFallThrough(
             fallThroughHandlingService,
@@ -145,12 +147,29 @@ class ExecutingFallThrough {
 }
 
 class ExecutingCut {
+    private isArcFeedbackReady: boolean = false;
+    private showArcFeedback: boolean = false;
     constructor(
         private executeCutService: ExecuteCutService,
         private feedbackService: ShowFeedbackService,
         private collectSelectedElementsService: CollectSelectedElementsService,
         private contextMenuService: ContextMenuService,
-    ) {}
+        readonly applicationStateService: ApplicationStateService,
+    ) {
+        applicationStateService.isArcFeedbackReady$.subscribe(
+            (isArcFeedbackReady) => {
+                this.isArcFeedbackReady = isArcFeedbackReady;
+                console.log('Feedback');
+
+                console.log(this.isArcFeedbackReady);
+            },
+        );
+        applicationStateService.showArcFeedback$.subscribe(
+            (showArcFeedback) => {
+                this.showArcFeedback = showArcFeedback;
+            },
+        );
+    }
 
     executeExclusiveCut(): void {
         this.executeCut(CutType.ExclusiveCut);
@@ -180,18 +199,22 @@ class ExecutingCut {
             );
             return;
         }
+        this.collectSelectedElementsService.setArcFeedback(cutType);
         if (
             !this.executeCutService.execute(
                 this.collectSelectedElementsService.currentCollectedArcsDFG,
                 this.collectSelectedElementsService.collectedArcs,
                 cutType,
-            )
+            ) &&
+            this.showArcFeedback
         ) {
-            if (
-                this.collectSelectedElementsService.currentCollectedArcsDFG
-                    .isFeedbackCalculationCompleted
-            ) {
-                this.collectSelectedElementsService.setArcFeedback(cutType);
+            this.collectSelectedElementsService.enableArcFeedback();
+            if (!this.isArcFeedbackReady) {
+                this.feedbackService.showMessage(
+                    'Arc Feedback Calculation still in progess.',
+                    true,
+                    'You have turned on the feedback calculation. If you perform a wrong cut the, the calculation has to be finished before.',
+                );
             }
         }
         this.contextMenuService.hide();
@@ -524,6 +547,7 @@ class Disabling {
     private isBasicPetriNet: boolean = false;
     private isInputPetriNet: boolean = false;
     private hasRecentEventLogs: boolean = false;
+    private isArcFeedbackReady: boolean = false;
 
     constructor(
         readonly applicationStateService: ApplicationStateService,
@@ -547,6 +571,11 @@ class Disabling {
         petriNetManagementService.recentEventLogs$.subscribe(
             (recentEventLogs) => {
                 this.hasRecentEventLogs = recentEventLogs.length !== 0;
+            },
+        );
+        applicationStateService.isArcFeedbackReady$.subscribe(
+            (isArcFeedbackReady) => {
+                this.isArcFeedbackReady = isArcFeedbackReady;
             },
         );
     }
@@ -577,7 +606,19 @@ class Disabling {
 
     isToggleFeedbackDisabled(): boolean {
         // return this.isPetriNetEmpty;
-        return this.isPetriNetEmpty || this.isBasicPetriNet;
+        return (
+            this.isPetriNetEmpty ||
+            this.isBasicPetriNet ||
+            !this.isArcFeedbackReady
+        );
+    }
+
+    isCalculationInProgress(): boolean {
+        return (
+            !this.isArcFeedbackReady &&
+            !this.isPetriNetEmpty &&
+            !this.isBasicPetriNet
+        );
     }
 
     isEditEventLogDisabled(): boolean {

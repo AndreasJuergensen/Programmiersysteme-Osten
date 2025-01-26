@@ -1,12 +1,4 @@
 <h2 mat-dialog-title>Event-Log Input</h2>
-<label>
-    <input
-        type="checkbox"
-        (change)="toggleArcCalculation()"
-        [checked]="arcCalculationFlag"
-    />
-    Enable Arc Calculation
-</label>
 <mat-dialog-content class="mat-typography">
     <form (ngSubmit)="onOkClick()">
         <mat-form-field
