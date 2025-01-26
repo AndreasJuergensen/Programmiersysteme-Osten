@@ -174,7 +174,7 @@ export class DrawingActivityComponent {
                     }
                 }
 
-                this._positionForActivitiesService.updatePosition(
+                this._positionForActivitiesService.updateActivityPosition(
                     this.activity.id,
                     this.activity.dfgId,
                     dx,
@@ -192,7 +192,7 @@ export class DrawingActivityComponent {
                 mousePositionCurrent[0] !== this.mousePositionInitial[0] &&
                 mousePositionCurrent[1] !== this.mousePositionInitial[1]
             ) {
-                this._positionForActivitiesService.updateCoordinatesOfArcs(
+                this._positionForActivitiesService.updateCoordinatesOfBoxArcs(
                     this.activity.id,
                     this.activity.dfgId,
                     this.activity.x,
