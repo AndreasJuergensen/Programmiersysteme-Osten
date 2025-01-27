@@ -71,10 +71,12 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
 
         path.active {
             stroke: #ebce97 !important;
+            // stroke: #bebebe !important;
         }
 
         path.hovered {
             stroke: #ebce97 !important;
+            // stroke: #bebebe !important;
         }
     `,
 })
