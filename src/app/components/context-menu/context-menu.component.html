@@ -235,19 +235,38 @@
         </div>
     </div>
     <div
-        class="menu-button"
+        class="legend-menu-wrapper"
         [class.disabled]="disabling.isToggleFeedbackDisabled()"
-        mat-button
-        (click)="showingArcFeedback.toggleArcFeedback()"
         [matTooltip]="
             disabling.isCalculationInProgress()
                 ? 'Calculation in progress...'
                 : ''
         "
         [matTooltipDisabled]="!disabling.isCalculationInProgress()"
-        matTooltipPosition="above"
+        matTooltipPosition="right"
     >
-        <div>{{ showingArcFeedback.buttonText() }}</div>
+        <div
+            class="menu-button"
+            [class.disabled]="disabling.isToggleFeedbackDisabled()"
+            mat-button
+            (click)="showingArcFeedback.toggleArcFeedback()"
+        >
+            <div>{{ showingArcFeedback.buttonText() }}</div>
+        </div>
+        <div class="context-menu legend-menu">
+            <div class="legend-menu-line">
+                <mat-icon class="green">call_made</mat-icon>
+                <div class="green">green arcs = definitely right</div>
+            </div>
+            <div class="legend-menu-line">
+                <mat-icon class="orange">call_made</mat-icon>
+                <div class="orange">orange arcs = possibly right</div>
+            </div>
+            <div class="legend-menu-line">
+                <mat-icon class="red">call_made</mat-icon>
+                <div class="red">red arcs = wrong</div>
+            </div>
+        </div>
     </div>
     <div class="hr"></div>
     <div
