@@ -27,8 +27,9 @@ import { Activity } from '../models';
             (mouseleave)="endDrag($event, activity)"
         />
         <svg:text
-            [attr.x]="activity.x - activity.id.length * 4.8"
+            [attr.x]="activity.x - activity.id.length * 3.8"
             [attr.y]="activity.y + (height + strokeWidth) / 2 + 20"
+            [attr.font-size]="13"
         >
             {{ activity.id }}
         </svg:text>
