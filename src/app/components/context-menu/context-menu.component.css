@@ -101,3 +101,30 @@
 .file-input {
     display: none;
 }
+
+.rich-tooltip {
+    background: #efc9db !important;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    max-width: 250px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    color: white;
+}
+
+.rich-tooltip span {
+    display: flex;
+}
+
+p.red {
+    color: red !important;
+}
+
+p.orange {
+    color: orange !important;
+}
+
+p.green {
+    color: green !important;
+}

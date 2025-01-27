@@ -18,6 +18,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
 import { DrawingAreaModule } from './components/drawing-area/drawing-area.module';
 import { FooterComponent } from './components/footer/footer.component';
+import { RichTooltipDirective } from './directives/rich-tooltip.directive';
 
 @NgModule({
     declarations: [AppComponent, FooterComponent],
@@ -36,6 +37,7 @@ import { FooterComponent } from './components/footer/footer.component';
         MatDialogModule,
         TextFieldModule,
         MatTooltipModule,
+        RichTooltipDirective,
     ],
     providers: [
         {

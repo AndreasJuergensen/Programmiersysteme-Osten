@@ -28,6 +28,7 @@ import { ParseXesService } from 'src/app/services/parse-xes.service';
 import { EventLogParserService } from 'src/app/services/event-log-parser.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
+import { RichTooltipDirective } from 'src/app/directives/rich-tooltip.directive';
 
 @Component({
     selector: 'app-context-menu',
@@ -38,6 +39,7 @@ import { CommonModule } from '@angular/common';
         NgFor,
         MatTooltipModule,
         CommonModule,
+        RichTooltipDirective,
     ],
     templateUrl: './context-menu.component.html',
     styleUrl: './context-menu.component.css',
@@ -271,6 +273,14 @@ class ShowingEventLog {
 
 class ShowingArcFeedback {
     showArcFeedback: boolean = false;
+    tooltipContentString: string = `
+    <div class=rich-tooltip>
+    <span><p class="green">Green arcs = definitely right</p></span>
+    <span><p class="orange">Orange arcs = possibly right</p></span>
+    <span><p class="red">Red arcs = wrong</p></span>
+    </div>
+`;
+
     constructor(
         private applicationStateService: ApplicationStateService,
         private contextMenuService: ContextMenuService,
@@ -282,6 +292,10 @@ class ShowingArcFeedback {
                 this.showArcFeedback = showArcFeedback;
             },
         );
+    }
+
+    get tooltipContent(): string {
+        return this.tooltipContentString;
     }
 
     buttonText(): string {
@@ -300,18 +314,18 @@ class ShowingArcFeedback {
         this.contextMenuService.hide();
     }
 
-    getTooltipContent(): string {
-        if (this.disabling.isCalculationInProgress()) {
-            return 'Calculation in progress...';
-        } else if (!this.disabling.isToggleFeedbackDisabled()) {
-            return (
-                'Green arcs = definitely right\n' +
-                'Orange arcs = possibly right\n' +
-                'Red arcs = wrong\n'
-            );
-        }
-        return '';
-    }
+    // getTooltipContent(): string {
+    //     if (this.disabling.isCalculationInProgress()) {
+    //         return 'Calculation in progress...';
+    //     } else if (!this.disabling.isToggleFeedbackDisabled()) {
+    //         return (
+    //             'Green arcs = definitely right\n' +
+    //             'Orange arcs = possibly right\n' +
+    //             'Red arcs = wrong\n'
+    //         );
+    //     }
+    //     return '';
+    // }
 }
 
 class DialogOpening {
