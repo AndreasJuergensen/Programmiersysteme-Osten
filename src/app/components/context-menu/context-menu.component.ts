@@ -323,7 +323,7 @@ class Examples {
 
     public generateExclusiveExample(): void {
         const traces: Trace[] = [
-            new Trace([new Activity('Order')]),
+            new Trace([new Activity('Order'), new Activity('Confirm')]),
             new Trace([new Activity('Request')]),
         ];
         const eventLog: EventLog = new EventLog(traces);
@@ -332,7 +332,16 @@ class Examples {
 
     generateSequenceExample(): void {
         const traces: Trace[] = [
-            new Trace([new Activity('Order'), new Activity('Confirm')]),
+            new Trace([
+                new Activity('Order'),
+                new Activity('Confirm'),
+                new Activity('Delivery'),
+            ]),
+            new Trace([
+                new Activity('Request'),
+                new Activity('Confirm'),
+                new Activity('Delivery'),
+            ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
         this.initializePetriNet(eventLog);
@@ -364,7 +373,6 @@ class Examples {
     public generateAOPTExample(): void {
         const traces: Trace[] = [
             new Trace([new Activity('Request'), new Activity('Order')]),
-            new Trace([new Activity('Order'), new Activity('Request')]),
             new Trace([
                 new Activity('Order'),
                 new Activity('Request'),
