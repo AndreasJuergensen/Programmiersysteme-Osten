@@ -13,13 +13,21 @@ body {
 
 .mat-mdc-snack-bar-container {
     &.success-snackbar {
-        --mdc-snackbar-container-color: #4caf50;
+        --mdc-snackbar-container-color: #1a711dac;
         --mat-mdc-snack-bar-button-color: #fff;
         --mdc-snackbar-supporting-text-color: #fff;
     }
     &.error-snackbar {
-        --mdc-snackbar-container-color: #f44336;
+        --mdc-snackbar-container-color: #ff007782;
         --mat-mdc-snack-bar-button-color: #fff;
         --mdc-snackbar-supporting-text-color: #fff;
     }
+}
+
+.mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
+    padding: 0px;
+}
+
+.mat-mdc-snack-bar-container .mdc-snackbar__label {
+    padding-left: 60px;
 }

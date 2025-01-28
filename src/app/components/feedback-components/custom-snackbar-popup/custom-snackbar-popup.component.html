@@ -1,15 +1,11 @@
-<div>
-    <div style="display: flex; justify-content: end" class="snackbar-content">
-        <button
-            mat-stroked-button
-            *ngIf="data.isError"
-            (click)="closePopUp()"
-            class="close-btn"
-        >
-            X
-        </button>
-    </div>
-    <div style="display: flex; justify-content: center">
-        <p>{{ data.message }}</p>
-    </div>
-</div>
+<span class="snackbar-content" matSnackBarLabel>{{ data.message }}</span>
+<span class="snackbar-content" matSnackBarActions>
+    <button
+        mat-button
+        matSnackBarAction
+        *ngIf="data.isError"
+        (click)="snackBarRef.dismissWithAction()"
+    >
+        <mat-icon>close</mat-icon>
+    </button>
+</span>
