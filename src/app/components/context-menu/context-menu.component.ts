@@ -231,7 +231,7 @@ class ExecutingCut {
             undefined
         ) {
             this.feedbackService.showMessage(
-                'No arc selected via the drawing area!',
+                "Please select arcs in a DFG by click or clicked-hover to partition it's activities and thus define a cut first.",
                 true,
             );
             return;

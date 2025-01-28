@@ -44,7 +44,9 @@ export class ExecuteCutService {
         }[] = dfg.canBeCutBy(selectedArcs, selectedCut);
         if (cutFeasibilityResults.length === 1) {
             this._feedbackService.showMessage(
-                'Not a valid Cut! Please try again!',
+                'Not a valid Cut! Please try other arc-mix or other cut.' +
+                    "If you aren't sure which arcs should be selected, " +
+                    'the arc feedback could help.',
                 true,
             );
             return false;
@@ -62,7 +64,7 @@ export class ExecuteCutService {
                 cutFeasibilityResults[i].matchingCut === selectedCut
             ) {
                 this._feedbackService.showMessage(
-                    'Too many arcs selected. Please select minimum amount of required arcs.',
+                    'Too many arcs selected. Please deselect irrelevant arcs.',
                     true,
                 );
                 return false;
@@ -116,7 +118,7 @@ export class ExecuteCutService {
             this._petriNetManagementService.showEventLogCompletelySplitted();
             return true;
         }
-        this._feedbackService.showMessage(selectedCut + ' executed', false);
+        this._feedbackService.showMessage(selectedCut + ' executed.', false);
         return true;
     }
 

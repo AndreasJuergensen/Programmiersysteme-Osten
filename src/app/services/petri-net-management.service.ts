@@ -135,7 +135,7 @@ export class PetriNetManagementService {
 
     showEventLogCompletelySplitted(): void {
         this._showFeedbackService.showMessage(
-            'The event log is completely splitted.',
+            'The event log is completely splitted. You can export this petri net now.',
             false,
         );
     }
