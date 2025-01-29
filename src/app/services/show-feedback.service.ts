@@ -18,17 +18,10 @@ export class ShowFeedbackService {
     showMessage(message: string, isError: boolean): void {
         this.snackbar.openFromComponent(CustomSnackbarPopupComponent, {
             data: { message, isError },
-            duration: isError ? 0 : 7000,
+            duration: isError ? 7000 : 7000,
             panelClass: isError ? 'error-snackbar' : 'success-snackbar',
             horizontalPosition: 'right',
             verticalPosition: 'top',
         });
-
-        // this.snackbar.open(message, '', {
-        //     duration: isError ? 0 : 7000,
-        //     panelClass: isError ? 'error-snackbar' : 'success-snackbar',
-        //     horizontalPosition: 'right',
-        //     verticalPosition: 'top',
-        // });
     }
 }

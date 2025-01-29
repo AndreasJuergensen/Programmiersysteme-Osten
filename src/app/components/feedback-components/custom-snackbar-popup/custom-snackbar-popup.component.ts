@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewEncapsulation } from '@angular/core';
 import {
     MAT_SNACK_BAR_DATA,
     MatSnackBarRef,
@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
     imports: [CommonModule, MatIconModule, MatButtonModule],
     templateUrl: './custom-snackbar-popup.component.html',
     styleUrl: './custom-snackbar-popup.component.css',
+    encapsulation: ViewEncapsulation.None,
 })
 export class CustomSnackbarPopupComponent {
     constructor(

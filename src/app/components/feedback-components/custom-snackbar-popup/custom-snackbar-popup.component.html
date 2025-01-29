@@ -1,11 +1,12 @@
-<span class="snackbar-content" matSnackBarLabel>{{ data.message }}</span>
-<span class="snackbar-content" matSnackBarActions>
-    <button
-        mat-button
-        matSnackBarAction
-        *ngIf="data.isError"
-        (click)="snackBarRef.dismissWithAction()"
-    >
-        <mat-icon>close</mat-icon>
-    </button>
-</span>
+<div class="snackbar-content" matSnackBarLabel>
+    {{ data.message }}
+    <div matSnackBarActions>
+        <button
+            mat-button
+            matSnackBarAction
+            (click)="snackBarRef.dismissWithAction()"
+        >
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+</div>

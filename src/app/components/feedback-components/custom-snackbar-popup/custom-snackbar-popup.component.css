@@ -1,3 +1,26 @@
 .snackbar-content {
-    color: white;
+    text-align: center;
+    display: block ruby !important;
+    float: inherit;
+    position: static;
+    .mdc-button {
+        .mat-icon {
+            color: dimgrey;
+            margin: 0px;
+        }
+    }
+}
+
+.cdk-global-overlay-wrapper {
+    .mat-mdc-snack-bar-container {
+        margin: 20px;
+        .mdc-snackbar__surface {
+            padding: 0px;
+            margin: 0px;
+        }
+    }
+}
+.mdc-snackbar__label {
+    padding: 10px 0px 10px 0px;
+    margin: 0px;
 }
