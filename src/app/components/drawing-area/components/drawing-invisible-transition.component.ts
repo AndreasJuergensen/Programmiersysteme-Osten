@@ -64,6 +64,9 @@ export class DrawingInvisibleTransitionComponent {
     transform: any;
     elementSelected: any;
 
+    dx: number = 0;
+    dy: number = 0;
+
     startDrag(event: MouseEvent) {
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
@@ -104,8 +107,8 @@ export class DrawingInvisibleTransitionComponent {
             const coord = this.getMousePosition(event);
 
             if (this.transform !== undefined) {
-                let dx = coord.x - this.offset.x;
-                let dy = coord.y - this.offset.y;
+                this.dx = coord.x - this.offset.x;
+                this.dy = coord.y - this.offset.y;
 
                 // if (target.classList.contains('confine')) {
                 //     if (dx < this.minX) {
@@ -124,8 +127,8 @@ export class DrawingInvisibleTransitionComponent {
                 this._positionForActivitiesService.updateElementPosition(
                     this.invisibleTransition.id,
                     'transition',
-                    dx,
-                    dy,
+                    this.dx,
+                    this.dy,
                 );
             }
         }
@@ -139,6 +142,8 @@ export class DrawingInvisibleTransitionComponent {
                 'transition',
                 this.invisibleTransition.x,
                 this.invisibleTransition.y,
+                this.dx,
+                this.dy,
             );
             this.mouseClicked = false;
         }

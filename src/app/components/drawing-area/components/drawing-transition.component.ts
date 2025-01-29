@@ -62,6 +62,9 @@ export class DrawingTransitionComponent {
     transform: any;
     elementSelected: any;
 
+    dx: number = 0;
+    dy: number = 0;
+
     startDrag(event: MouseEvent) {
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
@@ -102,8 +105,8 @@ export class DrawingTransitionComponent {
             const coord = this.getMousePosition(event);
 
             if (this.transform !== undefined) {
-                let dx = coord.x - this.offset.x;
-                let dy = coord.y - this.offset.y;
+                this.dx = coord.x - this.offset.x;
+                this.dy = coord.y - this.offset.y;
 
                 // if (target.classList.contains('confine')) {
                 //     if (dx < this.minX) {
@@ -122,8 +125,8 @@ export class DrawingTransitionComponent {
                 this._positionForActivitiesService.updateElementPosition(
                     this.transition.id,
                     'transition',
-                    dx,
-                    dy,
+                    this.dx,
+                    this.dy,
                 );
             }
         }
@@ -137,6 +140,8 @@ export class DrawingTransitionComponent {
                 'transition',
                 this.transition.x,
                 this.transition.y,
+                this.dx,
+                this.dy,
             );
             this.mouseClicked = false;
         }

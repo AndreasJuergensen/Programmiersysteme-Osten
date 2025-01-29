@@ -78,6 +78,11 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         new Array<Transition>();
     private _allMovedTransitions = new Array<[transitionId: string]>();
 
+    // ------------------- Boxes -------------------
+    private _originalPositionOfBoxes: Array<Box> = new Array<Box>();
+    private _lastPositionOfBoxes: Array<Box> = new Array<Box>();
+    private _allMovedBoxes = new Array<[boxId: string]>();
+
     public showEventLogs: boolean = false;
     public isEmpty: boolean = true;
 
@@ -258,6 +263,9 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 this._originalPositionOfTransitions = _.cloneDeep(transitions);
                 this._lastPositionOfTransitions = _.cloneDeep(transitions);
 
+                this._originalPositionOfBoxes = _.cloneDeep(boxes);
+                this._lastPositionOfBoxes = _.cloneDeep(boxes);
+
                 this.positionForActivitiesService.passBoxObjects(boxes);
             },
         );
@@ -291,47 +299,13 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                     );
 
                     if (movedActivity) {
-                        if (
-                            this._allMovedActivities.filter(
-                                (activity) =>
-                                    activity[0] === movedActivity.id &&
-                                    activity[1] === movedActivity.dfgId,
-                            ).length === 0
-                        ) {
-                            const originalX =
-                                this._originalPositionOfActivities.find(
-                                    (activity) =>
-                                        activity.id === activityId &&
-                                        activity.dfgId === dfgId,
-                                )!.x;
-
-                            const originalY =
-                                this._originalPositionOfActivities.find(
-                                    (activity) =>
-                                        activity.id === activityId &&
-                                        activity.dfgId === dfgId,
-                                )!.y;
-
-                            movedActivity.x = originalX + xTranslate;
-                            movedActivity.y = originalY + yTranslate;
-                            this.updateDfgArcs();
-                        } else {
-                            const lastX = this._lastPositionOfActivities.find(
-                                (activity) =>
-                                    activity.id === activityId &&
-                                    activity.dfgId === dfgId,
-                            )!.x;
-
-                            const lastY = this._lastPositionOfActivities.find(
-                                (activity) =>
-                                    activity.id === activityId &&
-                                    activity.dfgId === dfgId,
-                            )!.y;
-
-                            movedActivity.x = lastX + xTranslate;
-                            movedActivity.y = lastY + yTranslate;
-                            this.updateDfgArcs();
-                        }
+                        this.updateActivityPosition(
+                            movedActivity,
+                            activityId,
+                            dfgId,
+                            xTranslate,
+                            yTranslate,
+                        );
                     }
                 },
             );
@@ -340,17 +314,19 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         this._sub3 =
             this.positionForActivitiesService.updateBoxArcCoordinates$.subscribe(
                 (activity) => {
-                    this.updateAllMovedActivities(activity[0], activity[1]);
-                    const entryCurrentActivity =
-                        this._lastPositionOfActivities.find(
-                            (activity2) =>
-                                activity2.id === activity[0] &&
-                                activity2.dfgId === activity[1],
-                        );
-                    if (entryCurrentActivity) {
-                        entryCurrentActivity.x = activity[2];
-                        entryCurrentActivity.y = activity[3];
-                    }
+                    const activityId = activity[0];
+                    const dfgId = activity[1];
+                    const newX = activity[2];
+                    const newY = activity[3];
+
+                    //Aktualisiert Liste mit allen bewegten Activities
+                    this.updateAllMovedActivities(activityId, dfgId);
+                    this.updateLastPositionOfActivity(
+                        activityId,
+                        dfgId,
+                        newX,
+                        newY,
+                    );
                 },
             );
 
@@ -395,6 +371,28 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                             );
                         }
                     }
+
+                    if (elementType === 'box') {
+                        //Suche nach der Box innerhalb des Graphen
+                        const movedBox = this._boxes.find(
+                            (box) => box.id === elementId,
+                        );
+
+                        if (movedBox) {
+                            this.updateBoxPosition(
+                                movedBox,
+                                elementId,
+                                xTranslate,
+                                yTranslate,
+                            );
+
+                            this.updateDFGElementsPosition(
+                                elementId,
+                                xTranslate,
+                                yTranslate,
+                            );
+                        }
+                    }
                 },
             );
 
@@ -405,38 +403,91 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                     const elementType: string = element[1];
                     const newX: number = element[2];
                     const newY: number = element[3];
+                    const xTranslate: number = element[4];
+                    const yTranslate: number = element[5];
 
                     if (elementType === 'place') {
                         //Aktualisiert Liste mit allen bewegten Places
                         this.updateAllMovedPlaces(elementId);
-                        const entryCurrentPlace =
-                            this._lastPositionOfPlaces.find(
-                                (place) => place.id === elementId,
-                            );
-
-                        //Aktualisiert letzte Position des Places
-                        if (entryCurrentPlace) {
-                            entryCurrentPlace.x = newX;
-                            entryCurrentPlace.y = newY;
-                        }
+                        this.updateLastPositionOfElement(
+                            elementId,
+                            'place',
+                            newX,
+                            newY,
+                        );
                     }
 
                     if (elementType === 'transition') {
                         //Aktualisiert Liste mit allen bewegten Places
                         this.updateAllMovedTransitions(elementId);
-                        const entryCurrentTransition =
-                            this._lastPositionOfTransitions.find(
-                                (transition) => transition.id === elementId,
-                            );
+                        this.updateLastPositionOfElement(
+                            elementId,
+                            'transition',
+                            newX,
+                            newY,
+                        );
+                    }
 
-                        //Aktualisiert letzte Position des Places
-                        if (entryCurrentTransition) {
-                            entryCurrentTransition.x = newX;
-                            entryCurrentTransition.y = newY;
-                        }
+                    if (elementType === 'box') {
+                        this.updateAllMovedBoxes(elementId);
+                        this.updateLastPositionOfElement(
+                            elementId,
+                            'box',
+                            newX,
+                            newY,
+                        );
+                        this.updateLastPositionOfDFGElements(
+                            elementId,
+                            xTranslate,
+                            yTranslate,
+                        );
                     }
                 },
             );
+    }
+
+    updateActivityPosition(
+        movedActivity: Activity,
+        activityId: string,
+        dfgId: string,
+        xTranslate: number,
+        yTranslate: number,
+    ) {
+        if (
+            this._allMovedActivities.filter(
+                (activity) =>
+                    activity[0] === movedActivity.id &&
+                    activity[1] === movedActivity.dfgId,
+            ).length === 0
+        ) {
+            const originalX = this._originalPositionOfActivities.find(
+                (activity) =>
+                    activity.id === activityId && activity.dfgId === dfgId,
+            )!.x;
+
+            const originalY = this._originalPositionOfActivities.find(
+                (activity) =>
+                    activity.id === activityId && activity.dfgId === dfgId,
+            )!.y;
+
+            movedActivity.x = originalX + xTranslate;
+            movedActivity.y = originalY + yTranslate;
+            this.updateDfgArcs();
+        } else {
+            const lastX = this._lastPositionOfActivities.find(
+                (activity) =>
+                    activity.id === activityId && activity.dfgId === dfgId,
+            )!.x;
+
+            const lastY = this._lastPositionOfActivities.find(
+                (activity) =>
+                    activity.id === activityId && activity.dfgId === dfgId,
+            )!.y;
+
+            movedActivity.x = lastX + xTranslate;
+            movedActivity.y = lastY + yTranslate;
+            this.updateDfgArcs();
+        }
     }
 
     updatePlacePosition(
@@ -489,7 +540,6 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         yTranslate: number,
     ) {
         //Wenn Element noch nicht bewegt wurde
-
         if (
             this._allMovedTransitions.filter(
                 (transition) => transition[0] === movedTransition.id,
@@ -527,6 +577,74 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         }
     }
 
+    updateBoxPosition(
+        movedBox: Box,
+        elementId: string,
+        xTranslate: number,
+        yTranslate: number,
+    ) {
+        //Wenn Element noch nicht bewegt wurde
+        if (
+            this._allMovedBoxes.filter((box) => box[0] === movedBox.id)
+                .length === 0
+        ) {
+            const originalX = this._originalPositionOfBoxes.find(
+                (box) => box.id === elementId,
+            )!.x;
+
+            const originalY = this._originalPositionOfBoxes.find(
+                (box) => box.id === elementId,
+            )!.y;
+
+            //Setzt neue Koordinaten der Transition im Graphen
+            movedBox.x = originalX + xTranslate;
+            movedBox.y = originalY + yTranslate;
+            //Aktualisiert zugehörige Arcs
+            this.updateArcs();
+        }
+        //Wenn Element schon mal bewegt wurde
+        else {
+            const lastX = this._lastPositionOfBoxes.find(
+                (box) => box.id === elementId,
+            )!.x;
+
+            const lastY = this._lastPositionOfBoxes.find(
+                (box) => box.id === elementId,
+            )!.y;
+
+            //Setzt neue Koordinaten der Transition im Graphen
+            movedBox.x = lastX + xTranslate;
+            movedBox.y = lastY + yTranslate;
+            //Aktualisiert zugehörige Arcs
+            this.updateArcs();
+        }
+    }
+
+    updateDFGElementsPosition(
+        boxId: string,
+        xTranslate: number,
+        yTranslate: number,
+    ) {
+        const activitiesToMove = this._activities.filter(
+            (activity) => activity.dfgId === boxId,
+        );
+
+        const arcsToMove = this._boxArcs.filter(
+            (boxArc) => (boxArc.start as Activity).dfgId === boxId,
+        );
+
+        activitiesToMove.forEach((activity) => {
+            this.updateActivityPosition(
+                activity,
+                activity.id,
+                activity.dfgId,
+                xTranslate,
+                yTranslate,
+            );
+            this.updateAllMovedActivities(activity.id, activity.dfgId);
+        });
+    }
+
     updateAllMovedActivities(activityID: string, dfgId: string) {
         const activityEntry = this._allMovedActivities.filter(
             (activity) => activity[0] === activityID && activity[1] === dfgId,
@@ -555,6 +673,118 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         if (transitionEntry.length === 0) {
             this._allMovedTransitions.push([transitionId]);
         }
+    }
+
+    updateAllMovedBoxes(boxId: string) {
+        const boxEntry = this._allMovedBoxes.filter((box) => box[0] === boxId);
+
+        if (boxEntry.length === 0) {
+            this._allMovedBoxes.push([boxId]);
+        }
+    }
+
+    updateLastPositionOfActivity(
+        activityId: string,
+        dfgId: string,
+        newX: number,
+        newY: number,
+    ) {
+        const entryCurrentActivity = this._lastPositionOfActivities.find(
+            (activity) =>
+                activity.id === activityId && activity.dfgId === dfgId,
+        );
+
+        //Aktualisiert letzte Position der Activity
+        if (entryCurrentActivity) {
+            entryCurrentActivity.x = newX;
+            entryCurrentActivity.y = newY;
+        }
+    }
+
+    updateLastPositionOfActivityWhenMovingBox(
+        activityId: string,
+        dfgId: string,
+        xTranslate: number,
+        yTranslate: number,
+    ) {
+        const entryCurrentActivity = this._lastPositionOfActivities.find(
+            (activity) =>
+                activity.id === activityId && activity.dfgId === dfgId,
+        );
+
+        //Aktualisiert letzte Position der Activity
+        if (entryCurrentActivity) {
+            entryCurrentActivity.x = entryCurrentActivity.x + xTranslate;
+            entryCurrentActivity.y = entryCurrentActivity.y + yTranslate;
+        }
+    }
+
+    updateLastPositionOfElement(
+        elementId: string,
+        elementType: string,
+        newX: number,
+        newY: number,
+    ) {
+        if (elementType === 'place') {
+            const entryCurrentPlace = this._lastPositionOfPlaces.find(
+                (place) => place.id === elementId,
+            );
+
+            //Aktualisiert letzte Position des Places
+            if (entryCurrentPlace) {
+                entryCurrentPlace.x = newX;
+                entryCurrentPlace.y = newY;
+            }
+        }
+
+        if (elementType === 'transition') {
+            const entryCurrentTransition = this._lastPositionOfTransitions.find(
+                (transition) => transition.id === elementId,
+            );
+
+            //Aktualisiert letzte Position des Places
+            if (entryCurrentTransition) {
+                entryCurrentTransition.x = newX;
+                entryCurrentTransition.y = newY;
+            }
+        }
+
+        if (elementType === 'box') {
+            const entryCurrentBox = this._lastPositionOfBoxes.find(
+                (box) => box.id === elementId,
+            );
+
+            //Aktualisiert letzte Position der Box
+            if (entryCurrentBox) {
+                entryCurrentBox.x = newX;
+                entryCurrentBox.y = newY;
+            }
+
+            this.positionForActivitiesService.passBoxObjects(this.boxes);
+        }
+    }
+
+    updateLastPositionOfDFGElements(
+        boxId: string,
+        xTranslate: number,
+        yTranslate: number,
+    ) {
+        const activitiesToMove = this._activities.filter(
+            (activity) => activity.dfgId === boxId,
+        );
+
+        const arcsToMove = this._boxArcs.filter(
+            (boxArc) => (boxArc.start as Activity).dfgId === boxId,
+        );
+
+        activitiesToMove.forEach((activity) => {
+            this.updateLastPositionOfActivityWhenMovingBox(
+                activity.id,
+                activity.dfgId,
+                xTranslate,
+                yTranslate,
+            );
+        });
     }
 
     ngOnDestroy(): void {

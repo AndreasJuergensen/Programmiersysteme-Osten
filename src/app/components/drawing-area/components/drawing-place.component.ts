@@ -68,6 +68,9 @@ export class DrawingPlaceComponent {
     transform: any;
     elementSelected: any;
 
+    dx: number = 0;
+    dy: number = 0;
+
     minX: number = 0;
     maxX: number = 0;
     minY: number = 0;
@@ -113,8 +116,8 @@ export class DrawingPlaceComponent {
             const coord = this.getMousePosition(event);
 
             if (this.transform !== undefined) {
-                let dx = coord.x - this.offset.x;
-                let dy = coord.y - this.offset.y;
+                this.dx = coord.x - this.offset.x;
+                this.dy = coord.y - this.offset.y;
 
                 // if (target.classList.contains('confine')) {
                 //     if (dx < this.minX) {
@@ -133,8 +136,8 @@ export class DrawingPlaceComponent {
                 this._positionForActivitiesService.updateElementPosition(
                     this.place.id,
                     'place',
-                    dx,
-                    dy,
+                    this.dx,
+                    this.dy,
                 );
             }
         }
@@ -148,6 +151,8 @@ export class DrawingPlaceComponent {
                 'place',
                 this.place.x,
                 this.place.y,
+                this.dx,
+                this.dy,
             );
             this.mouseClicked = false;
         }

@@ -60,13 +60,34 @@ export class PositionForActivitiesService {
 
     //--------- Subscription 5 ---------
     private readonly _updateEndPositionOfElement$: BehaviorSubject<
-        [elementId: string, elementType: string, x: number, y: number]
+        [
+            elementId: string,
+            elementType: string,
+            x: number,
+            y: number,
+            xTranslate: number,
+            yTranslate: number,
+        ]
     > = new BehaviorSubject<
-        [elementId: string, elementType: string, x: number, y: number]
-    >(['', '', 0, 0]);
+        [
+            elementId: string,
+            elementType: string,
+            x: number,
+            y: number,
+            xTranslate: number,
+            yTranslate: number,
+        ]
+    >(['', '', 0, 0, 0, 0]);
 
     get updateEndPositionOfElement$(): Observable<
-        [elementId: string, elementType: string, x: number, y: number]
+        [
+            elementId: string,
+            elementType: string,
+            x: number,
+            y: number,
+            xTranslate: number,
+            yTranslate: number,
+        ]
     > {
         return this._updateEndPositionOfElement$.asObservable();
     }
@@ -86,7 +107,7 @@ export class PositionForActivitiesService {
 
     //--------- MAIN ---------
 
-    updateActivityPosition(
+    public updateActivityPosition(
         activityId: string,
         dfgId: string,
         xTranslate: number,
@@ -108,7 +129,7 @@ export class PositionForActivitiesService {
     //     this._movingPlaceInGraph$.next([placeId, xTranslate, yTranslate]);
     // }
 
-    updateElementPosition(
+    public updateElementPosition(
         elementId: string,
         elementType: string,
         xTranslate: number,
@@ -122,7 +143,7 @@ export class PositionForActivitiesService {
         ]);
     }
 
-    updateCoordinatesOfBoxArcs(
+    public updateCoordinatesOfBoxArcs(
         activityId: string,
         dfgId: string,
         newX: number,
@@ -131,17 +152,21 @@ export class PositionForActivitiesService {
         this._updateBoxArcCoordinates$.next([activityId, dfgId, newX, newY]);
     }
 
-    updateEndPositionOfElement(
+    public updateEndPositionOfElement(
         elementId: string,
         elementType: string,
         newX: number,
         newY: number,
+        xTranslate: number,
+        yTranslate: number,
     ) {
         this._updateEndPositionOfElement$.next([
             elementId,
             elementType,
             newX,
             newY,
+            xTranslate,
+            yTranslate,
         ]);
     }
 
