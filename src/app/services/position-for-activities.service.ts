@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Activity, Arc, Box } from '../components/drawing-area';
-import { BoxNode } from '../classes/graph';
+import { Box } from '../components/drawing-area';
 
 @Injectable({
     providedIn: 'root',
@@ -43,22 +42,7 @@ export class PositionForActivitiesService {
         return this._boxDimensions$.asObservable();
     }
 
-    // //--------- Subscription 4 ---------
-    // private readonly _movingPlaceInGraph$: BehaviorSubject<
-    //     [place: string, x: number, y: number]
-    // > = new BehaviorSubject<[placeId: string, x: number, y: number]>([
-    //     '',
-    //     0,
-    //     0,
-    // ]);
-
-    // get movingPlaceInGraph$(): Observable<
-    //     [placeId: string, x: number, y: number]
-    // > {
-    //     return this._movingPlaceInGraph$.asObservable();
-    // }
-
-    //--------- Subscription 5 ---------
+    //--------- Subscription 4 ---------
     private readonly _updateEndPositionOfElement$: BehaviorSubject<
         [
             elementId: string,
@@ -92,7 +76,7 @@ export class PositionForActivitiesService {
         return this._updateEndPositionOfElement$.asObservable();
     }
 
-    //--------- Subscription 6 ---------
+    //--------- Subscription 5 ---------
     private readonly _movingElementInGraph$: BehaviorSubject<
         [elementId: string, elementType: string, x: number, y: number]
     > = new BehaviorSubject<
@@ -120,14 +104,6 @@ export class PositionForActivitiesService {
             yTranslate,
         ]);
     }
-
-    // updatePlacePosition(
-    //     placeId: string,
-    //     xTranslate: number,
-    //     yTranslate: number,
-    // ) {
-    //     this._movingPlaceInGraph$.next([placeId, xTranslate, yTranslate]);
-    // }
 
     public updateElementPosition(
         elementId: string,
@@ -169,10 +145,6 @@ export class PositionForActivitiesService {
             yTranslate,
         ]);
     }
-
-    // updateCoordinatesOfArcs(placeId: string, newX: number, newY: number) {
-    //     this._updateArcCoordinates$.next([placeId, newX, newY]);
-    // }
 
     passBoxObjects(box: Box[]): void {
         this._boxDimensions$.next(box);

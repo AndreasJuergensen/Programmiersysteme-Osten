@@ -67,6 +67,18 @@ export class DrawingInvisibleTransitionComponent {
     dx: number = 0;
     dy: number = 0;
 
+    bbox: any;
+
+    boundaryX1: number = 0;
+    boundaryX2: number = 0;
+    boundaryY1: number = 0;
+    boundaryY2: number = 0;
+
+    minX: number = 0;
+    maxX: number = 0;
+    minY: number = 0;
+    maxY: number = 0;
+
     startDrag(event: MouseEvent) {
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
@@ -74,11 +86,21 @@ export class DrawingInvisibleTransitionComponent {
         const target = event.target as SVGRectElement;
         this.mouseClicked = true;
 
+        this.setBoundary(svg);
+
         if (target.classList.contains('draggable')) {
             this.offset = this.getMousePosition(event);
             this.elementSelected = target;
 
             const transforms = this.elementSelected.transform.baseVal;
+
+            if (target.classList.contains('confine')) {
+                this.bbox = target.getBBox();
+                this.minX = this.boundaryX1 - this.bbox.x;
+                this.maxX = this.boundaryX2 - this.bbox.x - this.bbox.width;
+                this.minY = this.boundaryY1 - this.bbox.y;
+                this.maxY = this.boundaryY2 - this.bbox.y - this.bbox.height;
+            }
 
             if (
                 transforms.length === 0 ||
@@ -110,19 +132,19 @@ export class DrawingInvisibleTransitionComponent {
                 this.dx = coord.x - this.offset.x;
                 this.dy = coord.y - this.offset.y;
 
-                // if (target.classList.contains('confine')) {
-                //     if (dx < this.minX) {
-                //         dx = this.minX;
-                //     } else if (dx > this.maxX) {
-                //         dx = this.maxX;
-                //     }
+                if (target.classList.contains('confine')) {
+                    if (this.dx < this.minX) {
+                        this.dx = this.minX;
+                    } else if (this.dx > this.maxX) {
+                        this.dx = this.maxX;
+                    }
 
-                //     if (dy < this.minY) {
-                //         dy = this.minY;
-                //     } else if (dy > this.maxY) {
-                //         dy = this.maxY;
-                //     }
-                // }
+                    if (this.dy < this.minY) {
+                        this.dy = this.minY;
+                    } else if (this.dy > this.maxY) {
+                        this.dy = this.maxY;
+                    }
+                }
 
                 this._positionForActivitiesService.updateElementPosition(
                     this.invisibleTransition.id,
@@ -163,5 +185,24 @@ export class DrawingInvisibleTransitionComponent {
             x: (event.clientX - CTM.e) / CTM.a,
             y: (event.clientY - CTM.f) / CTM.d,
         };
+    }
+
+    private setBoundary(svg: SVGSVGElement): void {
+        const drawingArea = document.getElementById('drawingArea');
+        if (drawingArea && svg) {
+            const drawingAreaBox = drawingArea.getBoundingClientRect();
+            const svgBox = svg.getBoundingClientRect();
+
+            this.boundaryX2 = drawingAreaBox.width;
+            this.boundaryY2 = drawingAreaBox.height;
+
+            if (svgBox.width > drawingAreaBox.width) {
+                this.boundaryX2 = svgBox.width;
+            }
+
+            if (svgBox.height > drawingAreaBox.height) {
+                this.boundaryY2 = svgBox.height;
+            }
+        }
     }
 }
