@@ -44,9 +44,9 @@ export class ExecuteCutService {
         }[] = dfg.canBeCutBy(selectedArcs, selectedCut);
         if (cutFeasibilityResults.length === 1) {
             this._feedbackService.showMessage(
-                'Not a valid Cut! Please try other arc-mix or other cut.' +
-                    "If you aren't sure which arcs should be selected, " +
-                    'the arc feedback could help.',
+                'Not a valid Cut! Please try another arc-combination or another cut. ' +
+                    "If you aren't sure which arcs need to be selected, " +
+                    'the arc feedback via context-menu might help.',
                 true,
             );
             return false;

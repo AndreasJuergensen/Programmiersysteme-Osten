@@ -231,7 +231,7 @@ class ExecutingCut {
             undefined
         ) {
             this.feedbackService.showMessage(
-                "Please select arcs in a DFG by click or clicked-hover to partition it's activities and thus define a cut first.",
+               "Please select arcs in a DFG by clicking or click-hovering them, to define a cut first.",
                 true,
             );
             return;

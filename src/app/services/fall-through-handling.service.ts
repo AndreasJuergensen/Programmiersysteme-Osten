@@ -32,7 +32,7 @@ export class FallThroughHandlingService {
             this._showFeedbackService.showMessage(
                 'Please select the activity you want to detach first.' +
                     "If you aren't sure which one fulfills the AOPT-property, " +
-                    'let the event logs showed by context-menu.',
+                    'showing the event logs via context-menu might help.',
                 true,
             );
             return;
@@ -82,7 +82,7 @@ export class FallThroughHandlingService {
             this._collectSelectedElementsService.selectedDFG;
         if (dfg === undefined) {
             this._showFeedbackService.showMessage(
-                "Please select a DFG by click on it's border first.",
+                "Please select a DFG by clicking on it's border first.",
                 true,
             );
             return;
