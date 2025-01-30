@@ -1,28 +1,47 @@
-div {
-    color: white;
+.snackbar-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    font-family: "Courier New", sans-serif !important;
+    font-size: 18px !important;
+    .snackbar-content {
+        padding-left: 16px !important;
+    }
+    .snackbar-action {
+        padding-left: 16px !important;
+        .mdc-button {
+            transform: scale(0.8);
+            .mat-icon {
+                color: rgb(71, 69, 69) !important;
+                margin: 0px;
+            }
+        }
+    }
 }
 
-a {
-    text-decoration: underline;
-    margin-top: 10px;
-    display: inline-block;
+.mat-mdc-snack-bar-container {
+    &.success-snackbar {
+        --mdc-snackbar-container-color: #1a711dac;
+        --mdc-snackbar-supporting-text-color: #fff;
+    }
+    &.error-snackbar {
+        --mdc-snackbar-container-color: #ff0000be;
+        --mdc-snackbar-supporting-text-color: #fff;
+    }
 }
 
-.snackbar-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: white;
+.cdk-global-overlay-wrapper {
+    .mat-mdc-snack-bar-container {
+        margin: 20px;
+        .mdc-snackbar__surface {
+            padding: 0px;
+            margin: 0px;
+        }
+    }
 }
-
-.close-btn {
-    background: none;
-    border: none;
-    color: lightblue;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.close-btn:hover {
-    text-decoration: underline;
+.mdc-snackbar__label {
+    padding: 10px 0px 10px 0px;
+    margin: 0px;
 }

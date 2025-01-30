@@ -188,7 +188,6 @@ class ExecutingCut {
             this.feedbackService.showMessage(
                 'No arc selected via the drawing area!',
                 true,
-                'You have to choose at least one arc the perform a cut on a dfg.',
             );
             return;
         }
