@@ -5,8 +5,12 @@ body {
     height: 100%;
     box-sizing: border-box;
 }
+html {
+    overflow-y: hidden;
+}
 body {
     margin: 0;
-    padding: 3vw;
+    padding: 3vh 3vw;
     font-family: "Courier New", sans-serif;
+    overflow-y: auto;
 }

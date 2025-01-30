@@ -51,7 +51,6 @@ export class EventLogDialogComponent implements OnInit {
         private dialogRef: MatDialogRef<EventLogDialogComponent, EventLog>,
         private eventLogParserService: EventLogParserService,
         private eventLogValidationService: EventLogValidationService,
-        private parseXesService: ParseXesService,
         private cdr: ChangeDetectorRef,
         @Inject(MAT_DIALOG_DATA) private data: any,
     ) {}

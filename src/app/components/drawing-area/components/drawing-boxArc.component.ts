@@ -4,8 +4,6 @@ import { environment } from 'src/environments/environment';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
-import { Subscription } from 'rxjs';
-import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
 
 @Component({
     selector: 'svg:g[app-drawing-boxArc]',
@@ -28,7 +26,7 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
                 ></svg:path>
             </svg:marker>
             <svg:marker
-                id="arrowhead-red"
+                id="arrowhead-pale"
                 viewBox="0 0 10 10"
                 markerWidth="10"
                 markerHeight="10"
@@ -38,8 +36,8 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
             >
                 <svg:path
                     d="M 1,1 L 9,5 L 1,9 Z"
-                    [attr.fill]="'red'"
-                    [attr.stroke]="'red'"
+                    [attr.fill]="'#bebebe'"
+                    [attr.stroke]="'#bebebe'"
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>
@@ -70,11 +68,11 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
         }
 
         path.active {
-            stroke: red !important;
+            stroke: #bebebe !important;
         }
 
         path.hovered {
-            stroke: red !important;
+            stroke: #bebebe !important;
         }
     `,
 })
@@ -85,40 +83,11 @@ export class DrawingBoxArcComponent {
         private collectSelectedElementsService: CollectSelectedElementsService,
         private feedbackService: ShowFeedbackService,
         private petriNetManagementService: PetriNetManagementService,
-        private positionForActivitiesService: PositionForActivitiesService,
     ) {}
 
     readonly width: number = environment.drawingElements.arcs.width;
     readonly color: string = environment.drawingElements.arcs.color;
     private timeoutId: any;
-
-    private _sub: Subscription | undefined;
-    private _sub2: Subscription | undefined;
-
-    private movingActivityID: string = '';
-    private xTranslate = 0;
-    private yTranslate = 0;
-    private movedActivityIdToSetNewCoordinates: string = '';
-    private updateCoordinates = false;
-
-    ngOnInit(): void {
-        this._sub =
-            this.positionForActivitiesService.movingActivityInGraph$.subscribe(
-                (position) => {
-                    this.movingActivityID = position[0];
-                    this.xTranslate = position[2];
-                    this.yTranslate = position[3];
-                },
-            );
-
-        this._sub2 =
-            this.positionForActivitiesService.updateArcCoordinates$.subscribe(
-                (coordinate) => {
-                    this.movedActivityIdToSetNewCoordinates = coordinate[0];
-                    this.updateCoordinates = true;
-                },
-            );
-    }
 
     changeLineColorOver(event: Event, arc: Arc): void {
         const pathDummy = event.target as SVGPathElement;
@@ -137,7 +106,7 @@ export class DrawingBoxArcComponent {
                 !path.classList.contains('active')
             ) {
                 path.classList.add('hovered');
-                path.setAttribute('marker-end', 'url(#arrowhead-red)');
+                path.setAttribute('marker-end', 'url(#arrowhead-pale)');
             } else if (svg.classList.contains('mouseDown')) {
                 this.timeoutId = setTimeout(() => {
                     if (
@@ -147,7 +116,7 @@ export class DrawingBoxArcComponent {
                             path.classList.toggle('active');
                             path.setAttribute(
                                 'marker-end',
-                                'url(#arrowhead-red)',
+                                'url(#arrowhead-pale)',
                             );
                         } else {
                             path.classList.toggle('active');

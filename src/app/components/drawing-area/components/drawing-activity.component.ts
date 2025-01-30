@@ -27,8 +27,9 @@ import { Activity } from '../models';
             (mouseleave)="endDrag($event, activity)"
         />
         <svg:text
-            [attr.x]="activity.x - activity.id.length * 4.8"
+            [attr.x]="activity.x - activity.id.length * 3.8"
             [attr.y]="activity.y + (height + strokeWidth) / 2 + 20"
+            [attr.font-size]="13"
         >
             {{ activity.id }}
         </svg:text>
@@ -36,12 +37,12 @@ import { Activity } from '../models';
     styles: `
         rect:hover {
             cursor: pointer;
-            stroke-width: 5;
-            stroke: #085c5c;
+            stroke-width: 4;
+            stroke-opacity: 0.5;
         }
         rect.activity-marked {
-            stroke-width: 5;
-            stroke: #085c5c;
+            stroke-width: 3;
+            stroke: #d42f7c;
         }
         .draggable {
             cursor: move;
@@ -174,7 +175,7 @@ export class DrawingActivityComponent {
                     }
                 }
 
-                this._positionForActivitiesService.updatePosition(
+                this._positionForActivitiesService.updateActivityPosition(
                     this.activity.id,
                     this.activity.dfgId,
                     dx,
@@ -192,7 +193,7 @@ export class DrawingActivityComponent {
                 mousePositionCurrent[0] !== this.mousePositionInitial[0] &&
                 mousePositionCurrent[1] !== this.mousePositionInitial[1]
             ) {
-                this._positionForActivitiesService.updateCoordinatesOfArcs(
+                this._positionForActivitiesService.updateCoordinatesOfBoxArcs(
                     this.activity.id,
                     this.activity.dfgId,
                     this.activity.x,
