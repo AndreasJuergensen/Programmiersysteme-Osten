@@ -14,12 +14,10 @@ body {
 .mat-mdc-snack-bar-container {
     &.success-snackbar {
         --mdc-snackbar-container-color: #1a711dac;
-        --mat-mdc-snack-bar-button-color: #fff;
         --mdc-snackbar-supporting-text-color: #fff;
     }
     &.error-snackbar {
         --mdc-snackbar-container-color: #c800007e;
-        --mat-mdc-snack-bar-button-color: #fff;
         --mdc-snackbar-supporting-text-color: #fff;
     }
 }

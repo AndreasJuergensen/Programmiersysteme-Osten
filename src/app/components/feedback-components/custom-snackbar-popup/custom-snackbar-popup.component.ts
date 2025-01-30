@@ -16,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
     encapsulation: ViewEncapsulation.None,
 })
 export class CustomSnackbarPopupComponent {
+    color = 'transparent';
     constructor(
         public snackBarRef: MatSnackBarRef<CustomSnackbarPopupComponent>,
         @Inject(MAT_SNACK_BAR_DATA)

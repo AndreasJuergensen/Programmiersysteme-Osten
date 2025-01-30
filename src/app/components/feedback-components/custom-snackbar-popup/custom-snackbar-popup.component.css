@@ -1,12 +1,21 @@
-.snackbar-content {
-    text-align: center;
-    display: block ruby !important;
-    float: inherit;
-    position: static;
-    .mdc-button {
-        .mat-icon {
-            color: dimgrey;
-            margin: 0px;
+.snackbar-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+
+    .snackbar-content {
+        padding-left: 16px !important;
+    }
+    .snackbar-action {
+        padding-left: 16px !important;
+        .mdc-button {
+            transform: scale(0.8);
+            .mat-icon {
+                color: rgb(71, 69, 69) !important;
+                margin: 0px;
+            }
         }
     }
 }

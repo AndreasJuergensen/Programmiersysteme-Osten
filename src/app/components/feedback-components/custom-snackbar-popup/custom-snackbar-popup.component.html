@@ -1,9 +1,13 @@
-<div class="snackbar-content" matSnackBarLabel>
-    {{ data.message }}
-    <div matSnackBarActions>
+<div class="snackbar-container">
+    <div class="snackbar-content" matSnackBarLabel>
+        {{ data.message }}
+    </div>
+    <div class="snackbar-action" matSnackBarActions>
         <button
             mat-button
             matSnackBarAction
+            [color]="color"
+            (mouseover)="color = 'warn'"
             (click)="snackBarRef.dismissWithAction()"
         >
             <mat-icon>close</mat-icon>
