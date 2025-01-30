@@ -209,7 +209,7 @@ class ExecutingCut {
                 this.collectSelectedElementsService.enableArcFeedback();
             } else {
                 this.feedbackService.showMessage(
-                    'Not a valid Cut! Wait for Arc Feedback Calculation to be finished and cut again.',
+                    'Not a valid Cut! Wait for Arc Feedback Calculation to be finished and execute the cut again.',
                     true,
                 );
             }
