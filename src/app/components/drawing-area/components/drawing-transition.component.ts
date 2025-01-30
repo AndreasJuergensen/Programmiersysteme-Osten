@@ -17,8 +17,9 @@ import { Transition } from '../models';
             [attr.stroke-width]="strokeWidth"
         />
         <svg:text
-            [attr.x]="transition.x - transition.name.length * 4.8"
+            [attr.x]="transition.x - transition.name.length * 3.8"
             [attr.y]="transition.y + (height + strokeWidth) / 2 + 20"
+            [attr.font-size]="13"
         >
             {{ transition.name }}
         </svg:text>

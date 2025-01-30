@@ -20,8 +20,9 @@ import { Box } from '../models';
             (click)="onBoxClick($event, box)"
         />
         <svg:text
-            [attr.x]="box.x - box.id.length * 4.8"
+            [attr.x]="box.x - box.id.length * 3.8"
             [attr.y]="box.y + (box.height + strokeWidth) / 2 + 20"
+            [attr.font-size]="13"
         >
             {{ box.id }}
         </svg:text>
@@ -42,12 +43,12 @@ import { Box } from '../models';
     styles: `
         rect:hover {
             cursor: pointer;
-            stroke-width: 7;
-            stroke: #085c5c;
+            stroke-width: 5;
+            stroke-opacity: 0.5;
         }
         rect.box-marked {
-            stroke: #085c5c;
-            stroke-width: 7;
+            stroke: #d42f7c;
+            stroke-width: 5;
         }
         .event-log {
             height: 100%;
