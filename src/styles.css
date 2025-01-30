@@ -10,14 +10,3 @@ body {
     padding: 3vw;
     font-family: "Courier New", sans-serif;
 }
-
-.mat-mdc-snack-bar-container {
-    &.success-snackbar {
-        --mdc-snackbar-container-color: #1a711dac;
-        --mdc-snackbar-supporting-text-color: #fff;
-    }
-    &.error-snackbar {
-        --mdc-snackbar-container-color: #c800007e;
-        --mdc-snackbar-supporting-text-color: #fff;
-    }
-}
