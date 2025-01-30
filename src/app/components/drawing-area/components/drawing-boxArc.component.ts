@@ -38,8 +38,8 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
             >
                 <svg:path
                     d="M 1,1 L 9,5 L 1,9 Z"
-                    [attr.fill]="'#ebce97'"
-                    [attr.stroke]="'#ebce97'"
+                    [attr.fill]="'#bebebe'"
+                    [attr.stroke]="'#bebebe'"
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>
@@ -70,13 +70,11 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
         }
 
         path.active {
-            stroke: #ebce97 !important;
-            // stroke: #bebebe !important;
+            stroke: #bebebe !important;
         }
 
         path.hovered {
-            stroke: #ebce97 !important;
-            // stroke: #bebebe !important;
+            stroke: #bebebe !important;
         }
     `,
 })
