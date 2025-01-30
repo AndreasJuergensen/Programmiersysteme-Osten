@@ -410,7 +410,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
     onContextMenu(event: MouseEvent) {
         event.preventDefault();
-        this.contextMenuService.showAt(event.clientX + 4, event.clientY + 4);
+        this.contextMenuService.showAt(event.clientX, event.clientY);
     }
 
     onMenuClose() {

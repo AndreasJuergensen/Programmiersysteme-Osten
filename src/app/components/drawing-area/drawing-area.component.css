@@ -9,7 +9,7 @@ svg {
 
 #drawingArea {
     width: 100%;
-    height: 80vh;
+    height: calc(100vh - 2*3vh - 87px - 56px);
     box-sizing: border-box;
     overflow: auto;
     scrollbar-color: gray lightgray;
@@ -18,7 +18,7 @@ svg {
 
     .start-text {
         text-align: center;
-        margin-top: 25vh;
+        margin-top: calc((100vh - 2*3vh - 87px - 56px) / 2 - 5vh);
         transform: translateY(-50%);
     }
 }
