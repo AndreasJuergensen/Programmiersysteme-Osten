@@ -1,31 +1,25 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewEncapsulation } from '@angular/core';
 import {
     MAT_SNACK_BAR_DATA,
     MatSnackBarRef,
 } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
-import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
     selector: 'app-custom-snackbar-popup',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, MatIconModule, MatButtonModule],
     templateUrl: './custom-snackbar-popup.component.html',
     styleUrl: './custom-snackbar-popup.component.css',
+    encapsulation: ViewEncapsulation.None,
 })
 export class CustomSnackbarPopupComponent {
+    color = 'transparent';
     constructor(
         public snackBarRef: MatSnackBarRef<CustomSnackbarPopupComponent>,
         @Inject(MAT_SNACK_BAR_DATA)
         public data: { message: string; isError: boolean },
-        private feedbackService: ShowFeedbackService,
     ) {}
-
-    openForm(): void {
-        this.feedbackService.openFormWithIndividualInput();
-    }
-
-    closePopUp(): void {
-        this.snackBarRef.dismiss();
-    }
 }
