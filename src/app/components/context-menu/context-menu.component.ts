@@ -159,9 +159,6 @@ class ExecutingCut {
         applicationStateService.isArcFeedbackReady$.subscribe(
             (isArcFeedbackReady) => {
                 this.isArcFeedbackReady = isArcFeedbackReady;
-                console.log('Feedback');
-
-                console.log(this.isArcFeedbackReady);
             },
         );
         applicationStateService.showArcFeedback$.subscribe(
@@ -195,7 +192,6 @@ class ExecutingCut {
             this.feedbackService.showMessage(
                 'No arc selected via the drawing area!',
                 true,
-                'You have to choose at least one arc the perform a cut on a dfg.',
             );
             return;
         }
@@ -208,15 +204,13 @@ class ExecutingCut {
             ) &&
             this.showArcFeedback
         ) {
-            this.collectSelectedElementsService.enableArcFeedback();
             if (this.isArcFeedbackReady) {
                 this.collectSelectedElementsService.setArcFeedback(cutType);
                 this.collectSelectedElementsService.enableArcFeedback();
             } else {
                 this.feedbackService.showMessage(
-                    'Arc Feedback Calculation still in progess.',
+                    'Not a valid Cut! Wait for Arc Feedback Calculation to be finished and.',
                     true,
-                    'You have turned on the feedback calculation. If you perform a wrong cut the, the calculation has to be finished before.',
                 );
             }
         }

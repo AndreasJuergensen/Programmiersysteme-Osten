@@ -56,13 +56,8 @@ export class ExecuteCutService {
             a1: Activities;
             a2: Activities;
         } = cutFeasibilityResults[0];
-        console.log('length');
-
-        console.log(cutFeasibilityResults.length);
 
         for (let i = 1; i < cutFeasibilityResults.length; i++) {
-            console.log(cutFeasibilityResults[i].cutIsPossible);
-            console.log(cutFeasibilityResults[i].matchingCut);
             if (
                 cutFeasibilityResults[i].cutIsPossible &&
                 cutFeasibilityResults[i].matchingCut === selectedCut

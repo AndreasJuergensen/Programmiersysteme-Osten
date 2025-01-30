@@ -442,7 +442,6 @@ export class DfgBuilder {
                 }[][];
             };
         }) => {
-            console.log("data: ", data)
             dfg.currentPossibleCut = data.currentPossibleCut;
             dfg.arcSubsets = data.arcSubsets.map((subset) =>
                 subset.map(
@@ -456,7 +455,6 @@ export class DfgBuilder {
             dfg.arcFeedbackCalculationState = true;
         };
         worker.postMessage(dfg);
-        console.log("worker startet")
         return dfg;
     }
 }
