@@ -26,7 +26,7 @@ import { PetriNetManagementService } from 'src/app/services/petri-net-management
                 ></svg:path>
             </svg:marker>
             <svg:marker
-                id="arrowhead-red"
+                id="arrowhead-pale"
                 viewBox="0 0 10 10"
                 markerWidth="10"
                 markerHeight="10"
@@ -36,8 +36,8 @@ import { PetriNetManagementService } from 'src/app/services/petri-net-management
             >
                 <svg:path
                     d="M 1,1 L 9,5 L 1,9 Z"
-                    [attr.fill]="'red'"
-                    [attr.stroke]="'red'"
+                    [attr.fill]="'#bebebe'"
+                    [attr.stroke]="'#bebebe'"
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>
@@ -68,11 +68,11 @@ import { PetriNetManagementService } from 'src/app/services/petri-net-management
         }
 
         path.active {
-            stroke: red !important;
+            stroke: #bebebe !important;
         }
 
         path.hovered {
-            stroke: red !important;
+            stroke: #bebebe !important;
         }
     `,
 })
@@ -106,7 +106,7 @@ export class DrawingBoxArcComponent {
                 !path.classList.contains('active')
             ) {
                 path.classList.add('hovered');
-                path.setAttribute('marker-end', 'url(#arrowhead-red)');
+                path.setAttribute('marker-end', 'url(#arrowhead-pale)');
             } else if (svg.classList.contains('mouseDown')) {
                 this.timeoutId = setTimeout(() => {
                     if (
@@ -116,7 +116,7 @@ export class DrawingBoxArcComponent {
                             path.classList.toggle('active');
                             path.setAttribute(
                                 'marker-end',
-                                'url(#arrowhead-red)',
+                                'url(#arrowhead-pale)',
                             );
                         } else {
                             path.classList.toggle('active');

@@ -27,8 +27,9 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
             (mouseleave)="endDrag($event, place)"
         />
         <svg:text
-            [attr.x]="place.x - place.id.length * 4.8"
+            [attr.x]="place.x - place.id.length * 3.8"
             [attr.y]="place.y + radius + strokeWidth / 2 + 20"
+            [attr.font-size]="13"
         >
             {{ place.id }}
         </svg:text>
