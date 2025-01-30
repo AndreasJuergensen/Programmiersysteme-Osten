@@ -72,6 +72,10 @@ export class PetriNetTransitions {
         throw new Error('Transition not found');
     }
 
+    getAllTransitions(): Array<PetriNetTransition> {
+        return this._transitions;
+    }
+
     getAllDFGs(): Array<Dfg> {
         const dfgs: Array<Dfg> = new Array<Dfg>();
         for (const transition of this._transitions) {

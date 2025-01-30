@@ -51,6 +51,10 @@ export class Places {
         throw new Error('Place not found');
     }
 
+    getAllPlaces(): Array<Place> {
+        return this._places;
+    }
+
     get input(): Place {
         return this._places[0];
     }
