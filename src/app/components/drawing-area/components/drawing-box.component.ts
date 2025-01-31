@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import { environment } from 'src/environments/environment';
 import { Box } from '../models';
+import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
 
 @Component({
     selector: 'svg:g[app-drawing-box]',
@@ -17,11 +18,16 @@ import { Box } from '../models';
             [attr.stroke-opacity]="strokeOpacity"
             [attr.stroke-width]="strokeWidth"
             pointer-events="stroke"
-            (click)="onBoxClick($event, box)"
+            [classList]="'draggable confine'"
+            (mousedown)="startDrag($event)"
+            (mousemove)="drag($event)"
+            (mouseup)="endDrag($event, box)"
+            (mouseleave)="endDrag($event, box)"
         />
         <svg:text
-            [attr.x]="box.x - box.id.length * 4.8"
+            [attr.x]="box.x - box.id.length * 3.8"
             [attr.y]="box.y + (box.height + strokeWidth) / 2 + 20"
+            [attr.font-size]="13"
         >
             {{ box.id }}
         </svg:text>
@@ -42,12 +48,12 @@ import { Box } from '../models';
     styles: `
         rect:hover {
             cursor: pointer;
-            stroke-width: 7;
-            stroke: #085c5c;
+            stroke-width: 5;
+            stroke-opacity: 0.5;
         }
         rect.box-marked {
-            stroke: #085c5c;
-            stroke-width: 7;
+            stroke: #d42f7c;
+            stroke-width: 5;
         }
         .event-log {
             height: 100%;
@@ -62,6 +68,9 @@ import { Box } from '../models';
                 background-color: #efc9db;
             }
         }
+        .draggable {
+            cursor: move;
+        }
     `,
 })
 export class DrawingBoxComponent {
@@ -70,6 +79,7 @@ export class DrawingBoxComponent {
 
     constructor(
         private _collectSelectedElementsService: CollectSelectedElementsService,
+        private _positionForActivitiesService: PositionForActivitiesService,
     ) {}
 
     readonly bgColor: string = environment.drawingElements.boxes.bgColor;
@@ -82,21 +92,174 @@ export class DrawingBoxComponent {
     readonly strokeWidth: number =
         environment.drawingElements.boxes.strokeWidth;
 
-    onBoxClick(event: Event, box: Box) {
-        const rect = event.target as SVGRectElement;
+    elementSelected: any;
+    offset: any;
+    transform: any;
+    mousePositionInitial: [number, number] = [0, 0];
+    mouseClicked: boolean = false;
+
+    dx: number = 0;
+    dy: number = 0;
+
+    bbox: any;
+
+    boundaryX1: number = 0;
+    boundaryX2: number = 0;
+    boundaryY1: number = 0;
+    boundaryY2: number = 0;
+
+    minX: number = 0;
+    maxX: number = 0;
+    minY: number = 0;
+    maxY: number = 0;
+
+    startDrag(event: MouseEvent) {
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
-        if (svg) {
-            const boxes = svg.querySelectorAll('rect');
-            boxes.forEach((box) => {
-                if (rect === box) {
-                    rect.classList.toggle('box-marked');
-                } else {
-                    box.classList.remove('box-marked');
-                }
-            });
+        const target = event.target as SVGRectElement;
+        this.mouseClicked = true;
+        this.mousePositionInitial = [event.clientX, event.clientY];
+
+        this.setBoundary(svg);
+
+        if (target.classList.contains('draggable')) {
+            this.offset = this.getMousePosition(event);
+            this.elementSelected = target;
+
+            const transforms = this.elementSelected.transform.baseVal;
+
+            if (target.classList.contains('confine')) {
+                this.bbox = target.getBBox();
+                this.minX = this.boundaryX1 - this.bbox.x;
+                this.maxX = this.boundaryX2 - this.bbox.x - this.bbox.width;
+                this.minY = this.boundaryY1 - this.bbox.y;
+                this.maxY = this.boundaryY2 - this.bbox.y - this.bbox.height;
+            }
+
+            if (
+                transforms.length === 0 ||
+                transforms.getItem(0).type !==
+                    SVGTransform.SVG_TRANSFORM_TRANSLATE
+            ) {
+                const translate = svg.createSVGTransform();
+                translate.setTranslate(0, 0);
+
+                this.elementSelected.transform.baseVal.insertItemBefore(
+                    translate,
+                    0,
+                );
+            }
+
+            this.transform = transforms.getItem(0);
+            this.offset.x -= this.transform.matrix.e;
+            this.offset.y -= this.transform.matrix.f;
         }
-        this._collectSelectedElementsService.updateSelectedDFG(box.id);
+    }
+    drag(event: MouseEvent) {
+        const target = event.target as SVGRectElement;
+        if (this.elementSelected !== null && this.mouseClicked === true) {
+            event.preventDefault();
+            const coord = this.getMousePosition(event);
+
+            if (this.transform !== undefined) {
+                this.dx = coord.x - this.offset.x;
+                this.dy = coord.y - this.offset.y;
+
+                if (target.classList.contains('confine')) {
+                    if (this.dx < this.minX) {
+                        this.dx = this.minX;
+                    } else if (this.dx > this.maxX) {
+                        this.dx = this.maxX;
+                    }
+
+                    if (this.dy < this.minY) {
+                        this.dy = this.minY;
+                    } else if (this.dy > this.maxY) {
+                        this.dy = this.maxY;
+                    }
+                }
+
+                this._positionForActivitiesService.updateElementPosition(
+                    this.box.id,
+                    'box',
+                    this.dx,
+                    this.dy,
+                );
+            }
+        }
+    }
+    endDrag(event: MouseEvent, box: Box) {
+        this.elementSelected = null;
+        const mousePositionCurrent = [event.clientX, event.clientY];
+
+        if (this.mouseClicked) {
+            if (
+                mousePositionCurrent[0] !== this.mousePositionInitial[0] &&
+                mousePositionCurrent[1] !== this.mousePositionInitial[1]
+            ) {
+                this._positionForActivitiesService.updateEndPositionOfElement(
+                    this.box.id,
+                    'box',
+                    this.box.x,
+                    this.box.y,
+                    this.dx,
+                    this.dy,
+                );
+                this.mouseClicked = false;
+            } else {
+                const rect = event.target as SVGRectElement;
+                const svg: SVGSVGElement = document.getElementsByTagName(
+                    'svg',
+                )[0] as SVGSVGElement;
+                if (svg) {
+                    const boxes = svg.querySelectorAll('rect');
+                    boxes.forEach((box) => {
+                        if (rect === box) {
+                            rect.classList.toggle('box-marked');
+                        } else {
+                            box.classList.remove('box-marked');
+                        }
+                    });
+                }
+                this._collectSelectedElementsService.updateSelectedDFG(box.id);
+                this.mouseClicked = false;
+            }
+        }
+    }
+
+    private getMousePosition(event: MouseEvent) {
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
+        var CTM = svg.getScreenCTM();
+
+        if (!CTM) {
+            throw new Error('CTM is null');
+        }
+
+        return {
+            x: (event.clientX - CTM.e) / CTM.a,
+            y: (event.clientY - CTM.f) / CTM.d,
+        };
+    }
+
+    private setBoundary(svg: SVGSVGElement): void {
+        const drawingArea = document.getElementById('drawingArea');
+        if (drawingArea && svg) {
+            const drawingAreaBox = drawingArea.getBoundingClientRect();
+            const svgBox = svg.getBoundingClientRect();
+
+            this.boundaryX2 = drawingAreaBox.width;
+            this.boundaryY2 = drawingAreaBox.height;
+
+            if (svgBox.width > drawingAreaBox.width) {
+                this.boundaryX2 = svgBox.width;
+            }
+
+            if (svgBox.height > drawingAreaBox.height) {
+                this.boundaryY2 = svgBox.height;
+            }
+        }
     }
 }

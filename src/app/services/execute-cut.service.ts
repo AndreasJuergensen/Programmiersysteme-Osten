@@ -46,7 +46,6 @@ export class ExecuteCutService {
             this._feedbackService.showMessage(
                 'Not a valid Cut! Please try again!',
                 true,
-                'The chosen arcs do not fit the selected cut. Please try again. For help use the help-button.',
             );
             return false;
         }

@@ -13,7 +13,10 @@ import { ApplicationStateService } from 'src/app/services/application-state.serv
 import { CalculateDfgService } from 'src/app/services/calculate-dfg.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { ExportService } from 'src/app/services/export.service';
-import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
+import {
+    PetriNetManagementService,
+    RecentEventLog,
+} from 'src/app/services/petri-net-management.service';
 import { EventLogDialogComponent } from '../event-log-dialog/event-log-dialog.component';
 import { Subscription } from 'rxjs';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
@@ -38,6 +41,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class ContextMenuComponent implements OnInit {
     @Input() visibility!: string;
     @Input() position!: { x: string; y: string };
+    isRightToLeft: boolean = false;
 
     readonly disabling: Disabling;
     readonly exporting: Exporting;
@@ -68,7 +72,16 @@ export class ContextMenuComponent implements OnInit {
             this.visibility = visibility;
         });
         this.contextMenuService.position$.subscribe((position) => {
-            this.position = { x: position.x + 'px', y: position.y + 'px' };
+            const xPosition =
+                position.x > window.innerWidth - 230
+                    ? position.x - 230
+                    : position.x + 2;
+            const yPosition =
+                position.y > window.innerHeight - 407
+                    ? window.innerHeight - 407
+                    : position.y;
+            this.position = { x: xPosition + 'px', y: yPosition + 'px' };
+            this.isRightToLeft = position.x > window.innerWidth - 620;
         });
         this.exporting = new Exporting(exportService, contextMenuService);
         this.disabling = new Disabling(
@@ -121,11 +134,17 @@ export class ContextMenuComponent implements OnInit {
         );
     }
     ngOnInit(): void {
-        window.addEventListener('scroll', () => {
+        const hide = () => {
             if (this.visibility === 'visible') {
                 this.contextMenuService.hide();
             }
-        });
+        };
+        document
+            .getElementsByTagName('body')[0]
+            .addEventListener('scroll', hide);
+        document
+            .getElementById('drawingArea')
+            ?.addEventListener('scroll', hide);
     }
 }
 
@@ -289,7 +308,7 @@ class ShowingArcFeedback {
 }
 
 class DialogOpening {
-    private _recentEventLogs: string[] = [];
+    private _recentEventLogs: RecentEventLog[] = [];
     constructor(
         private matDialog: MatDialog,
         private calculateDfgService: CalculateDfgService,
@@ -307,6 +326,7 @@ class DialogOpening {
 
     private openDialog(data?: {
         eventLog: string;
+        filename?: string;
     }): MatDialogRef<EventLogDialogComponent, EventLog> {
         this.contextMenuService.hide();
         const config: MatDialogConfig = { width: '800px', data: data };
@@ -321,7 +341,12 @@ class DialogOpening {
                 if (!eventLog) return;
                 Dfg.resetIdCount();
                 const dfg: Dfg = this.calculateDfgService.calculate(eventLog);
-                this.petriNetManagementService.initialize(dfg);
+                this.petriNetManagementService.initialize(
+                    dfg,
+                    eventLog.toString() === data?.eventLog
+                        ? data?.filename
+                        : undefined,
+                );
             },
             complete: () => sub.unsubscribe(),
         });
@@ -342,29 +367,24 @@ class DialogOpening {
         this.contextMenuService.hide();
         const file: File = event.target.files[0];
         file?.text().then((content) => {
-            this.openDialog({ eventLog: this.parseXesService.parse(content) });
+            this.openDialog({
+                eventLog: this.parseXesService.parse(content),
+                filename: file?.name,
+            });
         });
     }
 
-    openFromHistory(eventLog: string) {
+    openFromHistory(eventLog: RecentEventLog) {
         this.contextMenuService.hide();
         Dfg.resetIdCount();
         const dfg: Dfg = this.calculateDfgService.calculate(
-            this.eventLogParserService.parse(eventLog),
+            this.eventLogParserService.parse(eventLog.eventLog),
         );
-        this.petriNetManagementService.initialize(dfg);
+        this.petriNetManagementService.initialize(dfg, eventLog.name);
     }
 
-    recentEventLogs(): string[] {
+    recentEventLogs(): RecentEventLog[] {
         return this._recentEventLogs;
-    }
-
-    display(eventLog: string): string {
-        if (eventLog.length <= 30) {
-            return eventLog;
-        }
-        const suffix = '... [' + eventLog.length + ']';
-        return eventLog.substring(0, 30 - suffix.length) + suffix;
     }
 }
 
@@ -391,7 +411,7 @@ class Examples {
 
     public generateExclusiveExample(): void {
         const traces: Trace[] = [
-            new Trace([new Activity('Order')]),
+            new Trace([new Activity('Order'), new Activity('Confirm')]),
             new Trace([new Activity('Request')]),
         ];
         const eventLog: EventLog = new EventLog(traces);
@@ -400,7 +420,16 @@ class Examples {
 
     generateSequenceExample(): void {
         const traces: Trace[] = [
-            new Trace([new Activity('Order'), new Activity('Confirm')]),
+            new Trace([
+                new Activity('Order'),
+                new Activity('Confirm'),
+                new Activity('Delivery'),
+            ]),
+            new Trace([
+                new Activity('Request'),
+                new Activity('Confirm'),
+                new Activity('Delivery'),
+            ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
         this.initializePetriNet(eventLog);
@@ -432,7 +461,6 @@ class Examples {
     public generateAOPTExample(): void {
         const traces: Trace[] = [
             new Trace([new Activity('Request'), new Activity('Order')]),
-            new Trace([new Activity('Order'), new Activity('Request')]),
             new Trace([
                 new Activity('Order'),
                 new Activity('Request'),
