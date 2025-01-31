@@ -7,7 +7,7 @@ export class EventLogValidationService {
     private readonly validEventLogPattern =
         /^[^\+\s]+(?:\s[^\+\s]+|\s*\+\s*[^\+\s]+)*$/;
     private readonly multiplicityPattern =
-        /[0-9]+[\*{1}][^\*^0-9]+|[^\*^0-9]+[\*{1}][0-9]+/;
+        /[a-zA-Z]+\*[0-9]+|[0-9]+\*[a-zA-Z]+/;
 
     constructor() {}
 
