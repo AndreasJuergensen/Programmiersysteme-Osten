@@ -214,18 +214,20 @@ class ExecutingCut {
             );
             return;
         }
+        console.log('execute cut');
 
         if (
             !this.executeCutService.execute(
                 this.collectSelectedElementsService.currentCollectedArcsDFG,
                 this.collectSelectedElementsService.collectedArcs,
                 cutType,
-            ) &&
-            this.showArcFeedback
+            )
         ) {
             if (this.isArcFeedbackReady) {
                 this.collectSelectedElementsService.setArcFeedback(cutType);
-                this.collectSelectedElementsService.enableArcFeedback();
+                if (this.showArcFeedback) {
+                    this.collectSelectedElementsService.enableArcFeedback();
+                }
             } else {
                 this.feedbackService.showMessage(
                     'Not a valid Cut! Wait for Arc Feedback Calculation to be finished and execute the cut again.',
