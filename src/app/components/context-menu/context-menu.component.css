@@ -36,6 +36,25 @@
             cursor: wait;
         }
     }
+    .legend-menu-heading {
+        height: 40px;
+        padding: 8px;
+        border: none;
+        border-radius: 4px;
+        background-color: transparent;
+        cursor: auto;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        box-sizing: border-box;
+        white-space: nowrap;
+        font-size: 20px;
+        font-weight: bold;
+        align-self: center;
+        div {
+            flex-grow: 1;
+        }
+    }
 
     .legend-menu-line {
         height: 40px;
@@ -49,6 +68,12 @@
         width: 100%;
         box-sizing: border-box;
         white-space: nowrap;
+        justify-content: center;
+
+        h1 {
+            font-size: 20px;
+            font-weight: bold;
+        }
 
         mat-icon {
             margin-right: 8px;
@@ -111,13 +136,6 @@
     .legend-menu-wrapper {
         position: relative;
 
-        & > .legend-menu-line {
-            &::after {
-                content: "<>";
-                margin-left: 8px;
-            }
-        }
-
         .legend-menu {
             display: none;
         }
@@ -127,7 +145,7 @@
         }
 
         .orange {
-            color: orange;
+            color: rgb(236, 158, 13);
         }
 
         .red {
@@ -140,7 +158,9 @@
                 position: absolute;
                 top: 0;
                 left: 100%;
-                background-color: #feebf4;
+                background-color: #f2e0e9;
+                border: 1px dashed grey;
+                border-radius: 4%;
             }
         }
     }
@@ -157,7 +177,6 @@
     .legend-menu-wrapper.disabled .legend-menu-line {
         cursor: not-allowed;
         color: #ffe9fb;
-        /* color: white; */
         background-color: #efc9db !important;
     }
 }
