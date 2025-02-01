@@ -14,9 +14,6 @@ describe('CalculateDfgService', () => {
         const eventLog = new EventLog([new Trace([new Activity('A')])]);
 
         const result: DfgJson = sut.calculate(eventLog).asJson();
-        console.log('result');
-
-        console.log(result);
 
         const expectedDfg: DfgJson = {
             activities: ['play', 'stop', 'A'],

@@ -1,4 +1,5 @@
 .context-menu {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     border: 1px solid grey;
@@ -163,4 +164,24 @@
 
 .file-input {
     display: none;
+}
+
+.context-menu.right-to-left {
+    .sub-menu-wrapper {
+        &:not(.disabled):hover {
+            .sub-menu {
+                left: unset;
+                right: 100%;
+            }
+        }
+    }
+
+    .sub-sub-menu-wrapper {
+        &:not(.disabled):hover {
+            .sub-sub-menu {
+                left: unset;
+                right: 100%;
+            }
+        }
+    }
 }

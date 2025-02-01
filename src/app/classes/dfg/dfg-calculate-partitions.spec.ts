@@ -1,8 +1,6 @@
-import { CutType } from 'src/app/services/execute-cut.service';
 import { Activities } from './activities';
 import { Arcs } from './arcs';
 import { Dfg, DfgBuilder } from './dfg';
-import { Arc } from 'src/app/components/drawing-area';
 
 describe('Partition a Dfg by cutted arcs', () => {
     it('with all activities in one partition (a1 is empty)', () => {

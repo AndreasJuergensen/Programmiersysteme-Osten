@@ -21,7 +21,14 @@
 
             <ng-container *ngIf="!showEventLogs">
                 <ng-container *ngFor="let boxArc of boxArcs">
-                    <svg:g app-drawing-boxArc [boxArc]="boxArc"></svg:g>
+                    <svg:g
+                        *ngIf="boxArc.start !== boxArc.end; else loopArc"
+                        app-drawing-boxArc
+                        [boxArc]="boxArc"
+                    ></svg:g>
+                    <ng-template #loopArc>
+                        <svg:g app-drawing-loop-arc [loopArc]="boxArc"></svg:g>
+                    </ng-template>
                 </ng-container>
 
                 <ng-container *ngFor="let activity of activities">

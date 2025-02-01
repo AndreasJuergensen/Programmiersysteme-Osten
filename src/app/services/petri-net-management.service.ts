@@ -6,6 +6,11 @@ import { ShowFeedbackService } from './show-feedback.service';
 import _ from 'lodash';
 import { Arc } from '../components/drawing-area/models';
 
+export interface RecentEventLog {
+    eventLog: string;
+    name: string;
+}
+
 @Injectable({
     providedIn: 'root',
 })
@@ -18,16 +23,15 @@ export class PetriNetManagementService {
     private _petriNet$: BehaviorSubject<PetriNet> =
         new BehaviorSubject<PetriNet>(this._petriNet);
     private _initialEventLog: string = '';
-    private _recentEventLogs$: BehaviorSubject<string[]> = new BehaviorSubject<
-        string[]
-    >([]);
+    private _recentEventLogs$: BehaviorSubject<RecentEventLog[]> =
+        new BehaviorSubject<RecentEventLog[]>([]);
 
     constructor(private _showFeedbackService: ShowFeedbackService) {}
 
-    public initialize(dfg: Dfg): void {
+    public initialize(dfg: Dfg, filename?: string): void {
         const eventLog: string = dfg.eventLog.toString();
         this._initialEventLog = eventLog;
-        this.updateRecentEventLogs(eventLog);
+        this.updateRecentEventLogs(eventLog, filename);
         this._petriNet = new PetriNet(dfg);
         this._previousPetriNets = [];
         this._isInputPetriNet$.next(true);
@@ -43,11 +47,20 @@ export class PetriNetManagementService {
         this._petriNet$.next(this._petriNet);
     }
 
-    private updateRecentEventLogs(eventLog: string): void {
+    private updateRecentEventLogs(eventLog: string, filename?: string): void {
+        const recentEventLog: RecentEventLog = { eventLog: eventLog, name: filename ? filename : this.display(eventLog) };
         const recentEventLogs = [...this._recentEventLogs$.value];
-        const newLength = recentEventLogs.unshift(eventLog);
+        const newLength = recentEventLogs.unshift(recentEventLog);
         if (newLength > 5) recentEventLogs.pop();
         this._recentEventLogs$.next(recentEventLogs);
+    }
+
+    private display(eventLog: string): string {
+        if (eventLog.length <= 30) {
+            return eventLog;
+        }
+        const suffix = '... [' + eventLog.length + ']';
+        return eventLog.substring(0, 30 - suffix.length) + suffix;
     }
 
     public updatePnByExclusiveCut(

@@ -254,10 +254,7 @@ export class CollectSelectedElementsService {
                     path.classList.contains('visiblePath') &&
                     path.classList.contains('active')
                 ) {
-                    path.setAttribute(
-                        'marker-end',
-                        'url(#arrowhead-deepskyblue)',
-                    );
+                    path.setAttribute('marker-end', 'url(#arrowhead-pale)');
                 }
             });
         }
