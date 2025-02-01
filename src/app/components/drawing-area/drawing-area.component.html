@@ -16,6 +16,7 @@
                     app-drawing-box
                     [box]="box"
                     [showEventLogs]="showEventLogs"
+                    (positionChanged)="updatePosition(box, $event)"
                 ></svg:g>
             </ng-container>
 
@@ -32,7 +33,11 @@
                 </ng-container>
 
                 <ng-container *ngFor="let activity of activities">
-                    <svg:g app-drawing-activity [activity]="activity"></svg:g>
+                    <svg:g
+                        app-drawing-activity
+                        [activity]="activity"
+                        (positionChanged)="updatePosition(activity, $event)"
+                    ></svg:g>
                 </ng-container>
             </ng-container>
 
@@ -41,17 +46,23 @@
                     *ngIf="transition.name !== ''; else invisibleTransition"
                     app-drawing-transition
                     [transition]="transition"
+                    (positionChanged)="updatePosition(transition, $event)"
                 ></svg:g>
                 <ng-template #invisibleTransition>
                     <svg:g
                         app-drawing-invisible-transition
                         [invisibleTransition]="transition"
+                        (positionChanged)="updatePosition(transition, $event)"
                     ></svg:g>
                 </ng-template>
             </ng-container>
 
             <ng-container *ngFor="let place of places">
-                <svg:g app-drawing-place [place]="place"></svg:g>
+                <svg:g
+                    app-drawing-place
+                    [place]="place"
+                    (positionChanged)="updatePosition(place, $event)"
+                ></svg:g>
             </ng-container>
         </svg>
         <div class="start-text" *ngIf="isEmpty">Right click here to start.</div>

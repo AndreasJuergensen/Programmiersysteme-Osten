@@ -21,6 +21,7 @@ import {
     Box,
     BoxToPlaceArc,
     DfgArc,
+    InvisibleTransition,
     Place,
     PlaceToBoxArc,
     PlaceToInvisibleTransitionArc,
@@ -33,6 +34,7 @@ import { PositionForActivitiesService } from 'src/app/services/position-for-acti
 import _ from 'lodash';
 import { ApplicationStateService } from 'src/app/services/application-state.service';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
+import { DragAndDropService } from 'src/app/services/drag-and-drop.service';
 
 @Component({
     selector: 'app-drawing-area',
@@ -92,6 +94,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         private readonly contextMenuService: ContextMenuService,
         applicationStateService: ApplicationStateService,
         petriNetManagementService: PetriNetManagementService,
+        private _dragAndDopService: DragAndDropService,
     ) {
         applicationStateService.showEventLogs$.subscribe((showEventLogs) => {
             this.showEventLogs = showEventLogs;
@@ -254,19 +257,22 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 this._arcs = arcs;
                 this._boxArcs = boxArcs;
 
+                // console.log(places);
+
                 this._originalPositionOfActivities = _.cloneDeep(activities);
                 this._lastPositionOfActivities = _.cloneDeep(activities);
 
-                this._originalPositionOfPlaces = _.cloneDeep(places);
-                this._lastPositionOfPlaces = _.cloneDeep(places);
+                // this._originalPositionOfPlaces = _.cloneDeep(places);
+                // this._lastPositionOfPlaces = _.cloneDeep(places);
 
-                this._originalPositionOfTransitions = _.cloneDeep(transitions);
-                this._lastPositionOfTransitions = _.cloneDeep(transitions);
+                // this._originalPositionOfTransitions = _.cloneDeep(transitions);
+                // this._lastPositionOfTransitions = _.cloneDeep(transitions);
 
-                this._originalPositionOfBoxes = _.cloneDeep(boxes);
-                this._lastPositionOfBoxes = _.cloneDeep(boxes);
+                // this._originalPositionOfBoxes = _.cloneDeep(boxes);
+                // this._lastPositionOfBoxes = _.cloneDeep(boxes);
 
                 this.positionForActivitiesService.passBoxObjects(boxes);
+                this._dragAndDopService.clearAll();
             },
         );
 
@@ -311,140 +317,203 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
             );
 
         //Für BoxArcs
-        this._sub3 =
-            this.positionForActivitiesService.updateBoxArcCoordinates$.subscribe(
-                (activity) => {
-                    const activityId = activity[0];
-                    const dfgId = activity[1];
-                    const newX = activity[2];
-                    const newY = activity[3];
+        // this._sub3 =
+        //     this.positionForActivitiesService.updateBoxArcCoordinates$.subscribe(
+        //         (activity) => {
+        //             const activityId = activity[0];
+        //             const dfgId = activity[1];
+        //             const newX = activity[2];
+        //             const newY = activity[3];
 
-                    //Aktualisiert Liste mit allen bewegten Activities
-                    this.updateAllMovedActivities(activityId, dfgId);
-                    this.updateLastPositionOfActivity(
-                        activityId,
-                        dfgId,
-                        newX,
-                        newY,
-                    );
-                },
-            );
+        //             //Aktualisiert Liste mit allen bewegten Activities
+        //             this.updateAllMovedActivities(activityId, dfgId);
+        //             this.updateLastPositionOfActivity(
+        //                 activityId,
+        //                 dfgId,
+        //                 newX,
+        //                 newY,
+        //             );
+        //         },
+        //     );
 
         //Für Petri-Netz-Elemente (Transition, Place)
-        this._sub4 =
-            this.positionForActivitiesService.movingElementInGraph$.subscribe(
-                (element) => {
-                    //neue Position des Elements
-                    const elementId = element[0];
-                    const elementType = element[1];
-                    const xTranslate = element[2];
-                    const yTranslate = element[3];
+        // this._sub4 =
+        //     this.positionForActivitiesService.movingElementInGraph$.subscribe(
+        //         (element) => {
+        //neue Position des Elements
+        // const elementId = element[0];
+        // const elementType = element[1];
+        // const xTranslate = element[2];
+        // const yTranslate = element[3];
 
-                    if (elementType === 'place') {
-                        //Suche nach dem Place innerhalb des Graphen
-                        const movedPlace = this._places.find(
-                            (place) => place.id === elementId,
-                        );
+        // if (elementType === 'place') {
+        //     //Suche nach dem Place innerhalb des Graphen
+        //     const movedPlace = this._places.find(
+        //         (place) => place.id === elementId,
+        //     );
 
-                        if (movedPlace) {
-                            this.updatePlacePosition(
-                                movedPlace,
-                                elementId,
-                                xTranslate,
-                                yTranslate,
-                            );
-                        }
-                    }
+        //     if (movedPlace) {
+        //         this.updatePlacePosition(
+        //             movedPlace,
+        //             elementId,
+        //             xTranslate,
+        //             yTranslate,
+        //         );
+        //     }
+        // }
 
-                    if (elementType === 'transition') {
-                        //Suche nach der Transition innerhalb des Graphen
-                        const movedTransition = this._transitions.find(
-                            (transition) => transition.id === elementId,
-                        );
+        // if (elementType === 'transition') {
+        //     //Suche nach der Transition innerhalb des Graphen
+        //     const movedTransition = this._transitions.find(
+        //         (transition) => transition.id === elementId,
+        //     );
 
-                        if (movedTransition) {
-                            this.updateTransitionPosition(
-                                movedTransition,
-                                elementId,
-                                xTranslate,
-                                yTranslate,
-                            );
-                        }
-                    }
+        //     if (movedTransition) {
+        //         this.updateTransitionPosition(
+        //             movedTransition,
+        //             elementId,
+        //             xTranslate,
+        //             yTranslate,
+        //         );
+        //     }
+        // }
 
-                    if (elementType === 'box') {
-                        //Suche nach der Box innerhalb des Graphen
-                        const movedBox = this._boxes.find(
-                            (box) => box.id === elementId,
-                        );
+        // if (elementType === 'box') {
+        //     //Suche nach der Box innerhalb des Graphen
+        //     const movedBox = this._boxes.find(
+        //         (box) => box.id === elementId,
+        //     );
 
-                        if (movedBox) {
-                            this.updateBoxPosition(
-                                movedBox,
-                                elementId,
-                                xTranslate,
-                                yTranslate,
-                            );
+        //     if (movedBox) {
+        //         this.updateBoxPosition(
+        //             movedBox,
+        //             elementId,
+        //             xTranslate,
+        //             yTranslate,
+        //         );
 
-                            this.updateDFGElementsPosition(
-                                elementId,
-                                xTranslate,
-                                yTranslate,
-                            );
-                        }
-                    }
-                },
-            );
+        //         this.updateDFGElementsPosition(
+        //             elementId,
+        //             xTranslate,
+        //             yTranslate,
+        //         );
+        //     }
+        // }
+        //     },
+        // );
 
-        this._sub5 =
-            this.positionForActivitiesService.updateEndPositionOfElement$.subscribe(
-                (element) => {
-                    const elementId: string = element[0];
-                    const elementType: string = element[1];
-                    const newX: number = element[2];
-                    const newY: number = element[3];
-                    const xTranslate: number = element[4];
-                    const yTranslate: number = element[5];
+        // this._sub5 =
+        //     this.positionForActivitiesService.updateEndPositionOfElement$.subscribe(
+        //         (element) => {
+        //             const elementId: string = element[0];
+        //             const elementType: string = element[1];
+        //             const newX: number = element[2];
+        //             const newY: number = element[3];
+        //             const xTranslate: number = element[4];
+        //             const yTranslate: number = element[5];
 
-                    if (elementType === 'place') {
-                        //Aktualisiert Liste mit allen bewegten Places
-                        this.updateAllMovedPlaces(elementId);
-                        this.updateLastPositionOfElement(
-                            elementId,
-                            'place',
-                            newX,
-                            newY,
-                        );
-                    }
+        //             // if (elementType === 'place') {
+        //             //     //Aktualisiert Liste mit allen bewegten Places
+        //             //     this.updateAllMovedPlaces(elementId);
+        //             //     this.updateLastPositionOfElement(
+        //             //         elementId,
+        //             //         'place',
+        //             //         newX,
+        //             //         newY,
+        //             //     );
+        //             // }
 
-                    if (elementType === 'transition') {
-                        //Aktualisiert Liste mit allen bewegten Places
-                        this.updateAllMovedTransitions(elementId);
-                        this.updateLastPositionOfElement(
-                            elementId,
-                            'transition',
-                            newX,
-                            newY,
-                        );
-                    }
+        //             // if (elementType === 'transition') {
+        //             //     //Aktualisiert Liste mit allen bewegten Places
+        //             //     this.updateAllMovedTransitions(elementId);
+        //             //     this.updateLastPositionOfElement(
+        //             //         elementId,
+        //             //         'transition',
+        //             //         newX,
+        //             //         newY,
+        //             //     );
+        //             // }
 
-                    if (elementType === 'box') {
-                        this.updateAllMovedBoxes(elementId);
-                        this.updateLastPositionOfElement(
-                            elementId,
-                            'box',
-                            newX,
-                            newY,
-                        );
-                        this.updateLastPositionOfDFGElements(
-                            elementId,
-                            xTranslate,
-                            yTranslate,
-                        );
-                    }
-                },
-            );
+        //             // if (elementType === 'box') {
+        //             //     this.updateAllMovedBoxes(elementId);
+        //             //     this.updateLastPositionOfElement(
+        //             //         elementId,
+        //             //         'box',
+        //             //         newX,
+        //             //         newY,
+        //             //     );
+        //             //     this.updateLastPositionOfDFGElements(
+        //             //         elementId,
+        //             //         xTranslate,
+        //             //         yTranslate,
+        //             //     );
+        //             // }
+        //         },
+        //     );
     }
+
+    updatePosition(
+        element: Place | Transition | Box,
+        pos: { x: number; y: number; xtl: number; ytl: number },
+    ) {
+        if (element instanceof Place) {
+            const place = this.places.find((p) => p.id === element.id);
+
+            if (place) {
+                (place.x = pos.x), (place.y = pos.y);
+            }
+
+            this.updateArcs();
+        }
+
+        if (element instanceof Transition) {
+            const transition = this.transitions.find(
+                (t) => t.id === element.id,
+            );
+
+            if (transition) {
+                (transition.x = pos.x), (transition.y = pos.y);
+            }
+
+            this.updateArcs();
+        }
+
+        if (element instanceof Box) {
+            const box = this.boxes.find((b) => b.id === element.id);
+            //console.log(pos);
+
+            if (box) {
+                (box.x = pos.x), (box.y = pos.y);
+            }
+            this.positionForActivitiesService.passBoxObjects(this.boxes);
+            this.updateArcs();
+        }
+
+        if (element instanceof Activity) {
+            const activity = this.activities.find(
+                (a) => a.id === element.id && a.dfgId === element.dfgId,
+            );
+
+            if (activity) {
+                (activity.x = pos.x), (activity.y = pos.y);
+            }
+
+            this.updateDfgArcs();
+        }
+
+        //this._dragAndDopService.updatePosition(element.id, pos.x, pos.y);
+    }
+
+    // updateActivityPositions(x: number, y: number) {
+    //     console.log(`x: ${x} y: ${y}`);
+
+    //     this.activities.forEach((a) => {
+    //         const ax = a.x;
+    //         const ay = a.y;
+
+    //         (a.x = ax + x), (a.y = ay + y);
+    //     });
+    // }
 
     updateActivityPosition(
         movedActivity: Activity,
@@ -490,135 +559,135 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         }
     }
 
-    updatePlacePosition(
-        movedPlace: Place,
-        elementId: string,
-        xTranslate: number,
-        yTranslate: number,
-    ) {
-        //Wenn Element noch nicht bewegt wurde
-        if (
-            this._allMovedPlaces.filter((place) => place[0] === movedPlace.id)
-                .length === 0
-        ) {
-            const originalX = this._originalPositionOfPlaces.find(
-                (place) => place.id === elementId,
-            )!.x;
+    // updatePlacePosition(
+    //     movedPlace: Place,
+    //     elementId: string,
+    //     xTranslate: number,
+    //     yTranslate: number,
+    // ) {
+    //     //Wenn Element noch nicht bewegt wurde
+    //     if (
+    //         this._allMovedPlaces.filter((place) => place[0] === movedPlace.id)
+    //             .length === 0
+    //     ) {
+    //         const originalX = this._originalPositionOfPlaces.find(
+    //             (place) => place.id === elementId,
+    //         )!.x;
 
-            const originalY = this._originalPositionOfPlaces.find(
-                (place) => place.id === elementId,
-            )!.y;
+    //         const originalY = this._originalPositionOfPlaces.find(
+    //             (place) => place.id === elementId,
+    //         )!.y;
 
-            //Setzt neue Koordinaten des Place im Graphen
-            movedPlace.x = originalX + xTranslate;
-            movedPlace.y = originalY + yTranslate;
-            //Aktualisiert zugehörige Arcs
-            this.updateArcs();
-        }
-        //Wenn Element schon einmal bewegt wurde
-        else {
-            const lastX = this._lastPositionOfPlaces.find(
-                (place) => place.id === elementId,
-            )!.x;
+    //         //Setzt neue Koordinaten des Place im Graphen
+    //         movedPlace.x = originalX + xTranslate;
+    //         movedPlace.y = originalY + yTranslate;
+    //         //Aktualisiert zugehörige Arcs
+    //         this.updateArcs();
+    //     }
+    //     //Wenn Element schon einmal bewegt wurde
+    //     else {
+    //         const lastX = this._lastPositionOfPlaces.find(
+    //             (place) => place.id === elementId,
+    //         )!.x;
 
-            const lastY = this._lastPositionOfPlaces.find(
-                (place) => place.id === elementId,
-            )!.y;
+    //         const lastY = this._lastPositionOfPlaces.find(
+    //             (place) => place.id === elementId,
+    //         )!.y;
 
-            //Setzt neue Koordinaten des Place im Graphen
-            movedPlace.x = lastX + xTranslate;
-            movedPlace.y = lastY + yTranslate;
-            //Aktualisiert zugehörige Arcs
-            this.updateArcs();
-        }
-    }
+    //         //Setzt neue Koordinaten des Place im Graphen
+    //         movedPlace.x = lastX + xTranslate;
+    //         movedPlace.y = lastY + yTranslate;
+    //         //Aktualisiert zugehörige Arcs
+    //         this.updateArcs();
+    //     }
+    // }
 
-    updateTransitionPosition(
-        movedTransition: Transition,
-        elementId: string,
-        xTranslate: number,
-        yTranslate: number,
-    ) {
-        //Wenn Element noch nicht bewegt wurde
-        if (
-            this._allMovedTransitions.filter(
-                (transition) => transition[0] === movedTransition.id,
-            ).length === 0
-        ) {
-            const originalX = this._originalPositionOfTransitions.find(
-                (transition) => transition.id === elementId,
-            )!.x;
+    // updateTransitionPosition(
+    //     movedTransition: Transition,
+    //     elementId: string,
+    //     xTranslate: number,
+    //     yTranslate: number,
+    // ) {
+    //     //Wenn Element noch nicht bewegt wurde
+    //     if (
+    //         this._allMovedTransitions.filter(
+    //             (transition) => transition[0] === movedTransition.id,
+    //         ).length === 0
+    //     ) {
+    //         const originalX = this._originalPositionOfTransitions.find(
+    //             (transition) => transition.id === elementId,
+    //         )!.x;
 
-            const originalY = this._originalPositionOfTransitions.find(
-                (transition) => transition.id === elementId,
-            )!.y;
+    //         const originalY = this._originalPositionOfTransitions.find(
+    //             (transition) => transition.id === elementId,
+    //         )!.y;
 
-            //Setzt neue Koordinaten der Transition im Graphen
-            movedTransition.x = originalX + xTranslate;
-            movedTransition.y = originalY + yTranslate;
-            //Aktualisiert zugehörige Arcs
-            this.updateArcs();
-        }
-        //Wenn Element schon mal bewegt wurde
-        else {
-            const lastX = this._lastPositionOfTransitions.find(
-                (transition) => transition.id === elementId,
-            )!.x;
+    //         //Setzt neue Koordinaten der Transition im Graphen
+    //         movedTransition.x = originalX + xTranslate;
+    //         movedTransition.y = originalY + yTranslate;
+    //         //Aktualisiert zugehörige Arcs
+    //         this.updateArcs();
+    //     }
+    //     //Wenn Element schon mal bewegt wurde
+    //     else {
+    //         const lastX = this._lastPositionOfTransitions.find(
+    //             (transition) => transition.id === elementId,
+    //         )!.x;
 
-            const lastY = this._lastPositionOfTransitions.find(
-                (transition) => transition.id === elementId,
-            )!.y;
+    //         const lastY = this._lastPositionOfTransitions.find(
+    //             (transition) => transition.id === elementId,
+    //         )!.y;
 
-            //Setzt neue Koordinaten der Transition im Graphen
-            movedTransition.x = lastX + xTranslate;
-            movedTransition.y = lastY + yTranslate;
-            //Aktualisiert zugehörige Arcs
-            this.updateArcs();
-        }
-    }
+    //         //Setzt neue Koordinaten der Transition im Graphen
+    //         movedTransition.x = lastX + xTranslate;
+    //         movedTransition.y = lastY + yTranslate;
+    //         //Aktualisiert zugehörige Arcs
+    //         this.updateArcs();
+    //     }
+    // }
 
-    updateBoxPosition(
-        movedBox: Box,
-        elementId: string,
-        xTranslate: number,
-        yTranslate: number,
-    ) {
-        //Wenn Element noch nicht bewegt wurde
-        if (
-            this._allMovedBoxes.filter((box) => box[0] === movedBox.id)
-                .length === 0
-        ) {
-            const originalX = this._originalPositionOfBoxes.find(
-                (box) => box.id === elementId,
-            )!.x;
+    // updateBoxPosition(
+    //     movedBox: Box,
+    //     elementId: string,
+    //     xTranslate: number,
+    //     yTranslate: number,
+    // ) {
+    //     //Wenn Element noch nicht bewegt wurde
+    //     if (
+    //         this._allMovedBoxes.filter((box) => box[0] === movedBox.id)
+    //             .length === 0
+    //     ) {
+    //         const originalX = this._originalPositionOfBoxes.find(
+    //             (box) => box.id === elementId,
+    //         )!.x;
 
-            const originalY = this._originalPositionOfBoxes.find(
-                (box) => box.id === elementId,
-            )!.y;
+    //         const originalY = this._originalPositionOfBoxes.find(
+    //             (box) => box.id === elementId,
+    //         )!.y;
 
-            //Setzt neue Koordinaten der Transition im Graphen
-            movedBox.x = originalX + xTranslate;
-            movedBox.y = originalY + yTranslate;
-            //Aktualisiert zugehörige Arcs
-            this.updateArcs();
-        }
-        //Wenn Element schon mal bewegt wurde
-        else {
-            const lastX = this._lastPositionOfBoxes.find(
-                (box) => box.id === elementId,
-            )!.x;
+    //         //Setzt neue Koordinaten der Transition im Graphen
+    //         movedBox.x = originalX + xTranslate;
+    //         movedBox.y = originalY + yTranslate;
+    //         //Aktualisiert zugehörige Arcs
+    //         this.updateArcs();
+    //     }
+    //     //Wenn Element schon mal bewegt wurde
+    //     else {
+    //         const lastX = this._lastPositionOfBoxes.find(
+    //             (box) => box.id === elementId,
+    //         )!.x;
 
-            const lastY = this._lastPositionOfBoxes.find(
-                (box) => box.id === elementId,
-            )!.y;
+    //         const lastY = this._lastPositionOfBoxes.find(
+    //             (box) => box.id === elementId,
+    //         )!.y;
 
-            //Setzt neue Koordinaten der Transition im Graphen
-            movedBox.x = lastX + xTranslate;
-            movedBox.y = lastY + yTranslate;
-            //Aktualisiert zugehörige Arcs
-            this.updateArcs();
-        }
-    }
+    //         //Setzt neue Koordinaten der Transition im Graphen
+    //         movedBox.x = lastX + xTranslate;
+    //         movedBox.y = lastY + yTranslate;
+    //         //Aktualisiert zugehörige Arcs
+    //         this.updateArcs();
+    //     }
+    // }
 
     updateDFGElementsPosition(
         boxId: string,
@@ -655,137 +724,131 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         }
     }
 
-    updateAllMovedPlaces(placeID: string) {
-        const placeEntry = this._allMovedPlaces.filter(
-            (place) => place[0] === placeID,
-        );
+    // updateAllMovedPlaces(placeID: string) {
+    //     const placeEntry = this._allMovedPlaces.filter(
+    //         (place) => place[0] === placeID,
+    //     );
 
-        if (placeEntry.length === 0) {
-            this._allMovedPlaces.push([placeID]);
-        }
-    }
+    //     if (placeEntry.length === 0) {
+    //         this._allMovedPlaces.push([placeID]);
+    //     }
+    // }
 
-    updateAllMovedTransitions(transitionId: string) {
-        const transitionEntry = this._allMovedTransitions.filter(
-            (transition) => transition[0] === transitionId,
-        );
+    // updateAllMovedTransitions(transitionId: string) {
+    //     const transitionEntry = this._allMovedTransitions.filter(
+    //         (transition) => transition[0] === transitionId,
+    //     );
 
-        if (transitionEntry.length === 0) {
-            this._allMovedTransitions.push([transitionId]);
-        }
-    }
+    //     if (transitionEntry.length === 0) {
+    //         this._allMovedTransitions.push([transitionId]);
+    //     }
+    // }
 
-    updateAllMovedBoxes(boxId: string) {
-        const boxEntry = this._allMovedBoxes.filter((box) => box[0] === boxId);
+    // updateAllMovedBoxes(boxId: string) {
+    //     const boxEntry = this._allMovedBoxes.filter((box) => box[0] === boxId);
 
-        if (boxEntry.length === 0) {
-            this._allMovedBoxes.push([boxId]);
-        }
-    }
+    //     if (boxEntry.length === 0) {
+    //         this._allMovedBoxes.push([boxId]);
+    //     }
+    // }
 
-    updateLastPositionOfActivity(
-        activityId: string,
-        dfgId: string,
-        newX: number,
-        newY: number,
-    ) {
-        const entryCurrentActivity = this._lastPositionOfActivities.find(
-            (activity) =>
-                activity.id === activityId && activity.dfgId === dfgId,
-        );
+    // updateLastPositionOfActivity(
+    //     activityId: string,
+    //     dfgId: string,
+    //     newX: number,
+    //     newY: number,
+    // ) {
+    //     const entryCurrentActivity = this._lastPositionOfActivities.find(
+    //         (activity) =>
+    //             activity.id === activityId && activity.dfgId === dfgId,
+    //     );
 
-        //Aktualisiert letzte Position der Activity
-        if (entryCurrentActivity) {
-            entryCurrentActivity.x = newX;
-            entryCurrentActivity.y = newY;
-        }
-    }
+    //     //Aktualisiert letzte Position der Activity
+    //     if (entryCurrentActivity) {
+    //         entryCurrentActivity.x = newX;
+    //         entryCurrentActivity.y = newY;
+    //     }
+    // }
 
-    updateLastPositionOfActivityWhenMovingBox(
-        activityId: string,
-        dfgId: string,
-        xTranslate: number,
-        yTranslate: number,
-    ) {
-        const entryCurrentActivity = this._lastPositionOfActivities.find(
-            (activity) =>
-                activity.id === activityId && activity.dfgId === dfgId,
-        );
+    // updateLastPositionOfActivityWhenMovingBox(
+    //     activityId: string,
+    //     dfgId: string,
+    //     xTranslate: number,
+    //     yTranslate: number,
+    // ) {
+    //     const entryCurrentActivity = this._lastPositionOfActivities.find(
+    //         (activity) =>
+    //             activity.id === activityId && activity.dfgId === dfgId,
+    //     );
 
-        //Aktualisiert letzte Position der Activity
-        if (entryCurrentActivity) {
-            entryCurrentActivity.x = entryCurrentActivity.x + xTranslate;
-            entryCurrentActivity.y = entryCurrentActivity.y + yTranslate;
-        }
-    }
+    //     //Aktualisiert letzte Position der Activity
+    //     if (entryCurrentActivity) {
+    //         entryCurrentActivity.x = entryCurrentActivity.x + xTranslate;
+    //         entryCurrentActivity.y = entryCurrentActivity.y + yTranslate;
+    //     }
+    // }
 
-    updateLastPositionOfElement(
-        elementId: string,
-        elementType: string,
-        newX: number,
-        newY: number,
-    ) {
-        if (elementType === 'place') {
-            const entryCurrentPlace = this._lastPositionOfPlaces.find(
-                (place) => place.id === elementId,
-            );
+    // updateLastPositionOfElement(
+    //     elementId: string,
+    //     elementType: string,
+    //     newX: number,
+    //     newY: number,
+    // ) {
+    // if (elementType === 'place') {
+    //     const entryCurrentPlace = this._lastPositionOfPlaces.find(
+    //         (place) => place.id === elementId,
+    //     );
+    //     //Aktualisiert letzte Position des Places
+    //     if (entryCurrentPlace) {
+    //         entryCurrentPlace.x = newX;
+    //         entryCurrentPlace.y = newY;
+    //     }
+    // }
+    // if (elementType === 'transition') {
+    //     const entryCurrentTransition = this._lastPositionOfTransitions.find(
+    //         (transition) => transition.id === elementId,
+    //     );
+    //     //Aktualisiert letzte Position des Places
+    //     if (entryCurrentTransition) {
+    //         entryCurrentTransition.x = newX;
+    //         entryCurrentTransition.y = newY;
+    //     }
+    // }
+    // if (elementType === 'box') {
+    //     const entryCurrentBox = this._lastPositionOfBoxes.find(
+    //         (box) => box.id === elementId,
+    //     );
+    //     //Aktualisiert letzte Position der Box
+    //     if (entryCurrentBox) {
+    //         entryCurrentBox.x = newX;
+    //         entryCurrentBox.y = newY;
+    //     }
+    //     this.positionForActivitiesService.passBoxObjects(this.boxes);
+    // }
+    // }
 
-            //Aktualisiert letzte Position des Places
-            if (entryCurrentPlace) {
-                entryCurrentPlace.x = newX;
-                entryCurrentPlace.y = newY;
-            }
-        }
+    // updateLastPositionOfDFGElements(
+    //     boxId: string,
+    //     xTranslate: number,
+    //     yTranslate: number,
+    // ) {
+    //     const activitiesToMove = this._activities.filter(
+    //         (activity) => activity.dfgId === boxId,
+    //     );
 
-        if (elementType === 'transition') {
-            const entryCurrentTransition = this._lastPositionOfTransitions.find(
-                (transition) => transition.id === elementId,
-            );
+    //     const arcsToMove = this._boxArcs.filter(
+    //         (boxArc) => (boxArc.start as Activity).dfgId === boxId,
+    //     );
 
-            //Aktualisiert letzte Position des Places
-            if (entryCurrentTransition) {
-                entryCurrentTransition.x = newX;
-                entryCurrentTransition.y = newY;
-            }
-        }
-
-        if (elementType === 'box') {
-            const entryCurrentBox = this._lastPositionOfBoxes.find(
-                (box) => box.id === elementId,
-            );
-
-            //Aktualisiert letzte Position der Box
-            if (entryCurrentBox) {
-                entryCurrentBox.x = newX;
-                entryCurrentBox.y = newY;
-            }
-
-            this.positionForActivitiesService.passBoxObjects(this.boxes);
-        }
-    }
-
-    updateLastPositionOfDFGElements(
-        boxId: string,
-        xTranslate: number,
-        yTranslate: number,
-    ) {
-        const activitiesToMove = this._activities.filter(
-            (activity) => activity.dfgId === boxId,
-        );
-
-        const arcsToMove = this._boxArcs.filter(
-            (boxArc) => (boxArc.start as Activity).dfgId === boxId,
-        );
-
-        activitiesToMove.forEach((activity) => {
-            this.updateLastPositionOfActivityWhenMovingBox(
-                activity.id,
-                activity.dfgId,
-                xTranslate,
-                yTranslate,
-            );
-        });
-    }
+    //     activitiesToMove.forEach((activity) => {
+    //         this.updateLastPositionOfActivityWhenMovingBox(
+    //             activity.id,
+    //             activity.dfgId,
+    //             xTranslate,
+    //             yTranslate,
+    //         );
+    //     });
+    // }
 
     ngOnDestroy(): void {
         this._sub?.unsubscribe();
