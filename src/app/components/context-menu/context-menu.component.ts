@@ -18,7 +18,7 @@ import {
     RecentEventLog,
 } from 'src/app/services/petri-net-management.service';
 import { EventLogDialogComponent } from '../event-log-dialog/event-log-dialog.component';
-import { Subscription } from 'rxjs';
+import { combineLatest, filter, Subscription } from 'rxjs';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import {
     CutType,
@@ -30,6 +30,7 @@ import { NgFor } from '@angular/common';
 import { ParseXesService } from 'src/app/services/parse-xes.service';
 import { EventLogParserService } from 'src/app/services/event-log-parser.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Arcs } from 'src/app/classes/dfg/arcs';
 
 @Component({
     selector: 'app-context-menu',
@@ -168,6 +169,8 @@ class ExecutingFallThrough {
 class ExecutingCut {
     private isArcFeedbackReady: boolean = false;
     private showArcFeedback: boolean = false;
+    private selectedCutType: CutType | undefined;
+    private collectedArcs: Arcs = new Arcs();
     constructor(
         private executeCutService: ExecuteCutService,
         private feedbackService: ShowFeedbackService,
@@ -180,11 +183,44 @@ class ExecutingCut {
                 this.isArcFeedbackReady = isArcFeedbackReady;
             },
         );
+        applicationStateService.collectedArcs$.subscribe((collectedArcs) => {
+            this.collectedArcs = collectedArcs;
+        });
         applicationStateService.showArcFeedback$.subscribe(
             (showArcFeedback) => {
                 this.showArcFeedback = showArcFeedback;
             },
         );
+
+        combineLatest([
+            applicationStateService.isArcFeedbackReady$,
+            applicationStateService.showArcFeedback$,
+            applicationStateService.collectedArcs$,
+        ])
+            .pipe(
+                filter(
+                    ([isArcFeedbackReady, showArcFeedback, collectedArcs]) =>
+                        isArcFeedbackReady &&
+                        showArcFeedback &&
+                        collectedArcs.getArcs().length > 0,
+                ),
+            )
+            .subscribe(
+                ([isArcFeedbackReady, showArcFeedback, collectedArcs]) => {
+                    this.isArcFeedbackReady = isArcFeedbackReady;
+                    this.showArcFeedback = showArcFeedback;
+                    this.collectedArcs = collectedArcs;
+
+                    if (this.selectedCutType != undefined) {
+                        this.collectSelectedElementsService.setArcFeedback(
+                            this.selectedCutType,
+                        );
+                    }
+                    if (this.showArcFeedback) {
+                        this.collectSelectedElementsService.enableArcFeedback();
+                    }
+                },
+            );
     }
 
     executeExclusiveCut(): void {
@@ -204,6 +240,12 @@ class ExecutingCut {
     }
 
     private executeCut(cutType: CutType): void {
+        this.applicationStateService.resetCollectedArcs();
+        this.selectedCutType = cutType;
+        this.applicationStateService.setCollectedArcs(
+            this.collectSelectedElementsService.collectedArcs,
+        );
+
         if (
             this.collectSelectedElementsService.currentCollectedArcsDFG ==
             undefined
@@ -223,14 +265,9 @@ class ExecutingCut {
                 cutType,
             )
         ) {
-            if (this.isArcFeedbackReady) {
-                this.collectSelectedElementsService.setArcFeedback(cutType);
-                if (this.showArcFeedback) {
-                    this.collectSelectedElementsService.enableArcFeedback();
-                }
-            } else {
+            if (!this.isArcFeedbackReady && this.showArcFeedback) {
                 this.feedbackService.showMessage(
-                    'Not a valid Cut! Wait for Arc Feedback Calculation to be finished and execute the cut again.',
+                    "Arc Feedback Calculation isn't ready yet. Just wait some seconds for the arcs to be marked.",
                     true,
                 );
             }
