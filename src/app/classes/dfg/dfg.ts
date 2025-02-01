@@ -13,6 +13,7 @@ export interface DfgJson {
 export class Dfg implements PetriNetTransition {
     private static idCount: number = 0;
     public id: string;
+    public longestPath: number = 0;
     private _currentPossibleCut: CutType | undefined;
     private _arcSubsets: Array<Array<DfgArc>> = [];
     private _isArcFeedbackCalculationCompleted: boolean = false;
