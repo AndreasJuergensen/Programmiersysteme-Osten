@@ -104,6 +104,7 @@ export class CalculatePetriNetService {
 
         const graph = new Graph(nodes, edges);
         this._graph$.next(graph);
+
         return graph;
     }
 

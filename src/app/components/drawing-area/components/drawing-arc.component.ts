@@ -1,9 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
-import { Subscription } from 'rxjs';
-import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
-import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 import { environment } from 'src/environments/environment';
 import { Arc } from '../models';
 
@@ -27,6 +24,23 @@ import { Arc } from '../models';
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>
+            <!--Spitzen modified-->
+            <svg:marker
+                id="arrowhead-deepskyblue"
+                viewBox="0 0 10 10"
+                markerWidth="10"
+                markerHeight="10"
+                refX="5"
+                refY="5"
+                orient="auto-start-reverse"
+            >
+                <svg:path
+                    d="M 1,1 L 9,5 L 1,9 Z"
+                    [attr.fill]="'deepskyblue'"
+                    [attr.stroke]="'deepskyblue'"
+                    [attr.stroke-width]="width"
+                ></svg:path>
+            </svg:marker>
             <svg:marker
                 id="arrowhead-bright"
                 viewBox="0 0 10 10"
@@ -43,8 +57,39 @@ import { Arc } from '../models';
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>
+            <svg:marker
+                id="arrowhead-orange"
+                viewBox="0 0 10 10"
+                markerWidth="10"
+                markerHeight="10"
+                refX="5"
+                refY="5"
+                orient="auto-start-reverse"
+            >
+                <svg:path
+                    d="M 1,1 L 9,5 L 1,9 Z"
+                    [attr.fill]="'orange'"
+                    [attr.stroke]="'orange'"
+                    [attr.stroke-width]="width"
+                ></svg:path>
+            </svg:marker>
+            <svg:marker
+                id="arrowhead-green"
+                viewBox="0 0 10 10"
+                markerWidth="10"
+                markerHeight="10"
+                refX="5"
+                refY="5"
+                orient="auto-start-reverse"
+            >
+                <svg:path
+                    d="M 1,1 L 9,5 L 1,9 Z"
+                    [attr.fill]="'green'"
+                    [attr.stroke]="'green'"
+                    [attr.stroke-width]="width"
+                ></svg:path>
+            </svg:marker>
         </svg:defs>
-
         <svg:path
             [attr.d]="setPath(arc)"
             [attr.stroke]="'black'"
@@ -60,9 +105,7 @@ export class DrawingArcComponent {
 
     constructor(
         private collectSelectedElementsService: CollectSelectedElementsService,
-        private feedbackService: ShowFeedbackService,
         private petriNetManagementService: PetriNetManagementService,
-        private positionForActivitiesService: PositionForActivitiesService,
     ) {}
 
     readonly width: number = environment.drawingElements.arcs.width;
