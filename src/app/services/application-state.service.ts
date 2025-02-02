@@ -84,6 +84,7 @@ export class ApplicationStateService {
 
     setCollectedArcs(arcs: Arcs) {
         this._collectedArcs$.next(arcs);
+        console.log('set');
     }
 
     resetCollectedArcs() {

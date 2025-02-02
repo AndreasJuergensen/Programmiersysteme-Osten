@@ -181,46 +181,61 @@ class ExecutingCut {
         applicationStateService.isArcFeedbackReady$.subscribe(
             (isArcFeedbackReady) => {
                 this.isArcFeedbackReady = isArcFeedbackReady;
+                if (
+                    this.selectedCutType != undefined &&
+                    this.collectedArcs.getArcs().length > 0
+                ) {
+                    this.collectSelectedElementsService.setArcFeedback(
+                        this.selectedCutType,
+                    );
+                    if (this.showArcFeedback) {
+                        this.collectSelectedElementsService.enableArcFeedback();
+                    }
+                }
             },
         );
-        applicationStateService.collectedArcs$.subscribe((collectedArcs) => {
-            this.collectedArcs = collectedArcs;
-        });
+        // applicationStateService.collectedArcs$.subscribe((collectedArcs) => {
+        //     // this.collectedArcs = collectedArcs;
+        //     console.log('collectedArcs im subscribe', collectedArcs);
+        // });
         applicationStateService.showArcFeedback$.subscribe(
             (showArcFeedback) => {
                 this.showArcFeedback = showArcFeedback;
             },
         );
 
-        combineLatest([
-            applicationStateService.isArcFeedbackReady$,
-            applicationStateService.showArcFeedback$,
-            applicationStateService.collectedArcs$,
-        ])
-            .pipe(
-                filter(
-                    ([isArcFeedbackReady, showArcFeedback, collectedArcs]) =>
-                        isArcFeedbackReady &&
-                        showArcFeedback &&
-                        collectedArcs.getArcs().length > 0,
-                ),
-            )
-            .subscribe(
-                ([isArcFeedbackReady, showArcFeedback, collectedArcs]) => {
-                    this.isArcFeedbackReady = isArcFeedbackReady;
-                    this.showArcFeedback = showArcFeedback;
-                    this.collectedArcs = collectedArcs;
+        // combineLatest([
+        //     applicationStateService.isArcFeedbackReady$,
+        //     applicationStateService.showArcFeedback$,
+        //     // applicationStateService.collectedArcs$,
+        // ])
+        //     .pipe(
+        //         filter(
+        //             ([isArcFeedbackReady, showArcFeedback]) =>
+        //                 isArcFeedbackReady && showArcFeedback,
+        //         ),
+        //     )
+        //     .subscribe(([isArcFeedbackReady, showArcFeedback]) => {
+        //         this.isArcFeedbackReady = isArcFeedbackReady;
+        //         this.showArcFeedback = showArcFeedback;
+        //         // this.collectedArcs = collectedArcs;
+        //         // console.log(
+        //         //     'collectedArcs im combine LAtest',
+        //         //     collectedArcs,
+        //         // );
 
-                    if (this.selectedCutType != undefined) {
-                        this.collectSelectedElementsService.setArcFeedback(
-                            this.selectedCutType,
-                        );
-                    }
-                    if (this.showArcFeedback) {
-                        this.collectSelectedElementsService.enableArcFeedback();
-                    }
-                },
-            );
+        //         if (
+        //             this.selectedCutType != undefined &&
+        //             this.collectedArcs.getArcs().length > 0
+        //         ) {
+        //             this.collectSelectedElementsService.setArcFeedback(
+        //                 this.selectedCutType,
+        //             );
+        //         }
+        //         if (this.showArcFeedback) {
+        //             this.collectSelectedElementsService.enableArcFeedback();
+        //         }
+        //     });
     }
 
     executeExclusiveCut(): void {
@@ -240,11 +255,12 @@ class ExecutingCut {
     }
 
     private executeCut(cutType: CutType): void {
-        this.applicationStateService.resetCollectedArcs();
+        // this.applicationStateService.resetCollectedArcs();
         this.selectedCutType = cutType;
-        this.applicationStateService.setCollectedArcs(
-            this.collectSelectedElementsService.collectedArcs,
-        );
+        this.collectedArcs = this.collectSelectedElementsService.collectedArcs;
+        // this.applicationStateService.setCollectedArcs(
+        //     this.collectSelectedElementsService.collectedArcs,
+        // );
 
         if (
             this.collectSelectedElementsService.currentCollectedArcsDFG ==
@@ -270,7 +286,18 @@ class ExecutingCut {
                     "Arc Feedback Calculation isn't ready yet. Just wait some seconds for the arcs to be marked.",
                     true,
                 );
+            } else if (this.isArcFeedbackReady && this.showArcFeedback) {
+                this.collectSelectedElementsService.setArcFeedback(
+                    this.selectedCutType,
+                );
+                this.collectSelectedElementsService.enableArcFeedback();
+            } else if (this.isArcFeedbackReady && !this.showArcFeedback) {
+                this.collectSelectedElementsService.setArcFeedback(
+                    this.selectedCutType,
+                );
             }
+        } else {
+            this.selectedCutType = undefined;
         }
         this.contextMenuService.hide();
     }
@@ -338,8 +365,24 @@ class ShowingArcFeedback {
         this.applicationStateService.toggleShowArcFeedback();
         if (this.showArcFeedback) {
             this.collectSelectedElementsService.enableArcFeedback();
+            console.log(
+                'feedback enable',
+                this.collectSelectedElementsService.collectedArcs,
+            );
+            console.log(
+                'arcs im observable',
+                this.applicationStateService.collectedArcs$,
+            );
         } else {
             this.collectSelectedElementsService.disableArcFeedback();
+            console.log(
+                'feedback disable',
+                this.collectSelectedElementsService.collectedArcs,
+            );
+            console.log(
+                'arcs im observable',
+                this.applicationStateService.collectedArcs$,
+            );
         }
 
         this.contextMenuService.hide();
