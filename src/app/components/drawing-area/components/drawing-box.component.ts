@@ -15,6 +15,7 @@ import { DragAndDropService } from 'src/app/services/drag-and-drop.service';
     selector: 'svg:g[app-drawing-box]',
     template: `
         <svg:rect
+            [attr.id]="box.id"
             [attr.x]="box.x - box.width / 2"
             [attr.y]="box.y - box.height / 2"
             [attr.height]="box.height"
@@ -136,6 +137,7 @@ export class DrawingBoxComponent {
     private lastY = 0;
     private lastDeltaX = 0;
     private lastDeltaY = 0;
+    private mousePositionCurrent: [number, number] = [0, 0];
 
     //----------NEU----------
 
@@ -164,6 +166,9 @@ export class DrawingBoxComponent {
         this.startX = event.clientX;
         this.startY = event.clientY;
 
+        this.mousePositionInitial = [event.clientX, event.clientY];
+        this.mousePositionCurrent = [event.clientX, event.clientY];
+
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
@@ -176,6 +181,8 @@ export class DrawingBoxComponent {
     @HostListener('document:mousemove', ['$event'])
     onMouseMove = (event: MouseEvent) => {
         if (!this.dragging) return;
+
+        this.mousePositionCurrent = [event.clientX, event.clientY];
 
         const x = event.clientX - this.offsetX;
         const y = event.clientY - this.offsetY;
@@ -207,6 +214,35 @@ export class DrawingBoxComponent {
 
     @HostListener('document:mouseup')
     onMouseUp = () => {
+        if (this.dragging) {
+            if (
+                this.mousePositionCurrent[0] === this.mousePositionInitial[0] &&
+                this.mousePositionCurrent[1] === this.mousePositionInitial[1]
+            ) {
+                const rects = document.getElementsByTagName('svg')[0];
+                const rect = rects.getElementById(
+                    `${this.box.id}`,
+                ) as SVGRectElement;
+                const svg: SVGSVGElement = document.getElementsByTagName(
+                    'svg',
+                )[0] as SVGSVGElement;
+
+                if (svg) {
+                    const boxes = svg.querySelectorAll('rect');
+                    boxes.forEach((box) => {
+                        if (rect === box) {
+                            rect.classList.toggle('box-marked');
+                        } else {
+                            box.classList.remove('box-marked');
+                        }
+                    });
+                    this._collectSelectedElementsService.updateSelectedDFG(
+                        this.box.id,
+                    );
+                }
+            }
+        }
+
         this.dragging = false;
         document.removeEventListener('mousemove', this.onMouseMove);
         document.removeEventListener('mouseup', this.onMouseUp);

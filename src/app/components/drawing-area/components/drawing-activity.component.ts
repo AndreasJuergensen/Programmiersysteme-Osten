@@ -17,6 +17,7 @@ import { BoxNode } from 'src/app/classes/graph';
     selector: 'svg:g[app-drawing-activity]',
     template: `
         <svg:rect
+            [attr.id]="activity.dfgId + '_' + activity.id"
             [attr.x]="activity.x - width / 2"
             [attr.y]="activity.y - height / 2"
             [attr.height]="height"
@@ -121,6 +122,7 @@ export class DrawingActivityComponent {
 
     private xCoordinateInBox = 0;
     private yCoordinateInBox = 0;
+    private mousePositionCurrent: [number, number] = [0, 0];
     //---
 
     //---------NEU---------
@@ -182,6 +184,7 @@ export class DrawingActivityComponent {
 
         this._dragAndDropService.getTransformBox$.subscribe((transformBox) => {
             const updatedBox = transformBox.value;
+            this._collectSelectedElementsService.resetSelectedArcs();
 
             const box = transformBox.map.get(this.activity.dfgId);
 
@@ -224,6 +227,9 @@ export class DrawingActivityComponent {
         this.dragging = true;
         this.offsetX = event.clientX - this.activity.x;
         this.offsetY = event.clientY - this.activity.y;
+        // this.mouseClicked = true;
+        this.mousePositionInitial = [event.clientX, event.clientY];
+        this.mousePositionCurrent = [event.clientX, event.clientY];
 
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
@@ -237,6 +243,8 @@ export class DrawingActivityComponent {
     @HostListener('document:mousemove', ['$event'])
     onMouseMove = (event: MouseEvent) => {
         if (!this.dragging) return;
+
+        this.mousePositionCurrent = [event.clientX, event.clientY];
 
         let newX = event.clientX - this.offsetX;
         let newY = event.clientY - this.offsetY;
@@ -258,13 +266,42 @@ export class DrawingActivityComponent {
 
     @HostListener('document:mouseup')
     onMouseUp = () => {
-        this.dragging = false;
         this.startX = this.activity.x;
         this.startY = this.activity.y;
 
         this.xCoordinateInBox = Math.abs(this.boundaryX1 - this.activity.x);
         this.yCoordinateInBox = Math.abs(this.boundaryY1 - this.activity.y);
 
+        if (this.dragging) {
+            if (
+                this.mousePositionCurrent[0] !== this.mousePositionInitial[0] &&
+                this.mousePositionCurrent[1] !== this.mousePositionInitial[1]
+            ) {
+                this._collectSelectedElementsService.resetSelectedArcs();
+            } else {
+                const rects = document.getElementsByTagName('svg')[0];
+                const rect = rects.getElementById(
+                    `${this.activity.dfgId}_${this.activity.id}`,
+                ) as SVGRectElement;
+                const svg: SVGSVGElement = document.getElementsByTagName(
+                    'svg',
+                )[0] as SVGSVGElement;
+                if (svg) {
+                    const activities = svg.querySelectorAll('rect');
+                    activities.forEach((activity) => {
+                        if (rect === activity) {
+                            rect.classList.toggle('activity-marked');
+                        } else {
+                            activity.classList.remove('activity-marked');
+                        }
+                    });
+                }
+                this._collectSelectedElementsService.updateSelectedActivity(
+                    this.activity.id,
+                );
+            }
+        }
+        this.dragging = false;
         document.removeEventListener('mousemove', this.onMouseMove);
         document.removeEventListener('mouseup', this.onMouseUp);
     };

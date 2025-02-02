@@ -257,8 +257,6 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
                 this._arcs = arcs;
                 this._boxArcs = boxArcs;
 
-                // console.log(places);
-
                 this._originalPositionOfActivities = _.cloneDeep(activities);
                 this._lastPositionOfActivities = _.cloneDeep(activities);
 
@@ -480,7 +478,6 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
         if (element instanceof Box) {
             const box = this.boxes.find((b) => b.id === element.id);
-            //console.log(pos);
 
             if (box) {
                 (box.x = pos.x), (box.y = pos.y);
@@ -962,12 +959,14 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         this._arcs = arcs;
     }
 
-    mouseDown(): void {
+    mouseDown(event: MouseEvent): void {
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
 
-        if (svg) {
+        const target = event.target as SVGElement;
+
+        if (svg && event.target instanceof SVGSVGElement) {
             svg.classList.add('mouseDown');
         }
     }

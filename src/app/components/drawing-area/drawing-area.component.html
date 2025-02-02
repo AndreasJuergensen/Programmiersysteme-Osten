@@ -1,7 +1,7 @@
 <div (contextmenu)="onContextMenu($event)" (click)="onMenuClose()">
     <div id="drawingArea">
         <svg
-            (mousedown)="mouseDown()"
+            (mousedown)="mouseDown($event)"
             (mouseup)="mouseUp()"
             id="svg"
             #svgElement
