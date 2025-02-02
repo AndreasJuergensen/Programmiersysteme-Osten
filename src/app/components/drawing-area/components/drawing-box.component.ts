@@ -160,7 +160,10 @@ export class DrawingBoxComponent {
 
     @HostListener('mousedown', ['$event'])
     onMouseDown(event: MouseEvent) {
-        this.dragging = true;
+        if (event.button === 0) {
+            this.dragging = true;
+        }
+
         this.offsetX = event.clientX - this.box.x;
         this.offsetY = event.clientY - this.box.y;
         this.startX = event.clientX;
@@ -172,6 +175,7 @@ export class DrawingBoxComponent {
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
+
         this.setBoundary(svg);
 
         document.addEventListener('mousemove', this.onMouseMove);

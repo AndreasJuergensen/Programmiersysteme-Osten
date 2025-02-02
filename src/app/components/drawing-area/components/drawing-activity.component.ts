@@ -224,7 +224,9 @@ export class DrawingActivityComponent {
 
     @HostListener('mousedown', ['$event'])
     onMouseDown(event: MouseEvent) {
-        this.dragging = true;
+        if (event.button === 0) {
+            this.dragging = true;
+        }
         this.offsetX = event.clientX - this.activity.x;
         this.offsetY = event.clientY - this.activity.y;
         // this.mouseClicked = true;
