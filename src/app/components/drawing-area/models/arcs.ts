@@ -115,10 +115,16 @@ export class PlaceToBoxArc extends Arc {
         const heightHalf = (this.end as Box).height / 2;
         const strokeHalf = environment.drawingElements.boxes.strokeWidth / 2;
 
+        const angleDiagonalRad = Math.atan(
+            (heightHalf + strokeHalf) / (widthHalf + strokeHalf),
+        );
+        const angleDiagonalDeg = (angleDiagonalRad / Math.PI) * 180;
+
         let lengthToBorder = this.calculateLengthToBoxBorder(
             widthHalf,
             heightHalf,
             strokeHalf,
+            angleDiagonalDeg,
         );
 
         const realLength = this.length - lengthToBorder - offsetArrow;
@@ -135,11 +141,18 @@ export class PlaceToBoxArc extends Arc {
         widthHalf: number,
         heightHalf: number,
         strokeHalf: number,
+        angleDiagonalDeg: number,
     ): number {
         const alphaDegAbs = Math.abs(this.alphaDeg);
         switch (alphaDegAbs) {
             case 0:
                 return widthHalf + strokeHalf;
+            case angleDiagonalDeg:
+            case 45:
+                return Math.sqrt(
+                    Math.pow(widthHalf + strokeHalf, 2) +
+                        Math.pow(heightHalf + strokeHalf, 2),
+                );
             case 90:
                 return heightHalf + strokeHalf;
 
@@ -147,7 +160,9 @@ export class PlaceToBoxArc extends Arc {
                 break;
         }
 
-        return (heightHalf + strokeHalf) / Math.sin(Math.abs(this.alphaRad));
+        return alphaDegAbs < angleDiagonalDeg
+            ? (widthHalf + strokeHalf) / Math.cos(Math.abs(this.alphaRad))
+            : (heightHalf + strokeHalf) / Math.sin(Math.abs(this.alphaRad));
     }
 }
 
@@ -250,15 +265,21 @@ export class PlaceToInvisibleTransitionArc extends Arc {
         const offsetArrow = 5;
         const widthHalf =
             environment.drawingElements.invisibleTransitions.width / 2;
-        const heightQuarter =
-            environment.drawingElements.invisibleTransitions.height / 4;
+        const heightHalf =
+            environment.drawingElements.invisibleTransitions.height / 2;
         const strokeHalf =
             environment.drawingElements.invisibleTransitions.strokeWidth / 2;
 
+        const angleDiagonalRad = Math.atan(
+            (heightHalf + strokeHalf) / (widthHalf + strokeHalf),
+        );
+        const angleDiagonalDeg = (angleDiagonalRad / Math.PI) * 180;
+
         let lengthToBorder = this.calculateLengthToTransitionBorder(
             widthHalf,
-            heightQuarter,
+            heightHalf,
             strokeHalf,
+            angleDiagonalDeg,
         );
 
         const realLength = this.length - lengthToBorder - offsetArrow;
@@ -273,28 +294,30 @@ export class PlaceToInvisibleTransitionArc extends Arc {
 
     private calculateLengthToTransitionBorder(
         widthHalf: number,
-        heightQuarter: number,
+        heightHalf: number,
         strokeHalf: number,
+        angleDiagonalDeg: number,
     ): number {
         const alphaDegAbs = Math.abs(this.alphaDeg);
         switch (alphaDegAbs) {
             case 0:
                 return widthHalf + strokeHalf;
+            case angleDiagonalDeg:
             case 45:
                 return Math.sqrt(
                     Math.pow(widthHalf + strokeHalf, 2) +
-                        Math.pow(heightQuarter + strokeHalf, 2),
+                        Math.pow(heightHalf + strokeHalf, 2),
                 );
             case 90:
-                return heightQuarter + strokeHalf;
+                return heightHalf + strokeHalf;
 
             default:
                 break;
         }
 
-        return alphaDegAbs < 45
+        return alphaDegAbs < angleDiagonalDeg
             ? (widthHalf + strokeHalf) / Math.cos(Math.abs(this.alphaRad))
-            : (heightQuarter + strokeHalf) / Math.sin(Math.abs(this.alphaRad));
+            : (heightHalf + strokeHalf) / Math.sin(Math.abs(this.alphaRad));
     }
 }
 
