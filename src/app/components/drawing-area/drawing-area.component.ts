@@ -29,11 +29,11 @@ import {
     Transition,
     TransitionToPlaceArc,
 } from './models';
+import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
 import _ from 'lodash';
 import { ApplicationStateService } from 'src/app/services/application-state.service';
-import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
 import { DragAndDropService } from 'src/app/services/drag-and-drop.service';
 
 @Component({
@@ -87,6 +87,7 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
 
     public showEventLogs: boolean = false;
     public isEmpty: boolean = true;
+    public showArcFeedback: boolean = false;
 
     constructor(
         private calculatePetriNetService: CalculatePetriNetService,
@@ -102,6 +103,11 @@ export class DrawingAreaComponent implements OnInit, OnDestroy {
         petriNetManagementService.petriNet$.subscribe((petriNet) => {
             this.isEmpty = petriNet.isEmpty();
         });
+        applicationStateService.showArcFeedback$.subscribe(
+            (showArcFeedback) => {
+                this.showArcFeedback = showArcFeedback;
+            },
+        );
     }
 
     get activities(): Array<Activity> {

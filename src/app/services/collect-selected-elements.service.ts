@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Arcs, DfgArc } from '../classes/dfg/arcs';
+import { Arcs, CategorizedArcs, DfgArc } from '../classes/dfg/arcs';
 import { PetriNet } from '../classes/petrinet/petri-net';
 import { Dfg } from '../classes/dfg/dfg';
 import { Arc } from '../components/drawing-area/models';
 import { PetriNetManagementService } from './petri-net-management.service';
 import { Activity } from '../classes/dfg/activities';
+import { CutType } from './execute-cut.service';
 
 @Injectable({
     providedIn: 'root',
@@ -12,6 +13,9 @@ import { Activity } from '../classes/dfg/activities';
 export class CollectSelectedElementsService {
     private _petriNet!: PetriNet;
     private _collectedArcs: Arcs = new Arcs();
+    private _correctArcs: Arcs = new Arcs();
+    private _PossiblyCorrectArcs: Arcs = new Arcs();
+    private _wrongArcs: Arcs = new Arcs();
     private _currentCollectedArcsDFG: Dfg | undefined;
     private _selectedActivity: Activity | undefined;
     private _selectedDFGBox: Dfg | undefined;
@@ -59,6 +63,21 @@ export class CollectSelectedElementsService {
         }
     }
 
+    public setArcFeedback(selectedCut: CutType): void {
+        const validatedArcs: CategorizedArcs =
+            this._currentCollectedArcsDFG!.validateSelectedArcs(
+                this._collectedArcs,
+                selectedCut,
+            );
+
+        this._correctArcs = validatedArcs.correctArcs;
+        this._PossiblyCorrectArcs = validatedArcs.possiblyCorrectArcs;
+        this._wrongArcs = validatedArcs.wrongArcs;
+        console.log(this._correctArcs);
+        console.log(this._PossiblyCorrectArcs);
+        console.log(this._wrongArcs);
+    }
+
     updateSelectedDFG(clickedBoxName: string): void {
         if (
             this._selectedDFGBox !== undefined &&
@@ -92,6 +111,9 @@ export class CollectSelectedElementsService {
             paths.forEach((path) => {
                 path.classList.remove('active');
                 path.classList.remove('hovered');
+                path.classList.remove('correct');
+                path.classList.remove('possbiblyCorrect');
+                path.classList.remove('wrong');
                 if (path.classList.contains('visiblePath')) {
                     path.setAttribute('marker-end', 'url(#arrowhead)');
                 }
@@ -123,6 +145,117 @@ export class CollectSelectedElementsService {
             const boxes = svg.querySelectorAll('rect');
             boxes.forEach((box) => {
                 box.classList.remove('box-marked');
+            });
+        }
+    }
+
+    public enableArcFeedback(): void {
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
+
+        if (svg) {
+            const paths = svg.querySelectorAll('path');
+            paths.forEach((path) => {
+                const arcId = path.getAttribute('id');
+                const isCollectedArc = this._collectedArcs
+                    .getArcs()
+                    .some(
+                        (arc) =>
+                            `arc_${arc.asJson().start}_${arc.asJson().end}` ===
+                            arcId,
+                    );
+                const isCorrectArc = this._correctArcs
+                    .getArcs()
+                    .some(
+                        (arc) =>
+                            `arc_${arc.asJson().start}_${arc.asJson().end}` ===
+                            arcId,
+                    );
+
+                const isPossibleCorrectArc = this._PossiblyCorrectArcs
+                    .getArcs()
+                    .some(
+                        (arc) =>
+                            `arc_${arc.asJson().start}_${arc.asJson().end}` ===
+                            arcId,
+                    );
+
+                const isWrongArc = this._wrongArcs
+                    .getArcs()
+                    .some(
+                        (arc) =>
+                            `arc_${arc.asJson().start}_${arc.asJson().end}` ===
+                            arcId,
+                    );
+
+                if (isCollectedArc && isCorrectArc) {
+                    if (path.classList.contains('possiblyCorrect')) {
+                        path.classList.remove('possiblyCorrect');
+                    }
+                    if (path.classList.contains('wrong')) {
+                        path.classList.remove('wrong');
+                    }
+                    path.classList.add('correct');
+                    if (path.classList.contains('visiblePath')) {
+                        path.setAttribute(
+                            'marker-end',
+                            'url(#arrowhead-green)',
+                        );
+                    }
+                } else if (isCollectedArc && isPossibleCorrectArc) {
+                    if (path.classList.contains('correct')) {
+                        path.classList.remove('correct');
+                    }
+                    if (path.classList.contains('wrong')) {
+                        path.classList.remove('wrong');
+                    }
+                    path.classList.add('possbiblyCorrect');
+                    if (path.classList.contains('visiblePath')) {
+                        path.setAttribute(
+                            'marker-end',
+                            'url(#arrowhead-orange)',
+                        );
+                    }
+                } else if (isCollectedArc && isWrongArc) {
+                    if (path.classList.contains('correct')) {
+                        path.classList.remove('correct');
+                    }
+                    if (path.classList.contains('possbiblyCorrect')) {
+                        path.classList.remove('possbiblyCorrect');
+                    }
+                    path.classList.add('wrong');
+                    if (path.classList.contains('visiblePath')) {
+                        path.setAttribute('marker-end', 'url(#arrowhead-red)');
+                    }
+                }
+            });
+        }
+    }
+
+    public disableArcFeedback(): void {
+        const svg: SVGSVGElement = document.getElementsByTagName(
+            'svg',
+        )[0] as SVGSVGElement;
+
+        if (svg) {
+            const paths = svg.querySelectorAll('path');
+            paths.forEach((path) => {
+                if (path.classList.contains('correct')) {
+                    path.classList.remove('correct');
+                }
+                if (path.classList.contains('possbiblyCorrect')) {
+                    path.classList.remove('possbiblyCorrect');
+                }
+                if (path.classList.contains('wrong')) {
+                    path.classList.remove('wrong');
+                }
+                if (
+                    path.classList.contains('visiblePath') &&
+                    path.classList.contains('active')
+                ) {
+                    path.setAttribute('marker-end', 'url(#arrowhead-pale)');
+                }
             });
         }
     }

@@ -31,7 +31,11 @@ export class ExecuteCutService {
         });
     }
 
-    public execute(dfg: Dfg, selectedArcs: Arcs, selectedCut: CutType): void {
+    public execute(
+        dfg: Dfg,
+        selectedArcs: Arcs,
+        selectedCut: CutType,
+    ): boolean {
         const cutFeasibilityResults: {
             cutIsPossible: boolean;
             matchingCut: CutType | null;
@@ -43,7 +47,7 @@ export class ExecuteCutService {
                 'Not a valid Cut! Please try again!',
                 true,
             );
-            return;
+            return false;
         }
         const validCut: {
             cutIsPossible: boolean;
@@ -51,6 +55,7 @@ export class ExecuteCutService {
             a1: Activities;
             a2: Activities;
         } = cutFeasibilityResults[0];
+
         for (let i = 1; i < cutFeasibilityResults.length; i++) {
             if (
                 cutFeasibilityResults[i].cutIsPossible &&
@@ -60,7 +65,7 @@ export class ExecuteCutService {
                     'Too many arcs selected. Please select minimum amount of required arcs.',
                     true,
                 );
-                return;
+                return false;
             }
         }
 
@@ -109,9 +114,10 @@ export class ExecuteCutService {
         }
         if (this._petriNet.isBasicPetriNet()) {
             this._petriNetManagementService.showEventLogCompletelySplitted();
-            return;
+            return true;
         }
         this._feedbackService.showMessage(selectedCut + ' executed', false);
+        return true;
     }
 
     private createSubDfgs(eventLogs: [EventLog, EventLog]): [Dfg, Dfg] {

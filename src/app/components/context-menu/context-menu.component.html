@@ -153,7 +153,11 @@
             <div>Execute Cut</div>
         </div>
         <div class="context-menu sub-menu">
-            <div class="menu-button" mat-button (click)="executingCut.executeExclusiveCut()">
+            <div
+                class="menu-button"
+                mat-button
+                (click)="executingCut.executeExclusiveCut()"
+            >
                 <mat-icon>call_split</mat-icon>
                 <div>Exclusive Cut</div>
             </div>
@@ -165,7 +169,11 @@
                 <mat-icon>straight</mat-icon>
                 <div>Sequence Cut</div>
             </div>
-            <div class="menu-button" mat-button (click)="executingCut.executeParallelCut()">
+            <div
+                class="menu-button"
+                mat-button
+                (click)="executingCut.executeParallelCut()"
+            >
                 <mat-icon>alt_route</mat-icon>
                 <div>Parallel Cut</div>
             </div>
@@ -228,11 +236,53 @@
         </div>
     </div>
     <div
-        class="menu-button"
+        class="legend-menu-wrapper"
         [class.disabled]="disabling.isToggleFeedbackDisabled()"
-        mat-button
+        [matTooltip]="
+            disabling.isCalculationInProgress()
+                ? 'Calculation in progress...'
+                : ''
+        "
+        [matTooltipDisabled]="!disabling.isCalculationInProgress()"
+        matTooltipPosition="right"
     >
-        <div>Toggle Feedback</div>
+        <div
+            class="menu-button"
+            [class.disabled]="disabling.isToggleFeedbackDisabled()"
+            mat-button
+            (click)="showingArcFeedback.toggleArcFeedback()"
+        >
+            <div>{{ showingArcFeedback.buttonText() }}</div>
+        </div>
+        <div class="context-menu legend-menu">
+            <div class="legend-menu-line">
+                <h1>The Arc Feedback</h1>
+            </div>
+            <div class="legend-menu-line">
+                <div>
+                    By activating this feature arcs will be marked in the
+                    following colors:
+                </div>
+            </div>
+            <div class="legend-menu-line">
+                <mat-icon class="green">call_made</mat-icon>
+                <div class="green">green arcs = definitely right</div>
+            </div>
+            <div class="legend-menu-line">
+                <mat-icon class="orange">call_made</mat-icon>
+                <div class="orange">orange arcs = possibly right</div>
+            </div>
+            <div class="legend-menu-line">
+                <mat-icon class="red">call_made</mat-icon>
+                <div class="red">red arcs = definitely wrong</div>
+            </div>
+            <div class="legend-menu-line">
+                <div>
+                    Executing a wrong cut type will result in red marked arcs
+                    only.
+                </div>
+            </div>
+        </div>
     </div>
     <div class="hr"></div>
     <div

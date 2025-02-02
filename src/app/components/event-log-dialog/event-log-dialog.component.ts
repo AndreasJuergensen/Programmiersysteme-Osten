@@ -13,7 +13,6 @@ import {
     MatDialogRef,
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { EventLog } from 'src/app/classes/event-log';
 import { EventLogParserService } from 'src/app/services/event-log-parser.service';
@@ -33,7 +32,6 @@ import { ParseXesService } from 'src/app/services/parse-xes.service';
         ReactiveFormsModule,
         CommonModule,
         MatTooltipModule,
-        MatIcon,
     ],
     templateUrl: './event-log-dialog.component.html',
     styleUrl: './event-log-dialog.component.css',
