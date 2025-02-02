@@ -115,10 +115,16 @@ export class PlaceToBoxArc extends Arc {
         const heightHalf = (this.end as Box).height / 2;
         const strokeHalf = environment.drawingElements.boxes.strokeWidth / 2;
 
+        const angleDiagonalRad = Math.atan(
+            (heightHalf + strokeHalf) / (widthHalf + strokeHalf),
+        );
+        const angleDiagonalDeg = (angleDiagonalRad / Math.PI) * 180;
+
         let lengthToBorder = this.calculateLengthToBoxBorder(
             widthHalf,
             heightHalf,
             strokeHalf,
+            angleDiagonalDeg,
         );
 
         const realLength = this.length - lengthToBorder - offsetArrow;
@@ -135,11 +141,18 @@ export class PlaceToBoxArc extends Arc {
         widthHalf: number,
         heightHalf: number,
         strokeHalf: number,
+        angleDiagonalDeg: number,
     ): number {
         const alphaDegAbs = Math.abs(this.alphaDeg);
         switch (alphaDegAbs) {
             case 0:
                 return widthHalf + strokeHalf;
+            case angleDiagonalDeg:
+            case 45:
+                return Math.sqrt(
+                    Math.pow(widthHalf + strokeHalf, 2) +
+                        Math.pow(heightHalf + strokeHalf, 2),
+                );
             case 90:
                 return heightHalf + strokeHalf;
 
@@ -147,7 +160,9 @@ export class PlaceToBoxArc extends Arc {
                 break;
         }
 
-        return (heightHalf + strokeHalf) / Math.sin(Math.abs(this.alphaRad));
+        return alphaDegAbs < angleDiagonalDeg
+            ? (widthHalf + strokeHalf) / Math.cos(Math.abs(this.alphaRad))
+            : (heightHalf + strokeHalf) / Math.sin(Math.abs(this.alphaRad));
     }
 }
 
