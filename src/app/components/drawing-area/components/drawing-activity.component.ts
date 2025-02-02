@@ -11,6 +11,7 @@ import { environment } from 'src/environments/environment';
 import { Activity } from '../models';
 import { DragAndDropService } from 'src/app/services/drag-and-drop.service';
 import { ApplicationStateService } from 'src/app/services/application-state.service';
+import { last } from 'lodash';
 
 @Component({
     selector: 'svg:g[app-drawing-activity]',
@@ -210,6 +211,7 @@ export class DrawingActivityComponent {
                     });
                 }
             }
+
             if (this.showEventLogs === true) {
                 this.showEventLogs = false;
             }

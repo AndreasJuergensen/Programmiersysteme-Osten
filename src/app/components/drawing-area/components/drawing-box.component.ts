@@ -26,7 +26,8 @@ import { DragAndDropService } from 'src/app/services/drag-and-drop.service';
             [attr.stroke-opacity]="strokeOpacity"
             [attr.stroke-width]="strokeWidth"
             pointer-events="stroke"
-            [classList]="'draggable confine'"
+            (mouseenter)="setHover()"
+            (mouseleave)="unsetHover()"
         />
         <svg:text
             [attr.x]="box.x - box.id.length * 3.8"
@@ -104,26 +105,6 @@ export class DrawingBoxComponent {
     readonly strokeWidth: number =
         environment.drawingElements.boxes.strokeWidth;
 
-    elementSelected: any;
-    offset: any;
-    mousePositionInitial: [number, number] = [0, 0];
-    mouseClicked: boolean = false;
-
-    dx: number = 0;
-    dy: number = 0;
-
-    bbox: any;
-
-    boundaryX1: number = 0;
-    boundaryX2: number = 0;
-    boundaryY1: number = 0;
-    boundaryY2: number = 0;
-
-    minX: number = 0;
-    maxX: number = 0;
-    minY: number = 0;
-    maxY: number = 0;
-
     private dragging = false;
     private offsetX = 0;
     private offsetY = 0;
@@ -131,15 +112,16 @@ export class DrawingBoxComponent {
 
     private startX = 0;
     private startY = 0;
-    translateX = 0;
-    translateY = 0;
-    private lastX = 0;
-    private lastY = 0;
-    private lastDeltaX = 0;
-    private lastDeltaY = 0;
-    private mousePositionCurrent: [number, number] = [0, 0];
 
-    //----------NEU----------
+    private boundaryX1: number = 0;
+    private boundaryX2: number = 0;
+    private boundaryY1: number = 0;
+    private boundaryY2: number = 0;
+
+    private mousePositionCurrent: [number, number] = [0, 0];
+    private mousePositionInitial: [number, number] = [0, 0];
+
+    private isHovering = false;
 
     ngOnInit() {
         this.boundaryX1 =
@@ -156,6 +138,13 @@ export class DrawingBoxComponent {
                 this.transform = `translate(${this.box.x}, ${this.box.y})`;
             }
         });
+    }
+
+    setHover() {
+        this.isHovering = true;
+    }
+    unsetHover() {
+        this.isHovering = false;
     }
 
     @HostListener('mousedown', ['$event'])
@@ -184,9 +173,10 @@ export class DrawingBoxComponent {
 
     @HostListener('document:mousemove', ['$event'])
     onMouseMove = (event: MouseEvent) => {
-        if (!this.dragging) return;
-
         this.mousePositionCurrent = [event.clientX, event.clientY];
+
+        if (this.showEventLogs) return;
+        if (!this.dragging) return;
 
         const x = event.clientX - this.offsetX;
         const y = event.clientY - this.offsetY;
@@ -221,7 +211,8 @@ export class DrawingBoxComponent {
         if (this.dragging) {
             if (
                 this.mousePositionCurrent[0] === this.mousePositionInitial[0] &&
-                this.mousePositionCurrent[1] === this.mousePositionInitial[1]
+                this.mousePositionCurrent[1] === this.mousePositionInitial[1] &&
+                this.isHovering === true
             ) {
                 const rects = document.getElementsByTagName('svg')[0];
                 const rect = rects.getElementById(
@@ -248,6 +239,7 @@ export class DrawingBoxComponent {
         }
 
         this.dragging = false;
+
         document.removeEventListener('mousemove', this.onMouseMove);
         document.removeEventListener('mouseup', this.onMouseUp);
     };
@@ -270,156 +262,4 @@ export class DrawingBoxComponent {
             }
         }
     }
-
-    //----------ALT----------
-
-    // startDrag(event: MouseEvent) {
-    //     const svg: SVGSVGElement = document.getElementsByTagName(
-    //         'svg',
-    //     )[0] as SVGSVGElement;
-    //     const target = event.target as SVGRectElement;
-    //     this.mouseClicked = true;
-    //     this.mousePositionInitial = [event.clientX, event.clientY];
-
-    //     this.setBoundary(svg);
-
-    //     if (target.classList.contains('draggable')) {
-    //         this.offset = this.getMousePosition(event);
-    //         this.elementSelected = target;
-
-    //         const transforms = this.elementSelected.transform.baseVal;
-
-    //         if (target.classList.contains('confine')) {
-    //             this.bbox = target.getBBox();
-    //             this.minX = this.boundaryX1 - this.bbox.x;
-    //             this.maxX = this.boundaryX2 - this.bbox.x - this.bbox.width;
-    //             this.minY = this.boundaryY1 - this.bbox.y;
-    //             this.maxY = this.boundaryY2 - this.bbox.y - this.bbox.height;
-    //         }
-
-    //         if (
-    //             transforms.length === 0 ||
-    //             transforms.getItem(0).type !==
-    //                 SVGTransform.SVG_TRANSFORM_TRANSLATE
-    //         ) {
-    //             const translate = svg.createSVGTransform();
-    //             translate.setTranslate(0, 0);
-
-    //             this.elementSelected.transform.baseVal.insertItemBefore(
-    //                 translate,
-    //                 0,
-    //             );
-    //         }
-
-    //         this.transform = transforms.getItem(0);
-    //         this.offset.x -= this.transform.matrix.e;
-    //         this.offset.y -= this.transform.matrix.f;
-    //     }
-    // }
-    // drag(event: MouseEvent) {
-    //     const target = event.target as SVGRectElement;
-    //     if (this.elementSelected !== null && this.mouseClicked === true) {
-    //         event.preventDefault();
-    //         const coord = this.getMousePosition(event);
-
-    //         if (this.transform !== undefined) {
-    //             this.dx = coord.x - this.offset.x;
-    //             this.dy = coord.y - this.offset.y;
-
-    //             if (target.classList.contains('confine')) {
-    //                 if (this.dx < this.minX) {
-    //                     this.dx = this.minX;
-    //                 } else if (this.dx > this.maxX) {
-    //                     this.dx = this.maxX;
-    //                 }
-
-    //                 if (this.dy < this.minY) {
-    //                     this.dy = this.minY;
-    //                 } else if (this.dy > this.maxY) {
-    //                     this.dy = this.maxY;
-    //                 }
-    //             }
-
-    //             this._positionForActivitiesService.updateElementPosition(
-    //                 this.box.id,
-    //                 'box',
-    //                 this.dx,
-    //                 this.dy,
-    //             );
-    //         }
-    //     }
-    // }
-    // endDrag(event: MouseEvent, box: Box) {
-    //     this.elementSelected = null;
-    //     const mousePositionCurrent = [event.clientX, event.clientY];
-
-    //     if (this.mouseClicked) {
-    //         if (
-    //             mousePositionCurrent[0] !== this.mousePositionInitial[0] &&
-    //             mousePositionCurrent[1] !== this.mousePositionInitial[1]
-    //         ) {
-    //             this._positionForActivitiesService.updateEndPositionOfElement(
-    //                 this.box.id,
-    //                 'box',
-    //                 this.box.x,
-    //                 this.box.y,
-    //                 this.dx,
-    //                 this.dy,
-    //             );
-    //             this.mouseClicked = false;
-    //         } else {
-    //             const rect = event.target as SVGRectElement;
-    //             const svg: SVGSVGElement = document.getElementsByTagName(
-    //                 'svg',
-    //             )[0] as SVGSVGElement;
-    //             if (svg) {
-    //                 const boxes = svg.querySelectorAll('rect');
-    //                 boxes.forEach((box) => {
-    //                     if (rect === box) {
-    //                         rect.classList.toggle('box-marked');
-    //                     } else {
-    //                         box.classList.remove('box-marked');
-    //                     }
-    //                 });
-    //             }
-    //             this._collectSelectedElementsService.updateSelectedDFG(box.id);
-    //             this.mouseClicked = false;
-    //         }
-    //     }
-    // }
-
-    // private getMousePosition(event: MouseEvent) {
-    //     const svg: SVGSVGElement = document.getElementsByTagName(
-    //         'svg',
-    //     )[0] as SVGSVGElement;
-    //     var CTM = svg.getScreenCTM();
-
-    //     if (!CTM) {
-    //         throw new Error('CTM is null');
-    //     }
-
-    //     return {
-    //         x: (event.clientX - CTM.e) / CTM.a,
-    //         y: (event.clientY - CTM.f) / CTM.d,
-    //     };
-    // }
-
-    // private setBoundary(svg: SVGSVGElement): void {
-    //     const drawingArea = document.getElementById('drawingArea');
-    //     if (drawingArea && svg) {
-    //         const drawingAreaBox = drawingArea.getBoundingClientRect();
-    //         const svgBox = svg.getBoundingClientRect();
-
-    //         this.boundaryX2 = drawingAreaBox.width;
-    //         this.boundaryY2 = drawingAreaBox.height;
-
-    //         if (svgBox.width > drawingAreaBox.width) {
-    //             this.boundaryX2 = svgBox.width;
-    //         }
-
-    //         if (svgBox.height > drawingAreaBox.height) {
-    //             this.boundaryY2 = svgBox.height;
-    //         }
-    //     }
-    // }
 }
