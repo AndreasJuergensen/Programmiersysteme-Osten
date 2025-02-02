@@ -320,6 +320,7 @@ export class CalculateCoordinatesService {
             p.shift();
         });
 
+        dfg.longestPath = Math.max(...allPaths.map(p => p.length));
         return allPaths;
     }
 }

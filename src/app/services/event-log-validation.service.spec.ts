@@ -37,6 +37,18 @@ describe('EventLogValidationService False Cases', () => {
         const result = sut.validateInput(input);
         expect(result).toBeFalse();
     });
+
+    it('several numbers after each other', () => {
+        const input: string = 'A11';
+        const result = sut.checkForMultiplicityPattern(input);
+        expect(result).toBeFalse();
+    });
+
+    it('several numbers after each other 2.0', () => {
+        const input: string = 'A11 T12 B2000 200C Z554344K';
+        const result = sut.checkForMultiplicityPattern(input);
+        expect(result).toBeFalse();
+    });
 });
 
 describe('EventLogValidationService True Cases', () => {
@@ -67,6 +79,18 @@ describe('EventLogValidationService True Cases', () => {
         const input: string =
             'A+B (C) + X (test) ich_bin_18_Jahre_alt Z +N (hallo) +L K + hallo_mama';
         const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
+
+    it('checkForMultiplicityPattern', () => {
+        const input: string = 'A*1';
+        const result = sut.checkForMultiplicityPattern(input);
+        expect(result).toBeTrue();
+    });
+
+    it('checkForMultiplicityPattern 2.0', () => {
+        const input: string = '3*B';
+        const result = sut.checkForMultiplicityPattern(input);
         expect(result).toBeTrue();
     });
 

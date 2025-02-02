@@ -41,6 +41,55 @@ import { PetriNetManagementService } from 'src/app/services/petri-net-management
                     [attr.stroke-width]="width"
                 ></svg:path>
             </svg:marker>
+
+            <svg:marker
+                id="arrowhead-red"
+                viewBox="0 0 10 10"
+                markerWidth="10"
+                markerHeight="10"
+                refX="5"
+                refY="5"
+                orient="auto-start-reverse"
+            >
+                <svg:path
+                    d="M 1,1 L 9,5 L 1,9 Z"
+                    [attr.fill]="'red'"
+                    [attr.stroke]="'red'"
+                    [attr.stroke-width]="width"
+                ></svg:path>
+            </svg:marker>
+            <svg:marker
+                id="arrowhead-orange"
+                viewBox="0 0 10 10"
+                markerWidth="10"
+                markerHeight="10"
+                refX="5"
+                refY="5"
+                orient="auto-start-reverse"
+            >
+                <svg:path
+                    d="M 1,1 L 9,5 L 1,9 Z"
+                    [attr.fill]="'orange'"
+                    [attr.stroke]="'orange'"
+                    [attr.stroke-width]="width"
+                ></svg:path>
+            </svg:marker>
+            <svg:marker
+                id="arrowhead-green"
+                viewBox="0 0 10 10"
+                markerWidth="10"
+                markerHeight="10"
+                refX="5"
+                refY="5"
+                orient="auto-start-reverse"
+            >
+                <svg:path
+                    d="M 1,1 L 9,5 L 1,9 Z"
+                    [attr.fill]="'green'"
+                    [attr.stroke]="'green'"
+                    [attr.stroke-width]="width"
+                ></svg:path>
+            </svg:marker>
         </svg:defs>
 
         <svg:path
@@ -54,6 +103,7 @@ import { PetriNetManagementService } from 'src/app/services/petri-net-management
             (click)="onLineClick($event, boxArc)"
         ></svg:path>
         <svg:path
+            [attr.id]="getId(boxArc)"
             [attr.class]="'visiblePath'"
             [attr.d]="setPath(boxArc)"
             [attr.stroke]="'black'"
@@ -74,10 +124,23 @@ import { PetriNetManagementService } from 'src/app/services/petri-net-management
         path.hovered {
             stroke: #bebebe !important;
         }
+
+        path.correct {
+            stroke: green !important;
+        }
+
+        path.possbiblyCorrect {
+            stroke: orange !important;
+        }
+
+        path.wrong {
+            stroke: red !important;
+        }
     `,
 })
 export class DrawingBoxArcComponent {
     @Input({ required: true }) boxArc!: Arc;
+    // @Input({ required: true }) showArcFeedback!: boolean;
 
     constructor(
         private collectSelectedElementsService: CollectSelectedElementsService,
@@ -88,6 +151,10 @@ export class DrawingBoxArcComponent {
     readonly width: number = environment.drawingElements.arcs.width;
     readonly color: string = environment.drawingElements.arcs.color;
     private timeoutId: any;
+
+    getId(boxArc: Arc): string {
+        return `arc_${boxArc.start.id}_${boxArc.end.id}`;
+    }
 
     changeLineColorOver(event: Event, arc: Arc): void {
         const pathDummy = event.target as SVGPathElement;
@@ -112,7 +179,12 @@ export class DrawingBoxArcComponent {
                     if (
                         this.collectSelectedElementsService.isArcinSameDFG(arc)
                     ) {
-                        if (!path.classList.contains('active')) {
+                        if (
+                            !path.classList.contains('active') &&
+                            !path.classList.contains('correct') &&
+                            !path.classList.contains('possbiblyCorrect') &&
+                            !path.classList.contains('wrong')
+                        ) {
                             path.classList.toggle('active');
                             path.setAttribute(
                                 'marker-end',
@@ -120,6 +192,15 @@ export class DrawingBoxArcComponent {
                             );
                         } else {
                             path.classList.toggle('active');
+                            if (path.classList.contains('correct')) {
+                                path.classList.remove('correct');
+                            }
+                            if (path.classList.contains('possbiblyCorrect')) {
+                                path.classList.remove('possbiblyCorrect');
+                            }
+                            if (path.classList.contains('wrong')) {
+                                path.classList.remove('wrong');
+                            }
                             path.setAttribute('marker-end', 'url(#arrowhead)');
                         }
                         this.collectSelectedElementsService.updateCollectedArcs(
@@ -156,18 +237,28 @@ export class DrawingBoxArcComponent {
         const rect = event.target as SVGRectElement;
         const line = rect.nextElementSibling as SVGLineElement;
 
-        if (this.collectSelectedElementsService.isDFGArc(arc)) {
-            if (this.collectSelectedElementsService.isArcinSameDFG(arc)) {
-                if (line) {
-                    line.classList.toggle('active');
-                }
-
-                this.collectSelectedElementsService.updateCollectedArcs(arc);
-            } else {
-                this.feedbackService.showMessage('Arc not in same DFG', true);
+        if (this.collectSelectedElementsService.isArcinSameDFG(arc)) {
+            if (line) {
+                line.classList.toggle('active');
             }
+            if (line.classList.contains('correct')) {
+                line.classList.remove('correct');
+                line.classList.remove('hovered');
+                line.setAttribute('marker-end', 'url(#arrowhead)');
+            }
+            if (line.classList.contains('possbiblyCorrect')) {
+                line.classList.remove('possbiblyCorrect');
+                line.classList.remove('hovered');
+                line.setAttribute('marker-end', 'url(#arrowhead)');
+            }
+            if (line.classList.contains('wrong')) {
+                line.classList.remove('wrong');
+                line.classList.remove('hovered');
+                line.setAttribute('marker-end', 'url(#arrowhead)');
+            }
+            this.collectSelectedElementsService.updateCollectedArcs(arc);
         } else {
-            this.feedbackService.showMessage('Arc is not a DFGArc', true);
+            this.feedbackService.showMessage('Arc not in same DFG', true);
         }
     }
 

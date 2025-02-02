@@ -26,6 +26,7 @@ import {
 import { PetriNetManagementService } from './petri-net-management.service';
 
 type GraphWithBoxDimension = [Graph, number, number, Dfg];
+type Path = { path: string[]; length: number };
 
 @Injectable({
     providedIn: 'root',
@@ -83,10 +84,7 @@ export class CalculatePetriNetService {
         });
 
         //Schritt 3:
-        const nodes: Array<Node> = this.generateNodes(
-            petriNet,
-            this._dfgGraphsAndBoxes,
-        );
+        const nodes: Array<Node> = this.generateNodes(petriNet);
 
         const arcs: Array<PlaceToTransitionArc | TransitionToPlaceArc> =
             petriNet.arcs.arcs;
@@ -104,6 +102,7 @@ export class CalculatePetriNetService {
 
         const graph = new Graph(nodes, edges);
         this._graph$.next(graph);
+
         return graph;
     }
 
@@ -180,17 +179,13 @@ export class CalculatePetriNetService {
      * @param transitions
      * @returns
      */
-    private generateNodes(
-        petriNet: PetriNet,
-        sizeOfGraphsOfDFGs: Map<string, GraphWithBoxDimension>,
-    ): Array<Node> {
+    private generateNodes(petriNet: PetriNet): Array<Node> {
         const nodes: Array<Node> = new Array<Node>();
 
         const gapX = environment.drawingGrid.gapX;
         const gapY = environment.drawingGrid.gapY;
 
         let yCoordinate: number = 100;
-        let xOfLastModeledNode: number = 100;
 
         if (petriNet.places.isEmpty) {
             return nodes;
@@ -199,80 +194,89 @@ export class CalculatePetriNetService {
         const inputPlace: Place = petriNet.places.input;
         nodes.push(new PlaceNode(inputPlace.id, 100, 100));
 
-        const neighbours: Array<PetriNetTransition> =
-            petriNet.arcs.getNextTransitions(inputPlace);
-
-        // Put all neighbours of start activity into stack with the coordinates
-        // of the start activity.
-        const stack: Array<PetriNetStackElement> = neighbours.map(
-            (neighbour) => {
-                return {
-                    node: neighbour,
-                    source_x: 100,
-                    source_y: 100,
-                    additionalXOffset: 0,
-                };
-            },
+        const allPathsWithLength = this.calculatePaths(petriNet).sort(
+            (p1, p2) => p2.length - p1.length,
         );
 
-        while (stack.length > 0) {
-            const stackElement: PetriNetStackElement = stack.pop()!;
-            if (this.InsertNewLevel(nodes, stackElement, xOfLastModeledNode)) {
-                yCoordinate = this.biggestYCoodinateOfNodes(nodes) + gapY;
-            }
-
-            if (this.IsNodeAlreadyModeled(nodes, stackElement)) {
-                continue;
-            }
-
-            const generatedNode: Node = this.createNodeFromStackElement(
-                stackElement,
-                gapX,
-                yCoordinate,
-            );
-            nodes.push(generatedNode);
-
-            const neighbours: Array<Place | PetriNetTransition> =
-                this.getNeighbours(stackElement, petriNet);
-
-            // Each stackelement needs the information about the kind of node
-            // If we have a box, we have to add and extra gapX or gapY
-            // information because a box is bigger
-
+        allPathsWithLength.forEach((pathWithLength, index) => {
             let additionalXOffset: number = 0;
-            if (generatedNode instanceof BoxNode) {
-                additionalXOffset = (generatedNode as BoxNode).width / 2;
+            let xOfLastModeledNode: number = 100;
+            yCoordinate += index * gapY;
+
+            let i = 0;
+            for (let p of pathWithLength.path) {
+                let workItem: Place | PetriNetTransition;
+
+                const place: Place | undefined = this.getPlaceById(petriNet, p);
+                const petrinetTransition: PetriNetTransition | undefined =
+                    this.getPetrinetTransitionById(petriNet, p);
+
+                if (place) {
+                    workItem = place;
+                } else {
+                    workItem = petrinetTransition!;
+                }
+
+                const stackElement: PetriNetStackElement = {
+                    node: workItem,
+                    source_x: xOfLastModeledNode,
+                    source_y: 100 + index * gapY,
+                    additionalXOffset: additionalXOffset,
+                };
+
+                if (
+                    this.InsertNewLevel(nodes, stackElement, xOfLastModeledNode)
+                ) {
+                    yCoordinate = this.biggestYCoodinateOfNodes(nodes) + gapY;
+                }
+
+                if (this.IsNodeAlreadyModeled(nodes, stackElement)) {
+                    continue;
+                }
+
+                const generatedNode: Node = this.createNodeFromStackElement(
+                    stackElement,
+                    gapX,
+                    yCoordinate,
+                );
+                nodes.push(generatedNode);
+
+                xOfLastModeledNode = generatedNode.getXOffset();
+                if (generatedNode instanceof BoxNode) {
+                    additionalXOffset = (generatedNode as BoxNode).width / 2;
+                } else {
+                    additionalXOffset = 0;
+                }
+
+                i++;
             }
 
-            stack.push(
-                ...neighbours.map((neighbour) => {
-                    return {
-                        node: neighbour,
-                        source_x: generatedNode.x,
-                        source_y: generatedNode.y,
-                        additionalXOffset: additionalXOffset,
-                    };
-                }),
-            );
-
-            xOfLastModeledNode = generatedNode.getXOffset();
-        }
+            i = 0;
+        });
 
         return nodes;
     }
 
-    private getNeighbours(
-        stackElement: PetriNetStackElement,
+    private getPlaceById(
         petriNet: PetriNet,
-    ): Array<Place | PetriNetTransition> {
-        if (
-            stackElement.node instanceof Dfg ||
-            stackElement.node instanceof Transition
-        ) {
-            return petriNet.arcs.getNextPlaces(stackElement.node);
+        placeId: string,
+    ): Place | undefined {
+        try {
+            return petriNet.places.getPlaceByID(placeId);
+        } catch (error) {
+            return undefined;
         }
+    }
 
-        return petriNet.arcs.getNextTransitions(stackElement.node);
+    private getPetrinetTransitionById(
+        petriNet: PetriNet,
+        transitionId: string,
+    ): PetriNetTransition | undefined {
+        try {
+            return petriNet.transitions.getTransitionByID(transitionId);
+        } catch (error) {
+            return undefined;
+        }
     }
 
     private createNodeFromStackElement(
@@ -324,7 +328,7 @@ export class CalculatePetriNetService {
         const place = stackElement.node as Place;
         return new PlaceNode(
             place.id,
-            stackElement.source_x + gapX + stackElement.additionalXOffset,
+            stackElement.source_x + gapX,
             yCoordinate,
         );
     }
@@ -416,7 +420,7 @@ export class CalculatePetriNetService {
 
         do {
             nodeWasMoved = false;
-            nodes.forEach((node) => {
+            nodes.reverse().forEach((node) => {
                 if (this.checkNodeOverlap(node, nodes)) {
                     node.addYOffset(gapY);
                     nodeWasMoved = true;
@@ -507,5 +511,95 @@ export class CalculatePetriNetService {
         }
 
         return false;
+    }
+
+    private calculatePaths(petriNet: PetriNet): Path[] {
+        type NeighbourWithLength = { nodeId: string; length: number };
+        type InnerGraph = { [key: string]: NeighbourWithLength[] };
+        type StackElement = {
+            nodeId: string;
+            path: NeighbourWithLength[];
+            visitCount: { [key: string]: number };
+        };
+        let innerGraph: InnerGraph = {};
+
+        petriNet.places.getAllPlaces().forEach((place) => {
+            if (place.id === 'output') {
+                return;
+            }
+
+            const neighboursWithLength: NeighbourWithLength[] = [];
+            petriNet.arcs.getNextTransitions(place).forEach((pnt) => {
+                if (pnt instanceof Dfg) {
+                    const longestPathLength = (pnt as Dfg).longestPath;
+                    neighboursWithLength.push({
+                        nodeId: pnt.id,
+                        length: longestPathLength,
+                    });
+                } else {
+                    neighboursWithLength.push({ nodeId: pnt.id, length: 1 });
+                }
+            });
+            innerGraph[place.id] = neighboursWithLength;
+        });
+
+        petriNet.transitions.getAllTransitions().forEach((pnt) => {
+            const neighboursWithLength: NeighbourWithLength[] = petriNet.arcs
+                .getNextPlaces(pnt)
+                .map((place) => {
+                    return { nodeId: place.id, length: 1 };
+                });
+            innerGraph[pnt.id] = neighboursWithLength;
+        });
+
+        const allPaths: Array<Path> = [];
+
+        const stack: StackElement[] = [
+            {
+                nodeId: 'input',
+                path: [{ nodeId: 'input', length: 1 }],
+                visitCount: { ['input']: 1 },
+            },
+        ];
+
+        while (stack.length > 0) {
+            const stackElement: StackElement = stack.pop()!;
+
+            if (stackElement.nodeId === 'output') {
+                const length = stackElement.path
+                    .map((e) => e.length)
+                    .reduce((a, b) => a + b);
+
+                const path = stackElement.path.map((e) => e.nodeId);
+                allPaths.push({ path: [...path], length: length });
+                continue;
+            }
+
+            innerGraph[stackElement.nodeId].forEach((neighbourWithLength) => {
+                const visits =
+                    stackElement.visitCount[neighbourWithLength.nodeId] || 0;
+
+                if (visits < 2) {
+                    const newVisitCount = {
+                        ...stackElement.visitCount,
+                        [neighbourWithLength.nodeId]: visits + 1,
+                    };
+
+                    const pathElement: NeighbourWithLength = {
+                        nodeId: neighbourWithLength.nodeId,
+                        length: neighbourWithLength.length,
+                    };
+
+                    stack.push({
+                        nodeId: neighbourWithLength.nodeId,
+                        path: [...stackElement.path, pathElement],
+                        visitCount: newVisitCount,
+                    });
+                }
+            });
+        }
+
+        allPaths.forEach((p) => p.path.shift());
+        return allPaths;
     }
 }
