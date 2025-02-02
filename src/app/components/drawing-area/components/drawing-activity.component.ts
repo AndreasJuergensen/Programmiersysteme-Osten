@@ -6,12 +6,10 @@ import {
     Output,
 } from '@angular/core';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
-import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
 import { environment } from 'src/environments/environment';
 import { Activity } from '../models';
 import { DragAndDropService } from 'src/app/services/drag-and-drop.service';
 import { ApplicationStateService } from 'src/app/services/application-state.service';
-import { last } from 'lodash';
 
 @Component({
     selector: 'svg:g[app-drawing-activity]',
@@ -65,7 +63,6 @@ export class DrawingActivityComponent {
 
     constructor(
         private _collectSelectedElementsService: CollectSelectedElementsService,
-        private _positionForActivitiesService: PositionForActivitiesService,
         private _dragAndDropService: DragAndDropService,
         private _applicationStateService: ApplicationStateService,
     ) {}
@@ -118,7 +115,7 @@ export class DrawingActivityComponent {
             },
         );
 
-        this._positionForActivitiesService.boxDimensions$.subscribe((boxes) => {
+        this._dragAndDropService.boxDimensions$.subscribe((boxes) => {
             const relevantBox = boxes.find(
                 (box) => box.id === this.activity.dfgId,
             );
@@ -127,19 +124,25 @@ export class DrawingActivityComponent {
                 this.boundaryX1 =
                     relevantBox!.x -
                     relevantBox!.width / 2 +
-                    environment.drawingElements.activities.width / 2;
+                    environment.drawingElements.activities.width / 2 +
+                    environment.drawingElements.activities.strokeWidth;
                 this.boundaryX2 =
                     this.boundaryX1 +
                     relevantBox!.width -
-                    environment.drawingElements.activities.width;
+                    environment.drawingElements.activities.width -
+                    environment.drawingElements.activities.strokeWidth -
+                    environment.drawingElements.boxes.strokeWidth / 2;
                 this.boundaryY1 =
                     relevantBox!.y -
                     relevantBox!.height / 2 +
-                    environment.drawingElements.activities.height / 2;
+                    environment.drawingElements.activities.height / 2 +
+                    environment.drawingElements.activities.strokeWidth;
                 this.boundaryY2 =
                     this.boundaryY1 +
                     relevantBox!.height -
-                    environment.drawingElements.activities.height;
+                    environment.drawingElements.activities.height -
+                    environment.drawingElements.activities.strokeWidth -
+                    environment.drawingElements.boxes.strokeWidth / 2;
 
                 if (
                     this.xCoordinateInBox === 0 &&

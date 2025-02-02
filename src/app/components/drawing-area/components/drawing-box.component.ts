@@ -8,7 +8,6 @@ import {
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import { environment } from 'src/environments/environment';
 import { Box } from '../models';
-import { PositionForActivitiesService } from 'src/app/services/position-for-activities.service';
 import { DragAndDropService } from 'src/app/services/drag-and-drop.service';
 
 @Component({
@@ -91,7 +90,6 @@ export class DrawingBoxComponent {
 
     constructor(
         private _collectSelectedElementsService: CollectSelectedElementsService,
-        private _positionForActivitiesService: PositionForActivitiesService,
         private _dragAndDropService: DragAndDropService,
     ) {}
 
