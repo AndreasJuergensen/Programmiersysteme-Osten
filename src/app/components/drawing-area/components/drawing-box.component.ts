@@ -118,7 +118,9 @@ export class DrawingBoxComponent {
             'svg',
         )[0] as SVGSVGElement;
         const target = event.target as SVGRectElement;
-        this.mouseClicked = true;
+        if (event.button === 0) {
+            this.mouseClicked = true;
+        }
         this.mousePositionInitial = [event.clientX, event.clientY];
 
         this.setBoundary(svg);
