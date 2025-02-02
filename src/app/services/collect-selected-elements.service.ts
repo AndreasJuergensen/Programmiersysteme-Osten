@@ -73,9 +73,6 @@ export class CollectSelectedElementsService {
         this._correctArcs = validatedArcs.correctArcs;
         this._PossiblyCorrectArcs = validatedArcs.possiblyCorrectArcs;
         this._wrongArcs = validatedArcs.wrongArcs;
-        console.log(this._correctArcs);
-        console.log(this._PossiblyCorrectArcs);
-        console.log(this._wrongArcs);
     }
 
     updateSelectedDFG(clickedBoxName: string): void {
