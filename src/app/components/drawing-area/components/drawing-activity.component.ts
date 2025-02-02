@@ -203,7 +203,6 @@ export class DrawingActivityComponent {
                     this.activity.y,
                 );
                 this.mouseClicked = false;
-                this._collectSelectedElementsService.resetSelectedArcs();
             } else {
                 const rect = event.target as SVGRectElement;
                 const svg: SVGSVGElement = document.getElementsByTagName(
