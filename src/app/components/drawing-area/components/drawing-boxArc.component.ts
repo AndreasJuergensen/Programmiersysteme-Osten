@@ -104,19 +104,18 @@ import { PetriNetManagementService } from 'src/app/services/petri-net-management
         ></svg:path>
         <svg:path
             [attr.id]="getId(boxArc)"
-            [attr.class]="'visiblePath'"
+            [attr.class]="classListAttributes()"
             [attr.d]="setPath(boxArc)"
             [attr.stroke]="'black'"
             [attr.stroke-width]="width"
             [attr.fill]="'none'"
-            marker-end="url(#arrowhead)"
+            [attr.marker-end]="urlForMarker()"
         ></svg:path>
     `,
     styles: `
         path:hover {
             cursor: pointer;
         }
-
         path.active {
             stroke: #bebebe !important;
         }
@@ -148,12 +147,60 @@ export class DrawingBoxArcComponent {
         private petriNetManagementService: PetriNetManagementService,
     ) {}
 
+    private arcId: string = '';
     readonly width: number = environment.drawingElements.arcs.width;
     readonly color: string = environment.drawingElements.arcs.color;
     private timeoutId: any;
 
+    ngOnInit() {
+        this.arcId = `arc_${this.boxArc.start.id}_${this.boxArc.end.id}`;
+        this.collectSelectedElementsService.setArcClassListAttributes(
+            this.arcId,
+            'visiblePath',
+        );
+    }
+
     getId(boxArc: Arc): string {
         return `arc_${boxArc.start.id}_${boxArc.end.id}`;
+    }
+
+    classListAttributes(): string {
+        let classListAttributes: string = '';
+        const attributes =
+            this.collectSelectedElementsService.getArcClassListAttributes(
+                this.arcId,
+            )!;
+
+        attributes.forEach((attribute) => {
+            classListAttributes = `${classListAttributes} ${attribute}`;
+        });
+
+        return classListAttributes;
+    }
+
+    urlForMarker(): string {
+        const classListAttributes: string[] | undefined =
+            this.collectSelectedElementsService.getArcClassListAttributes(
+                this.arcId,
+            );
+        let marker: string = 'url(#arrowhead)';
+
+        if (classListAttributes) {
+            if (classListAttributes.includes('active')) {
+                marker = 'url(#arrowhead-pale)';
+            }
+            if (classListAttributes.includes('wrong')) {
+                marker = 'url(#arrowhead-red)';
+            }
+            if (classListAttributes.includes('possbiblyCorrect')) {
+                marker = 'url(#arrowhead-orange)';
+            }
+            if (classListAttributes.includes('correct')) {
+                marker = 'url(#arrowhead-green)';
+            }
+        }
+
+        return marker;
     }
 
     changeLineColorOver(event: Event, arc: Arc): void {
@@ -172,7 +219,10 @@ export class DrawingBoxArcComponent {
                 !svg.classList.contains('mouseDown') &&
                 !path.classList.contains('active')
             ) {
-                path.classList.add('hovered');
+                this.collectSelectedElementsService.setArcClassListAttributes(
+                    this.arcId,
+                    'hovered',
+                );
                 path.setAttribute('marker-end', 'url(#arrowhead-pale)');
             } else if (svg.classList.contains('mouseDown')) {
                 this.timeoutId = setTimeout(() => {
@@ -185,21 +235,37 @@ export class DrawingBoxArcComponent {
                             !path.classList.contains('possbiblyCorrect') &&
                             !path.classList.contains('wrong')
                         ) {
-                            path.classList.toggle('active');
+                            this.collectSelectedElementsService.toggleArcClassListAttributes(
+                                this.arcId,
+                                'active',
+                            );
                             path.setAttribute(
                                 'marker-end',
                                 'url(#arrowhead-pale)',
                             );
                         } else {
-                            path.classList.toggle('active');
+                            this.collectSelectedElementsService.toggleArcClassListAttributes(
+                                this.arcId,
+                                'active',
+                            );
+
                             if (path.classList.contains('correct')) {
-                                path.classList.remove('correct');
+                                this.collectSelectedElementsService.removeArcClassListAttributes(
+                                    this.arcId,
+                                    'correct',
+                                );
                             }
                             if (path.classList.contains('possbiblyCorrect')) {
-                                path.classList.remove('possbiblyCorrect');
+                                this.collectSelectedElementsService.removeArcClassListAttributes(
+                                    this.arcId,
+                                    'possbiblyCorrect',
+                                );
                             }
                             if (path.classList.contains('wrong')) {
-                                path.classList.remove('wrong');
+                                this.collectSelectedElementsService.removeArcClassListAttributes(
+                                    this.arcId,
+                                    'wrong',
+                                );
                             }
                             path.setAttribute('marker-end', 'url(#arrowhead)');
                         }
@@ -227,7 +293,10 @@ export class DrawingBoxArcComponent {
             const line = rect.nextElementSibling as SVGLineElement;
 
             if (line && !line.classList.contains('active')) {
-                line.classList.remove('hovered');
+                this.collectSelectedElementsService.removeArcClassListAttributes(
+                    this.arcId,
+                    'hovered',
+                );
                 line.setAttribute('marker-end', 'url(#arrowhead)');
             }
         }
@@ -239,21 +308,42 @@ export class DrawingBoxArcComponent {
 
         if (this.collectSelectedElementsService.isArcinSameDFG(arc)) {
             if (line) {
-                line.classList.toggle('active');
+                this.collectSelectedElementsService.toggleArcClassListAttributes(
+                    this.arcId,
+                    'active',
+                );
             }
             if (line.classList.contains('correct')) {
-                line.classList.remove('correct');
-                line.classList.remove('hovered');
+                this.collectSelectedElementsService.removeArcClassListAttributes(
+                    this.arcId,
+                    'correct',
+                );
+                this.collectSelectedElementsService.removeArcClassListAttributes(
+                    this.arcId,
+                    'hovered',
+                );
                 line.setAttribute('marker-end', 'url(#arrowhead)');
             }
             if (line.classList.contains('possbiblyCorrect')) {
-                line.classList.remove('possbiblyCorrect');
-                line.classList.remove('hovered');
+                this.collectSelectedElementsService.removeArcClassListAttributes(
+                    this.arcId,
+                    'possbiblyCorrect',
+                );
+                this.collectSelectedElementsService.removeArcClassListAttributes(
+                    this.arcId,
+                    'hovered',
+                );
                 line.setAttribute('marker-end', 'url(#arrowhead)');
             }
             if (line.classList.contains('wrong')) {
-                line.classList.remove('wrong');
-                line.classList.remove('hovered');
+                this.collectSelectedElementsService.removeArcClassListAttributes(
+                    this.arcId,
+                    'wrong',
+                );
+                this.collectSelectedElementsService.removeArcClassListAttributes(
+                    this.arcId,
+                    'hovered',
+                );
                 line.setAttribute('marker-end', 'url(#arrowhead)');
             }
             this.collectSelectedElementsService.updateCollectedArcs(arc);

@@ -20,6 +20,11 @@ export class CollectSelectedElementsService {
     private _selectedActivity: Activity | undefined;
     private _selectedDFGBox: Dfg | undefined;
 
+    private _arcClassListAttributes: Map<string, string[]> = new Map<
+        string,
+        string[]
+    >();
+
     constructor(private petriNetManagementService: PetriNetManagementService) {
         this.petriNetManagementService.petriNet$.subscribe((petriNetSub) => {
             this._petriNet = petriNetSub;
@@ -45,6 +50,60 @@ export class CollectSelectedElementsService {
         return this._selectedDFGBox === undefined
             ? undefined
             : this._selectedDFGBox;
+    }
+
+    /**
+     * @param {String} arcId Format: "arc_<start.id>_<end.id>"
+     * @returns Array mit allen Class List Attributen
+     */
+    getArcClassListAttributes(arcId: string): Array<string> | undefined {
+        return this._arcClassListAttributes.get(arcId);
+    }
+
+    setArcClassListAttributes(arcId: string, attribute: string) {
+        const classListAttributes: Array<string> | undefined =
+            this._arcClassListAttributes.get(arcId);
+
+        if (classListAttributes) {
+            if (!classListAttributes.includes(attribute)) {
+                classListAttributes.push(attribute);
+            }
+            this._arcClassListAttributes.set(arcId, classListAttributes);
+        } else {
+            this._arcClassListAttributes.set(arcId, [`${attribute}`]);
+        }
+    }
+
+    removeArcClassListAttributes(arcId: string, attribute: string) {
+        const classListAttributes: Array<string> | undefined =
+            this._arcClassListAttributes.get(arcId);
+
+        if (classListAttributes) {
+            const indexOfEntry: number = classListAttributes.indexOf(attribute);
+            classListAttributes.splice(indexOfEntry, 1);
+        }
+    }
+
+    toggleArcClassListAttributes(arcId: string, attribute: string) {
+        const classListAttributes: Array<string> | undefined =
+            this._arcClassListAttributes.get(arcId);
+
+        if (classListAttributes) {
+            if (!classListAttributes.includes(attribute)) {
+                classListAttributes.push(attribute);
+            } else {
+                const indexOfEntry: number =
+                    classListAttributes.indexOf(attribute);
+                classListAttributes.splice(indexOfEntry, 1);
+            }
+            this._arcClassListAttributes.set(arcId, classListAttributes);
+        } else {
+            this._arcClassListAttributes.set(arcId, [`${attribute}`]);
+        }
+    }
+
+    resetArcClassListAttributes(): void {
+        this._arcClassListAttributes.clear();
     }
 
     updateSelectedActivity(activityName: string): void {
@@ -115,6 +174,7 @@ export class CollectSelectedElementsService {
                     path.setAttribute('marker-end', 'url(#arrowhead)');
                 }
             });
+            this.resetArcClassListAttributes();
         }
     }
 
@@ -155,6 +215,7 @@ export class CollectSelectedElementsService {
             const paths = svg.querySelectorAll('path');
             paths.forEach((path) => {
                 const arcId = path.getAttribute('id');
+
                 const isCollectedArc = this._collectedArcs
                     .getArcs()
                     .some(
@@ -186,42 +247,49 @@ export class CollectSelectedElementsService {
                             arcId,
                     );
 
-                if (isCollectedArc && isCorrectArc) {
+                if (isCollectedArc && isCorrectArc && arcId) {
                     if (path.classList.contains('possiblyCorrect')) {
-                        path.classList.remove('possiblyCorrect');
+                        this.removeArcClassListAttributes(
+                            arcId,
+                            'possiblyCorrect',
+                        );
                     }
                     if (path.classList.contains('wrong')) {
-                        path.classList.remove('wrong');
+                        this.removeArcClassListAttributes(arcId, 'wrong');
                     }
-                    path.classList.add('correct');
+                    this.setArcClassListAttributes(arcId, 'correct');
+
                     if (path.classList.contains('visiblePath')) {
                         path.setAttribute(
                             'marker-end',
                             'url(#arrowhead-green)',
                         );
                     }
-                } else if (isCollectedArc && isPossibleCorrectArc) {
+                } else if (isCollectedArc && isPossibleCorrectArc && arcId) {
                     if (path.classList.contains('correct')) {
-                        path.classList.remove('correct');
+                        this.removeArcClassListAttributes(arcId, 'correct');
                     }
                     if (path.classList.contains('wrong')) {
-                        path.classList.remove('wrong');
+                        this.removeArcClassListAttributes(arcId, 'wrong');
                     }
-                    path.classList.add('possbiblyCorrect');
+                    this.setArcClassListAttributes(arcId, 'possbiblyCorrect');
                     if (path.classList.contains('visiblePath')) {
                         path.setAttribute(
                             'marker-end',
                             'url(#arrowhead-orange)',
                         );
                     }
-                } else if (isCollectedArc && isWrongArc) {
+                } else if (isCollectedArc && isWrongArc && arcId) {
                     if (path.classList.contains('correct')) {
-                        path.classList.remove('correct');
+                        this.removeArcClassListAttributes(arcId, 'correct');
                     }
                     if (path.classList.contains('possbiblyCorrect')) {
-                        path.classList.remove('possbiblyCorrect');
+                        this.removeArcClassListAttributes(
+                            arcId,
+                            'possbiblyCorrect',
+                        );
                     }
-                    path.classList.add('wrong');
+                    this.setArcClassListAttributes(arcId, 'wrong');
                     if (path.classList.contains('visiblePath')) {
                         path.setAttribute('marker-end', 'url(#arrowhead-red)');
                     }
@@ -238,14 +306,18 @@ export class CollectSelectedElementsService {
         if (svg) {
             const paths = svg.querySelectorAll('path');
             paths.forEach((path) => {
+                const arcId = path.getAttribute('id')!;
                 if (path.classList.contains('correct')) {
-                    path.classList.remove('correct');
+                    this.removeArcClassListAttributes(arcId, 'correct');
                 }
                 if (path.classList.contains('possbiblyCorrect')) {
-                    path.classList.remove('possbiblyCorrect');
+                    this.removeArcClassListAttributes(
+                        arcId,
+                        'possbiblyCorrect',
+                    );
                 }
                 if (path.classList.contains('wrong')) {
-                    path.classList.remove('wrong');
+                    this.removeArcClassListAttributes(arcId, 'wrong');
                 }
                 if (
                     path.classList.contains('visiblePath') &&
