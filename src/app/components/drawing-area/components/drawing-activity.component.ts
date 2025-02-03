@@ -173,7 +173,6 @@ export class DrawingActivityComponent {
         this._dragAndDropService.getTransformBox$.subscribe((transformBox) => {
             if (this.showEventLogs === false) {
                 const updatedBox = transformBox.value;
-                this._collectSelectedElementsService.resetSelectedArcs();
 
                 const box = transformBox.map.get(this.activity.dfgId);
 
@@ -270,11 +269,9 @@ export class DrawingActivityComponent {
 
         if (this.dragging) {
             if (
-                this.mousePositionCurrent[0] !== this.mousePositionInitial[0] &&
-                this.mousePositionCurrent[1] !== this.mousePositionInitial[1]
+                this.mousePositionCurrent[0] === this.mousePositionInitial[0] &&
+                this.mousePositionCurrent[1] === this.mousePositionInitial[1]
             ) {
-                this._collectSelectedElementsService.resetSelectedArcs();
-            } else {
                 const rects = document.getElementsByTagName('svg')[0];
                 const rect = rects.getElementById(
                     `${this.activity.dfgId}_${this.activity.id}`,
