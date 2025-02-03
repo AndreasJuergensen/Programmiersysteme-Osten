@@ -18,7 +18,7 @@ import {
     RecentEventLog,
 } from 'src/app/services/petri-net-management.service';
 import { EventLogDialogComponent } from '../event-log-dialog/event-log-dialog.component';
-import { combineLatest, filter, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import {
     CutType,
@@ -181,46 +181,29 @@ class ExecutingCut {
         applicationStateService.isArcFeedbackReady$.subscribe(
             (isArcFeedbackReady) => {
                 this.isArcFeedbackReady = isArcFeedbackReady;
+                if (
+                    this.selectedCutType != undefined &&
+                    this.collectedArcs.getArcs().length > 0
+                ) {
+                    this.collectSelectedElementsService.setArcFeedback(
+                        this.selectedCutType,
+                    );
+                    if (this.showArcFeedback) {
+                        this.collectSelectedElementsService.enableArcFeedback();
+                        this.feedbackService.showMessage(
+                            'Arc Feedback Calculation finished!',
+                            false,
+                        );
+                    }
+                }
             },
         );
-        applicationStateService.collectedArcs$.subscribe((collectedArcs) => {
-            this.collectedArcs = collectedArcs;
-        });
+
         applicationStateService.showArcFeedback$.subscribe(
             (showArcFeedback) => {
                 this.showArcFeedback = showArcFeedback;
             },
         );
-
-        combineLatest([
-            applicationStateService.isArcFeedbackReady$,
-            applicationStateService.showArcFeedback$,
-            applicationStateService.collectedArcs$,
-        ])
-            .pipe(
-                filter(
-                    ([isArcFeedbackReady, showArcFeedback, collectedArcs]) =>
-                        isArcFeedbackReady &&
-                        showArcFeedback &&
-                        collectedArcs.getArcs().length > 0,
-                ),
-            )
-            .subscribe(
-                ([isArcFeedbackReady, showArcFeedback, collectedArcs]) => {
-                    this.isArcFeedbackReady = isArcFeedbackReady;
-                    this.showArcFeedback = showArcFeedback;
-                    this.collectedArcs = collectedArcs;
-
-                    if (this.selectedCutType != undefined) {
-                        this.collectSelectedElementsService.setArcFeedback(
-                            this.selectedCutType,
-                        );
-                    }
-                    if (this.showArcFeedback) {
-                        this.collectSelectedElementsService.enableArcFeedback();
-                    }
-                },
-            );
     }
 
     executeExclusiveCut(): void {
@@ -240,11 +223,8 @@ class ExecutingCut {
     }
 
     private executeCut(cutType: CutType): void {
-        this.applicationStateService.resetCollectedArcs();
         this.selectedCutType = cutType;
-        this.applicationStateService.setCollectedArcs(
-            this.collectSelectedElementsService.collectedArcs,
-        );
+        this.collectedArcs = this.collectSelectedElementsService.collectedArcs;
 
         if (
             this.collectSelectedElementsService.currentCollectedArcsDFG ==
@@ -256,7 +236,6 @@ class ExecutingCut {
             );
             return;
         }
-        console.log('execute cut');
 
         if (
             !this.executeCutService.execute(
@@ -270,7 +249,18 @@ class ExecutingCut {
                     "Arc Feedback Calculation isn't ready yet. Just wait some seconds for the arcs to be marked.",
                     true,
                 );
+            } else if (this.isArcFeedbackReady && this.showArcFeedback) {
+                this.collectSelectedElementsService.setArcFeedback(
+                    this.selectedCutType,
+                );
+                this.collectSelectedElementsService.enableArcFeedback();
+            } else if (this.isArcFeedbackReady && !this.showArcFeedback) {
+                this.collectSelectedElementsService.setArcFeedback(
+                    this.selectedCutType,
+                );
             }
+        } else {
+            this.selectedCutType = undefined;
         }
         this.contextMenuService.hide();
     }
