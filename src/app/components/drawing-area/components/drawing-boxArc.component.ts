@@ -154,10 +154,6 @@ export class DrawingBoxArcComponent {
 
     ngOnInit() {
         this.arcId = `arc_${this.boxArc.start.id}_${this.boxArc.end.id}`;
-        this.collectSelectedElementsService.setArcClassListAttributes(
-            this.arcId,
-            'visiblePath',
-        );
     }
 
     getId(boxArc: Arc): string {
@@ -170,12 +166,13 @@ export class DrawingBoxArcComponent {
             this.collectSelectedElementsService.getArcClassListAttributes(
                 this.arcId,
             )!;
+        if (attributes) {
+            attributes.forEach((attribute) => {
+                classListAttributes = `${classListAttributes} ${attribute}`;
+            });
+        }
 
-        attributes.forEach((attribute) => {
-            classListAttributes = `${classListAttributes} ${attribute}`;
-        });
-
-        return classListAttributes;
+        return `visiblePath ${classListAttributes}`;
     }
 
     urlForMarker(): string {
@@ -311,6 +308,10 @@ export class DrawingBoxArcComponent {
                 this.collectSelectedElementsService.toggleArcClassListAttributes(
                     this.arcId,
                     'active',
+                );
+                this.collectSelectedElementsService.removeArcClassListAttributes(
+                    this.arcId,
+                    'hovered',
                 );
             }
             if (line.classList.contains('correct')) {
