@@ -83,6 +83,7 @@ export class CalculateCoordinatesService {
             yCoordinate += index * gapY;
 
             let i = 1;
+            let j = 1;
             for (let a of path) {
                 const activity = dfg.activities.getActivityByName(a);
 
@@ -99,12 +100,40 @@ export class CalculateCoordinatesService {
                 }
 
                 if (this.IsNodeAlreadyModeled(nodes, stackElement)) {
+                    j++;
                     continue;
                 }
 
+                let xCoordinate = stackElement.source_x + i * gapX;
+
+                if (j > 1) {
+                    const indexOfCurrentElement = path.indexOf(a);
+
+                    const previousNode = nodes.find(
+                        (n) => n.id === path[indexOfCurrentElement - 1],
+                    );
+                    if (previousNode) {
+                        const previousNodeIsOnLowerLevel =
+                            previousNode.y < yCoordinate;
+
+                        const previousNodeIsMoreRight =
+                            previousNode.x > xCoordinate;
+
+                        if (
+                            previousNodeIsOnLowerLevel &&
+                            previousNodeIsMoreRight
+                        ) {
+                            xCoordinate = previousNode.x;
+                        }
+                    }
+                }
+                // Start Node wurde bereits modelliert und befindet sich auf einer höheren y-Ebene
+                // End Node ist der aktuelle Node
+                //
+
                 const activityAsNode = new ActivityNode(
                     stackElement.activity.name,
-                    stackElement.source_x + i * gapX,
+                    xCoordinate,
                     yCoordinate,
                     dfg.id,
                 );
@@ -113,6 +142,7 @@ export class CalculateCoordinatesService {
                 xOfLastModeledNode = activityAsNode.x;
 
                 i++;
+                j++;
             }
 
             i = 1;
@@ -320,7 +350,7 @@ export class CalculateCoordinatesService {
             p.shift();
         });
 
-        dfg.longestPath = Math.max(...allPaths.map(p => p.length));
+        dfg.longestPath = Math.max(...allPaths.map((p) => p.length));
         return allPaths;
     }
 }

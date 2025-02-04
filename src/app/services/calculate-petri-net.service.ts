@@ -204,6 +204,7 @@ export class CalculatePetriNetService {
             yCoordinate += index * gapY;
 
             let i = 0;
+            let j = 1;
             for (let p of pathWithLength.path) {
                 let workItem: Place | PetriNetTransition;
 
@@ -231,6 +232,7 @@ export class CalculatePetriNetService {
                 }
 
                 if (this.IsNodeAlreadyModeled(nodes, stackElement)) {
+                    j++;
                     continue;
                 }
 
@@ -239,6 +241,31 @@ export class CalculatePetriNetService {
                     gapX,
                     yCoordinate,
                 );
+
+                if (j > 1) {
+                    const indexOfCurrentElement =
+                        pathWithLength.path.indexOf(p);
+
+                    const previousNode = nodes.find(
+                        (n) =>
+                            n.id ===
+                            pathWithLength.path[indexOfCurrentElement - 1],
+                    );
+
+                    if (previousNode) {
+                        const previousNodeIsOnLowerLevel =
+                            previousNode.y < yCoordinate;
+                        const previousNodeIsMoreRight =
+                            previousNode.x > generatedNode.x;
+                        if (
+                            previousNodeIsOnLowerLevel &&
+                            previousNodeIsMoreRight
+                        ) {
+                            generatedNode.x = previousNode.x;
+                        }
+                    }
+                }
+
                 nodes.push(generatedNode);
 
                 xOfLastModeledNode = generatedNode.getXOffset();
@@ -249,6 +276,7 @@ export class CalculatePetriNetService {
                 }
 
                 i++;
+                j++;
             }
 
             i = 0;
