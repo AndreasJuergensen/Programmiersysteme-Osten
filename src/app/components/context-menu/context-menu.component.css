@@ -57,6 +57,7 @@
         }
         div {
             flex-grow: 1;
+            padding: 10px 0px 10px 0px;
         }
     }
 
@@ -133,17 +134,13 @@
             .legend-menu {
                 display: flex !important;
                 position: absolute;
-                top: 0;
+                top: auto;
                 left: 100%;
+                right: unset;
+                bottom: 0px;
                 background-color: #f2e0e9;
                 border: 1px dashed grey;
                 border-radius: 4%;
-
-                .hr-legend-menu {
-                    height: 0px;
-                    border-top: 1px dotted #ff007798;
-                    margin-top: 15px;
-                }
             }
         }
     }
@@ -178,11 +175,22 @@
         }
     }
 
+    .legend-menu-wrapper {
+        &:not(.disabled):hover {
+            .legend-menu {
+                left: unset;
+                right: 100%;
+            }
+        }
+    }
+
     .sub-sub-menu-wrapper {
         &:not(.disabled):hover {
             .sub-sub-menu {
                 left: unset;
                 right: 100%;
+                top: 0;
+                position: absolute;
             }
         }
     }
