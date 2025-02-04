@@ -44,7 +44,7 @@ export class ExecuteCutService {
         }[] = dfg.canBeCutBy(selectedArcs, selectedCut);
         if (cutFeasibilityResults.length === 1) {
             this._feedbackService.showMessage(
-                'Not a valid Cut! Please try another arc-combination or another cut. ' +
+                'Not a valid cut! Please try another arc-combination or another cut type. ' +
                     "If you aren't sure which arcs need to be selected, " +
                     'the arc feedback via context-menu might help.',
                 true,
@@ -64,7 +64,7 @@ export class ExecuteCutService {
                 cutFeasibilityResults[i].matchingCut === selectedCut
             ) {
                 this._feedbackService.showMessage(
-                    'Too many arcs selected. Please deselect irrelevant arcs.',
+                    'Selection includes a valid cut. Please deselect irrelevant arcs.',
                     true,
                 );
                 return false;

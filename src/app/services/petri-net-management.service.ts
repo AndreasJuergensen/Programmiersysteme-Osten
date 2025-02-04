@@ -15,6 +15,7 @@ export interface RecentEventLog {
     providedIn: 'root',
 })
 export class PetriNetManagementService {
+    private _firstInitialization: boolean = true;
     private _petriNet: PetriNet = new PetriNet();
     private _previousPetriNets: PetriNet[] = [];
     private _isModifiable: boolean = false;
@@ -29,6 +30,15 @@ export class PetriNetManagementService {
     constructor(private _showFeedbackService: ShowFeedbackService) {}
 
     public initialize(dfg: Dfg, filename?: string): void {
+        if (this._firstInitialization) {
+            this._firstInitialization = false;
+            this._showFeedbackService.showMessage(
+                'Select arcs in DFG to define a cut, select activity ' +
+                    'or DFG to define a fall-through and execute desired ' +
+                    'operation via context-menu',
+                false,
+            );
+        }
         const eventLog: string = dfg.eventLog.toString();
         this._initialEventLog = eventLog;
         this.updateRecentEventLogs(eventLog, filename);
@@ -48,7 +58,10 @@ export class PetriNetManagementService {
     }
 
     private updateRecentEventLogs(eventLog: string, filename?: string): void {
-        const recentEventLog: RecentEventLog = { eventLog: eventLog, name: filename ? filename : this.display(eventLog) };
+        const recentEventLog: RecentEventLog = {
+            eventLog: eventLog,
+            name: filename ? filename : this.display(eventLog),
+        };
         const recentEventLogs = [...this._recentEventLogs$.value];
         const newLength = recentEventLogs.unshift(recentEventLog);
         if (newLength > 5) recentEventLogs.pop();
