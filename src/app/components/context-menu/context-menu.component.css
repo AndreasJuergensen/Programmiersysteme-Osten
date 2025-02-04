@@ -57,6 +57,7 @@
         }
         div {
             flex-grow: 1;
+            padding: 10px 0px 10px 0px;
         }
     }
 
@@ -140,12 +141,6 @@
                 background-color: #f2e0e9;
                 border: 1px dashed grey;
                 border-radius: 4%;
-
-                .hr-legend-menu {
-                    height: 0px;
-                    border-top: 1px dotted #ff007798;
-                    margin-top: 15px;
-                }
             }
         }
     }
