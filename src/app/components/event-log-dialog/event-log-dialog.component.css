@@ -1,3 +1,57 @@
+* {
+    font-family: "Courier New", sans-serif !important;
+}
+
+h2 {
+    font-weight: bold !important;
+}
+
+button[mat-stroked-button] {
+    color: #d42f7c;
+}
+button[mat-stroked-button].cancel {
+    color: #000000 !important;
+    border: 1px solid #000000;
+}
+
+button[mat-stroked-button].clear {
+    border: 1px solid #d42f7c !important;
+}
+
+button[mat-stroked-button].submit {
+    background-color: #f2d4e2 !important;
+    border: 1px solid #d42f7c !important;
+}
+
+button[mat-stroked-button].clear:disabled {
+    color: #a9a9a9;
+    background-color: #ffffff;
+    cursor: not-allowed;
+    border: 1px solid #a9a9a9 !important;
+}
+
+button[mat-stroked-button].submit:disabled {
+    color: #a9a9a9;
+    background-color: #ffffff !important;
+    cursor: not-allowed;
+    border: 1px solid #a9a9a9 !important;
+}
+
+button[mat-stroked-button].submit:hover {
+    background-color: #af899b !important;
+    color: #ffe9fb !important;
+}
+
+.mat-primary {
+    --mat-full-pseudo-checkbox-selected-icon-color: none !important;
+    --mat-minimal-pseudo-checkbox-selected-checkmark-color: none !important;
+}
+
+::ng-deep html {
+    --mdc-filled-text-field-focus-active-indicator-color: none !important;
+    --mdc-filled-text-field-focus-label-text-color: none !important;
+}
+
 .file-input {
     display: none;
 }

@@ -1,11 +1,7 @@
 <h2 mat-dialog-title>Event-Log Input</h2>
 <mat-dialog-content class="mat-typography">
     <form (ngSubmit)="onOkClick()">
-        <mat-form-field
-            style="width: 100%"
-            hintLabel="Activities per trace may concatenated by exactly one whitespace.
-                Traces may concatenated by a plus (+). Empty input and multiplicity-patterns like '3*A' or 'B*4' can't be used."
-        >
+        <mat-form-field style="width: 100%">
             <mat-label>Enter Event-Log here!</mat-label>
             <textarea
                 matInput
@@ -18,53 +14,56 @@
                 (keydown)="onKeyDown($event)"
                 #textarea
             ></textarea>
+            <mat-hint
+                >Activities per trace may concatenated by exactly one
+                whitespace. Traces may concatenated by a plus (+). Empty input
+                and multiplicity-patterns like '3*A' or 'B*4' can't be
+                used.</mat-hint
+            >
             <mat-error
                 *ngIf="
                     eventLogControl.hasError('required') &&
                     eventLogControl.dirty
                 "
-            >
-                There is no empty input allowed!
+                >There is no empty input allowed!
             </mat-error>
-            <mat-error *ngIf="eventLogControl.hasError('multiplicityRegEx')">
-                The Input of multiplicity-patterns through a "*" is not
+            <mat-error *ngIf="eventLogControl.hasError('multiplicityRegEx')"
+                >The Input of multiplicity-patterns through a "*" is not
                 possible.
             </mat-error>
-            <mat-error *ngIf="eventLogControl.hasError('invalidInput')">
-                Invalid Input! Reason: A plus at the beginning or the end of the
-                string, too many whitespaces in a row between activities or too
-                many plus signs.
+            <mat-error *ngIf="eventLogControl.hasError('invalidInput')"
+                >Invalid Input! Reason: A plus at the beginning or the end of
+                the string, too many whitespaces in a row between activities or
+                too many plus signs.
             </mat-error>
         </mat-form-field>
         <mat-dialog-actions align="end">
             <button
-                mat-fab
-                extended
+                mat-stroked-button
                 mat-dialog-close
                 color=""
                 matTooltip="Close Dialog"
+                class="cancel"
             >
                 Cancel
             </button>
             <button
-                mat-fab
-                extended
+                mat-stroked-button
                 matTooltip="Clear the text input"
                 [disabled]="eventLogControl.value === ''"
                 (click)="clearTextarea(textarea)"
-                color="accent"
+                class="clear"
             >
                 Clear
             </button>
             <button
-                mat-fab
-                extended
+                mat-stroked-button
                 matTooltip="You can also press Ctrl + Enter to submit."
                 type="submit"
                 [disabled]="eventLogControl.invalid"
-                color="primary"
+                class="submit"
             >
-                Ok
+                Submit
             </button>
         </mat-dialog-actions>
     </form>
