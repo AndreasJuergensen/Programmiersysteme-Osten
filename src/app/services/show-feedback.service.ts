@@ -11,7 +11,7 @@ export class ShowFeedbackService {
     showMessage(message: string, isError: boolean): void {
         this.snackbar.openFromComponent(CustomSnackbarPopupComponent, {
             data: { message, isError },
-            duration: isError ? 0 : 10000,
+            duration: isError ? 0 : 13000,
             panelClass: isError ? 'error-snackbar' : 'success-snackbar',
             horizontalPosition: 'right',
             verticalPosition: 'top',
