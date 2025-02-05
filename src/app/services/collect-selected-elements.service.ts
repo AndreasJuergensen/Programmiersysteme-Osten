@@ -6,6 +6,7 @@ import { Arc } from '../components/drawing-area/models';
 import { PetriNetManagementService } from './petri-net-management.service';
 import { Activity } from '../classes/dfg/activities';
 import { CutType } from './execute-cut.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -19,6 +20,8 @@ export class CollectSelectedElementsService {
     private _currentCollectedArcsDFG: Dfg | undefined;
     private _selectedActivity: Activity | undefined;
     private _selectedDFGBox: Dfg | undefined;
+    private _isElementSelected$: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false);
 
     private _arcClassListAttributes: Map<string, string[]> = new Map<
         string,
@@ -50,6 +53,22 @@ export class CollectSelectedElementsService {
         return this._selectedDFGBox === undefined
             ? undefined
             : this._selectedDFGBox;
+    }
+
+    get isElementSelected$() {
+        return this._isElementSelected$.asObservable();
+    }
+
+    isAnyElementSelected(): void {
+        if (
+            this._currentCollectedArcsDFG !== undefined ||
+            this._selectedActivity !== undefined ||
+            this._selectedDFGBox !== undefined
+        ) {
+            this._isElementSelected$.next(true);
+            return;
+        }
+        this._isElementSelected$.next(false);
     }
 
     /**
@@ -112,6 +131,7 @@ export class CollectSelectedElementsService {
             this._selectedActivity.name === activityName
         ) {
             this._selectedActivity = undefined;
+            this.isAnyElementSelected();
             return;
         }
         for (const dfg of this._petriNet.getDFGs()) {
@@ -120,6 +140,7 @@ export class CollectSelectedElementsService {
                     dfg.activities.getActivityByName(activityName);
             }
         }
+        this.isAnyElementSelected();
     }
 
     public setArcFeedback(selectedCut: CutType): void {
@@ -140,6 +161,7 @@ export class CollectSelectedElementsService {
             this._selectedDFGBox.id === clickedBoxName
         ) {
             this._selectedDFGBox = undefined;
+            this.isAnyElementSelected();
             return;
         }
         for (const dfg of this._petriNet.getDFGs()) {
@@ -147,6 +169,7 @@ export class CollectSelectedElementsService {
                 this._selectedDFGBox = dfg;
             }
         }
+        this.isAnyElementSelected();
     }
 
     public resetSelectedElements(): void {
@@ -158,6 +181,7 @@ export class CollectSelectedElementsService {
     resetSelectedArcs(): void {
         this._collectedArcs = new Arcs();
         this._currentCollectedArcsDFG = undefined;
+        this.isAnyElementSelected();
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
@@ -180,6 +204,7 @@ export class CollectSelectedElementsService {
 
     resetSelectedActivity(): void {
         this._selectedActivity = undefined;
+        this.isAnyElementSelected();
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
@@ -194,6 +219,7 @@ export class CollectSelectedElementsService {
 
     resetSelectedDFGBox(): void {
         this._selectedDFGBox = undefined;
+        this.isAnyElementSelected();
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
@@ -395,6 +421,7 @@ export class CollectSelectedElementsService {
         } else {
             this._currentCollectedArcsDFG = this.getDFG(arc);
         }
+        this.isAnyElementSelected();
     }
 
     private getDFG(arc: Arc): Dfg | undefined {

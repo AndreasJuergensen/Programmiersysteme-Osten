@@ -30,7 +30,9 @@ export class FallThroughHandlingService {
             this._collectSelectedElementsService.selectedActivity;
         if (activity === undefined) {
             this._showFeedbackService.showMessage(
-                'An Activity need to be selected first.',
+                'Please select the activity you want to detach first.' +
+                    "If you aren't sure which one fulfills the AOPT-property, " +
+                    'showing the event logs via context-menu might help.',
                 true,
             );
             return;
@@ -39,7 +41,7 @@ export class FallThroughHandlingService {
             if (dfg.activities.containsActivity(activity)) {
                 if (dfg.canBeCutByAnyPartitions()) {
                     this._showFeedbackService.showMessage(
-                        'Another cut can be performed in the selected DFG, try this first.',
+                        'Another cut can be performed in the DFG which the selected activity belongs to, try this first.',
                         true,
                     );
                     return;
@@ -61,13 +63,13 @@ export class FallThroughHandlingService {
                         return;
                     }
                     this._showFeedbackService.showMessage(
-                        'Activity-Once-Per-Trace Fall-Through executed',
+                        'Activity-Once-Per-Trace fall-through executed.',
                         false,
                     );
                     return;
                 }
                 this._showFeedbackService.showMessage(
-                    'Activity-Once-Per-Trace Fall-Through is not valid for the selected activity',
+                    'Activity-Once-Per-Trace fall-through is not valid for the selected activity.',
                     true,
                 );
                 return;
@@ -80,7 +82,7 @@ export class FallThroughHandlingService {
             this._collectSelectedElementsService.selectedDFG;
         if (dfg === undefined) {
             this._showFeedbackService.showMessage(
-                'A DFG-Box need to be selected first.',
+                "Please select a DFG by clicking on it's border first.",
                 true,
             );
             return;
@@ -97,7 +99,7 @@ export class FallThroughHandlingService {
             for (const activity of trace.getAllActivities()) {
                 if (eventLog.activityOncePerTraceIsPossibleBy(activity)) {
                     this._showFeedbackService.showMessage(
-                        'Another Fall-Through can be performed in this DFG, try this first.',
+                        'Another fall-through can be performed in the selected DFG, try this first.',
                         true,
                     );
                     return;
@@ -118,7 +120,7 @@ export class FallThroughHandlingService {
             return;
         }
         this._showFeedbackService.showMessage(
-            'Flower-Model Fall-Through executed',
+            'Flower-Model fall-through executed.',
             false,
         );
         return;

@@ -88,6 +88,7 @@ export class ContextMenuComponent implements OnInit {
         this.disabling = new Disabling(
             applicationStateService,
             petriNetManagementService,
+            collectSelectedElementsService,
         );
         this.examples = new Examples(
             petriNetManagementService,
@@ -231,7 +232,7 @@ class ExecutingCut {
             undefined
         ) {
             this.feedbackService.showMessage(
-                'No arc selected via the drawing area!',
+               "Please select arcs in a DFG by clicking or click-hovering them, to define a cut first.",
                 true,
             );
             return;
@@ -602,10 +603,12 @@ class Disabling {
     private isInputPetriNet: boolean = false;
     private hasRecentEventLogs: boolean = false;
     private isArcFeedbackReady: boolean = false;
+    private isElementSelected: boolean = false;
 
     constructor(
         readonly applicationStateService: ApplicationStateService,
         readonly petriNetManagementService: PetriNetManagementService,
+        readonly collectSelectedElementsService: CollectSelectedElementsService,
     ) {
         applicationStateService.isPetriNetEmpty$.subscribe(
             (isPetriNetEmpty) => {
@@ -632,6 +635,11 @@ class Disabling {
                 this.isArcFeedbackReady = isArcFeedbackReady;
             },
         );
+        collectSelectedElementsService.isElementSelected$.subscribe(
+            (isElementSelected) => {
+                this.isElementSelected = isElementSelected;
+            },
+        );
     }
 
     isExportDisabled(): boolean {
@@ -639,7 +647,7 @@ class Disabling {
     }
 
     isResetSelectionDisabled(): boolean {
-        return this.isPetriNetEmpty || this.isBasicPetriNet;
+        return !this.isElementSelected;
     }
 
     isExecuteCutDisabled(): boolean {
