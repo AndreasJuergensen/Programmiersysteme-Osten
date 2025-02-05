@@ -32,7 +32,7 @@ export class PetriNetManagementService {
     public initialize(dfg: Dfg, filename?: string): void {
         if (this._firstInitialization) {
             this._firstInitialization = false;
-            this._showFeedbackService.showMessage(
+            this._showFeedbackService.showInitialMessage(
                 'Select arcs in DFG to define a cut, select activity ' +
                     'or DFG to define a fall-through and execute desired ' +
                     'operation via context-menu',

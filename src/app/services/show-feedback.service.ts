@@ -17,4 +17,14 @@ export class ShowFeedbackService {
             verticalPosition: 'top',
         });
     }
+
+    showInitialMessage(message: string, isError: boolean): void {
+        this.snackbar.openFromComponent(CustomSnackbarPopupComponent, {
+            data: { message, isError },
+            duration: isError ? 0 : 0,
+            panelClass: isError ? 'error-snackbar' : 'success-snackbar',
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+        });
+    }
 }
