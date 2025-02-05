@@ -220,6 +220,31 @@ export class DrawingActivityComponent {
         });
     }
 
+    ngAfterViewInit() {
+        if (this._collectSelectedElementsService.selectedActivity) {
+            if (
+                this._collectSelectedElementsService.selectedActivity.name ===
+                this.activity.id
+            ) {
+                const svg: SVGSVGElement = document.getElementsByTagName(
+                    'svg',
+                )[0] as SVGSVGElement;
+                const rect = svg.getElementById(
+                    `${this.activity.dfgId}_${this.activity.id}`,
+                ) as SVGRectElement;
+
+                if (svg) {
+                    const activities = svg.querySelectorAll('rect');
+                    activities.forEach((activity) => {
+                        if (rect === activity) {
+                            activity.classList.add('activity-marked');
+                        }
+                    });
+                }
+            }
+        }
+    }
+
     @HostListener('mousedown', ['$event'])
     onMouseDown(event: MouseEvent) {
         if (event.button === 0) {
