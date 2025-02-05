@@ -5,7 +5,7 @@ import {
     PetriNetTransition,
     PetriNetTransitions,
 } from './petri-net-transitions';
-import { EventLog } from '../event-log';
+import { Activities } from '../dfg/activities';
 
 export class PetriNet {
     private readonly _places: Places = new Places();
@@ -95,6 +95,22 @@ export class PetriNet {
             originDFG,
             subDFG1,
         );
+        if (
+            this.previousEventLogContainsTraceIncludingOnlyActivitiesFromPartition(
+                subDFG1.activities,
+                originDFG,
+            )
+        ) {
+            this._arcs
+                .addPlaceToTransitionArc(
+                    this.arcs.getPrevPlace(firstReplacingTransition),
+                    this._transitions.createTransition('').getLastTransition(),
+                )
+                .addTransitionToPlaceArc(
+                    this._transitions.getLastTransition(),
+                    this._arcs.getNextPlace(firstReplacingTransition),
+                );
+        }
         this._arcs.addTransitionToPlaceArc(
             this._arcs.getPrevTransition(
                 this._arcs.getPrevPlace(firstReplacingTransition),
@@ -119,7 +135,42 @@ export class PetriNet {
                     this._arcs.getNextPlace(firstReplacingTransition),
                 ),
             );
+        if (
+            this.previousEventLogContainsTraceIncludingOnlyActivitiesFromPartition(
+                subDFG2.activities,
+                originDFG,
+            )
+        ) {
+            this._arcs
+                .addPlaceToTransitionArc(
+                    this._arcs.getPrevPlace(secondReplacingTransition),
+                    this._transitions.createTransition('').getLastTransition(),
+                )
+                .addTransitionToPlaceArc(
+                    this._transitions.getLastTransition(),
+                    this._arcs.getNextPlace(secondReplacingTransition),
+                );
+        }
         return this;
+    }
+
+    previousEventLogContainsTraceIncludingOnlyActivitiesFromPartition(
+        partition: Activities,
+        dfg: Dfg,
+    ) {
+        for (const trace of dfg.eventLog.getAllTraces()) {
+            let containsActivity: boolean = false;
+            for (const activity of trace.activities) {
+                if (partition.containsActivity(activity)) {
+                    containsActivity = true;
+                    break;
+                }
+            }
+            if (!containsActivity) {
+                return true;
+            }
+        }
+        return false;
     }
 
     updateByLoopCut(originDFG: Dfg, subDFG1: Dfg, subDFG2: Dfg): PetriNet {
