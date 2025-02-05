@@ -271,7 +271,7 @@ export class DrawingBoxArcComponent {
                         );
                     } else {
                         this.feedbackService.showMessage(
-                            'Arc not in same DFG',
+                            'Arcs can be selected in one DFG only. Please reset selection first.',
                             true,
                         );
                     }
@@ -349,7 +349,10 @@ export class DrawingBoxArcComponent {
             }
             this.collectSelectedElementsService.updateCollectedArcs(arc);
         } else {
-            this.feedbackService.showMessage('Arc not in same DFG', true);
+            this.feedbackService.showMessage(
+                'Arcs can be selected in one DFG only. Please reset selection first.',
+                true,
+            );
         }
     }
 
