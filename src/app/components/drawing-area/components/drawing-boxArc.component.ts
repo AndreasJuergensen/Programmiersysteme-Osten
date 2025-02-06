@@ -94,10 +94,10 @@ import { PetriNetManagementService } from 'src/app/services/petri-net-management
 
         <svg:path
             [attr.d]="setPath(boxArc)"
-            [attr.stroke-width]="10"
+            [attr.stroke-width]="15"
             [attr.fill]="'none'"
             fill="transparent"
-            pointer-events="all"
+            pointer-events="stroke"
             (pointerenter)="changeLineColorOver($event, boxArc)"
             (pointerleave)="changeLineColorOut($event)"
             (click)="onLineClick($event, boxArc)"
@@ -110,6 +110,7 @@ import { PetriNetManagementService } from 'src/app/services/petri-net-management
             [attr.stroke-width]="width"
             [attr.fill]="'none'"
             [attr.marker-end]="urlForMarker()"
+            pointer-events="none"
         ></svg:path>
     `,
     styles: `
