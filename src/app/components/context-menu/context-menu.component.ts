@@ -147,6 +147,21 @@ export class ContextMenuComponent implements OnInit {
         document
             .getElementById('drawingArea')
             ?.addEventListener('scroll', hide);
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 's') {
+                this.executingCut.executeSequenceCut();
+            } else if (event.key === 'p') {
+                this.executingCut.executeParallelCut();
+            } else if (event.key === 'e') {
+                this.executingCut.executeExclusiveCut();
+            } else if (event.key === 'l') {
+                this.executingCut.executeLoopCut();
+            } else if (event.key === '1') {
+                this.executingFallThrough.executeActivityOncePerTraceFallThrough();
+            } else if (event.key === 'f') {
+                this.executingFallThrough.executeFlowerModelFallThrough();
+            }
+        });
     }
 }
 
