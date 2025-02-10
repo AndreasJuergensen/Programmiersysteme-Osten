@@ -475,7 +475,7 @@ class Examples {
             new Trace([new Activity('Request')]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "Exclusive Cut Example");
     }
 
     generateSequenceExample(): void {
@@ -492,7 +492,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "Sequence Cut Example");
     }
 
     public generateParallelExample(): void {
@@ -501,7 +501,7 @@ class Examples {
             new Trace([new Activity('Order'), new Activity('Request')]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "Parallel Cut Example");
     }
 
     generateLoopExample(): void {
@@ -515,7 +515,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "Loop Cut Example");
     }
 
     public generateAOPTExample(): void {
@@ -533,7 +533,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "AOPT Example");
     }
 
     public generateFlowerExample(): void {
@@ -551,7 +551,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "Flower Model Example");
     }
 
     public generateFUHProcessMiningExample(): void {
@@ -594,13 +594,13 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "FUH Example");
     }
 
-    private initializePetriNet(eventLog: EventLog): void {
+    private initializePetriNet(eventLog: EventLog, name: string): void {
         Dfg.resetIdCount();
         const dfg: Dfg = this._calculateDfgService.calculate(eventLog);
-        this._petriNetManagementService.initialize(dfg);
+        this._petriNetManagementService.initialize(dfg, name);
         this._contextMenuService.hide();
     }
 }
