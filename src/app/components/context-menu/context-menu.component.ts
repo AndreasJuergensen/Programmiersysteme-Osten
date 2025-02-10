@@ -116,6 +116,7 @@ export class ContextMenuComponent implements OnInit {
         this.resettingSelection = new ResettingSelection(
             collectSelectedElementsService,
             contextMenuService,
+            this.disabling,
         );
         this.executingCut = new ExecutingCut(
             executeCutService,
@@ -256,7 +257,7 @@ class ExecutingCut {
             undefined
         ) {
             this.feedbackService.showMessage(
-               "Please select arcs in a DFG by clicking or click-hovering them, to define a cut first.",
+                'Please select arcs in a DFG by clicking or click-hovering them, to define a cut first.',
                 true,
             );
             return;
@@ -294,9 +295,11 @@ class ResettingSelection {
     constructor(
         private collectSelectedElementsService: CollectSelectedElementsService,
         private contextMenuService: ContextMenuService,
+        private disabling: Disabling,
     ) {}
 
     resetSelection() {
+        if (this.disabling.isResetSelectionDisabled()) return;
         this.collectSelectedElementsService.resetSelectedElements();
         this.contextMenuService.hide();
     }
@@ -318,7 +321,9 @@ class ShowingEventLog {
     }
 
     buttonText(): string {
-        return this.showEventLogs ? 'Hide Event Logs (t)' : 'Show Event Logs (t)';
+        return this.showEventLogs
+            ? 'Hide Event Logs (t)'
+            : 'Show Event Logs (t)';
     }
 
     toggleEventLogs() {
@@ -344,7 +349,9 @@ class ShowingArcFeedback {
     }
 
     buttonText(): string {
-        return this.showArcFeedback ? 'Hide Arc Feedback (a)' : 'Show Arc Feedback (a)';
+        return this.showArcFeedback
+            ? 'Hide Arc Feedback (a)'
+            : 'Show Arc Feedback (a)';
     }
 
     toggleArcFeedback() {
