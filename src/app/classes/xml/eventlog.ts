@@ -1,4 +1,4 @@
-import { Trace, TraceXml } from "./trace";
+import { Trace, TraceXml } from './trace';
 
 export interface EventLogXml {
     trace: TraceXml[];
@@ -17,9 +17,12 @@ export class EventLog {
     }
 
     toString(): string {
-        return this.eventLogXml.trace
-            .map(this.traceFactory)
-            .map((trace) => trace.toString())
-            .join(' +\n');
+        return [
+            ...new Set(
+                this.eventLogXml.trace
+                    .map(this.traceFactory)
+                    .map((trace) => trace.toString()),
+            ),
+        ].join(' +\n');
     }
 }
