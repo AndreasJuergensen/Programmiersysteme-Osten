@@ -78,8 +78,8 @@ export class ContextMenuComponent implements OnInit {
                     ? position.x - 230
                     : position.x + 2;
             const yPosition =
-                position.y > window.innerHeight - 407
-                    ? window.innerHeight - 407
+                position.y > window.innerHeight - 448
+                    ? window.innerHeight - 448
                     : position.y;
             this.position = { x: xPosition + 'px', y: yPosition + 'px' };
             this.isRightToLeft = position.x > window.innerWidth - 620;
