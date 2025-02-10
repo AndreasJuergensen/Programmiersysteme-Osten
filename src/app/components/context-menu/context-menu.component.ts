@@ -224,6 +224,7 @@ class ExecutingCut {
     }
 
     private executeCut(cutType: CutType): void {
+        this.contextMenuService.hide();
         this.selectedCutType = cutType;
         this.collectedArcs = this.collectSelectedElementsService.collectedArcs;
 
@@ -263,7 +264,6 @@ class ExecutingCut {
         } else {
             this.selectedCutType = undefined;
         }
-        this.contextMenuService.hide();
     }
 }
 
