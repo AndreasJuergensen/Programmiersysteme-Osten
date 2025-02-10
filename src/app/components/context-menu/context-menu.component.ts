@@ -160,6 +160,14 @@ export class ContextMenuComponent implements OnInit {
                 this.executingFallThrough.executeActivityOncePerTraceFallThrough();
             } else if (event.key === 'f') {
                 this.executingFallThrough.executeFlowerModelFallThrough();
+            } else if (event.key === 'u') {
+                this.undoing.undoLastUpdate();
+            } else if (event.key === 'r') {
+                this.resettingSelection.resetSelection();
+            } else if (event.key === 'a') {
+                this.showingArcFeedback.toggleArcFeedback();
+            } else if (event.key === 't') {
+                this.showingEventLog.toggleEventLogs();
             }
         });
     }
@@ -310,7 +318,7 @@ class ShowingEventLog {
     }
 
     buttonText(): string {
-        return this.showEventLogs ? 'Hide Event Logs' : 'Show Event Logs';
+        return this.showEventLogs ? 'Hide Event Logs (t)' : 'Show Event Logs (t)';
     }
 
     toggleEventLogs() {
@@ -336,7 +344,7 @@ class ShowingArcFeedback {
     }
 
     buttonText(): string {
-        return this.showArcFeedback ? 'Hide Arc Feedback' : 'Show Arc Feedback';
+        return this.showArcFeedback ? 'Hide Arc Feedback (a)' : 'Show Arc Feedback (a)';
     }
 
     toggleArcFeedback() {
