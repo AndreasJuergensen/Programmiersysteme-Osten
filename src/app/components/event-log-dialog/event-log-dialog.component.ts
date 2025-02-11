@@ -18,7 +18,6 @@ import { EventLog } from 'src/app/classes/event-log';
 import { EventLogParserService } from 'src/app/services/event-log-parser.service';
 import { CommonModule } from '@angular/common';
 import { EventLogValidationService } from 'src/app/services/event-log-validation.service';
-import { ParseXesService } from 'src/app/services/parse-xes.service';
 
 @Component({
     selector: 'app-event-log-dialog',

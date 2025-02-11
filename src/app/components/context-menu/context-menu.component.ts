@@ -232,7 +232,7 @@ class ExecutingCut {
             undefined
         ) {
             this.feedbackService.showMessage(
-               "Please select arcs in a DFG by clicking or click-hovering them, to define a cut first.",
+                'Please select arcs in a DFG by clicking or click-hovering them, to define a cut first.',
                 true,
             );
             return;
@@ -359,7 +359,12 @@ class DialogOpening {
         filename?: string;
     }): MatDialogRef<EventLogDialogComponent, EventLog> {
         this.contextMenuService.hide();
-        const config: MatDialogConfig = { width: '800px', data: data };
+        const config: MatDialogConfig = {
+            width: '99vw',
+            maxHeight: 'calc(99vh - 30px)',
+            data: data,
+            autoFocus: true,
+        };
         const dialogRef = this.matDialog.open<
             EventLogDialogComponent,
             MatDialogConfig,
