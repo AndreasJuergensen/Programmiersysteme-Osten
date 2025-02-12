@@ -37,6 +37,12 @@ describe('EventLogValidationService False Cases', () => {
         const result = sut.checkForMultiplicityPattern(input);
         expect(result).toBeFalse();
     });
+
+    it('only whitespaces', () => {
+        const input: string = '   ';
+        const result = sut.validateInput(input);
+        expect(result).toBeFalse();
+    });
 });
 
 describe('EventLogValidationService True Cases', () => {
@@ -60,6 +66,18 @@ describe('EventLogValidationService True Cases', () => {
 
     it('too many whitespaces means more than one whitespace betweens Strings 3', () => {
         const input: string = 'A    B   +  C     I';
+        const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
+
+    it('whitespaces at the beginning of the string', () => {
+        const input: string = '  AB C D';
+        const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
+
+    it('whitespaces at the end of the string', () => {
+        const input: string = 'AB C D  ';
         const result = sut.validateInput(input);
         expect(result).toBeTrue();
     });
