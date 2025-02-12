@@ -101,6 +101,30 @@ describe('EventLogValidationService True Cases', () => {
         expect(result).toBeTrue();
     });
 
+    it('checkForMultiplicityPattern 3.0', () => {
+        const input: string = '3*B C D';
+        const result = sut.checkForMultiplicityPattern(input);
+        expect(result).toBeTrue();
+    });
+
+    it('checkForMultiplicityPattern 4.0', () => {
+        const input: string = 'B C D*4';
+        const result = sut.checkForMultiplicityPattern(input);
+        expect(result).toBeTrue();
+    });
+
+    it('checkForMultiplicityPattern with optional ()', () => {
+        const input: string = '5*(B C D)';
+        const result = sut.checkForMultiplicityPattern(input);
+        expect(result).toBeTrue();
+    });
+
+    it('checkForMultiplicityPattern with optional ()', () => {
+        const input: string = '(B C D F)*10';
+        const result = sut.checkForMultiplicityPattern(input);
+        expect(result).toBeTrue();
+    });
+
     it('Small Part of RepairExample.xes', () => {
         const input: string =
             'Register Analyze Defect Analyze Defect Repair (Complex) Repair (Complex) Test Repair Test Repair Inform User Archive Repair + Register Analyze Defect Analyze Defect Repair (Simple) Repair (Simple) Test Repair Test Repair Restart Repair Repair (Simple) Inform User Repair (Simple) Test Repair Test Repair Archive Repair + Register Analyze Defect Analyze Defect Repair (Complex) Repair (Complex) Test Repair Test Repair Inform User Archive Repair + Register Analyze Defect Analyze Defect Repair (Simple) Repair (Simple) Test Repair Test Repair Inform User Archive Repair + Register Analyze Defect Analyze Defect Repair (Complex) Inform User Repair (Complex) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Simple) Inform User Repair (Simple) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Simple) Repair (Simple) Test Repair Inform User Test Repair Restart Repair Repair (Simple) Repair (Simple) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Simple) Repair (Simple) Test Repair Test Repair Inform User + Register Analyze Defect Analyze Defect Repair (Simple) Repair (Simple) Test Repair Test Repair Inform User + Register Analyze Defect Analyze Defect Repair (Complex) Inform User Repair (Complex) Test Repair Test Repair + Register Analyze Defect Analyze Defect Inform User Repair (Simple) Repair (Simple) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Simple) Inform User Repair (Simple) Test Repair Test Repair Restart Repair Repair (Simple) Repair (Simple) Test Repair Test Repair Restart Repair Repair (Simple) Repair (Simple) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Complex) Repair (Complex) Test Repair Test Repair Inform User + Register Analyze Defect Analyze Defect Inform User Repair (Complex) Repair (Complex) Test Repair Test Repair Archive Repair + Register Analyze Defect Analyze Defect Repair (Simple) Repair (Simple) Test Repair Test Repair Restart Repair Repair (Simple) Inform User Repair (Simple) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Complex) Inform User Repair (Complex) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Complex) Repair (Complex) Test Repair Test Repair Inform User + Register Analyze Defect Analyze Defect Repair (Complex) Inform User Repair (Complex) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Simple) Repair (Simple) Test Repair Inform User Test Repair + Register Analyze Defect Analyze Defect Repair (Complex) Repair (Complex) Test Repair Test Repair Inform User + Register Analyze Defect Analyze Defect Repair (Simple) Inform User Repair (Simple) Test Repair Test Repair Restart Repair Repair (Simple) Repair (Simple) Test Repair Test Repair Restart Repair Repair (Simple) Repair (Simple) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Simple) Inform User Repair (Simple) Test Repair Test Repair + Register Analyze Defect Analyze Defect Inform User Repair (Complex) Repair (Complex) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Complex) Repair (Complex) Test Repair Inform User Test Repair + Register Analyze Defect Analyze Defect Repair (Complex) Inform User Repair (Complex) Test Repair Test Repair Archive Repair + Register Analyze Defect Analyze Defect Repair (Complex) Inform User Repair (Complex) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Complex) Repair (Complex) Test Repair Inform User Test Repair + Register Analyze Defect Analyze Defect Repair (Simple) Inform User Repair (Simple) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Complex) Repair (Complex) Test Repair Test Repair Inform User + Register Analyze Defect Analyze Defect Repair (Simple) Repair (Simple) Test Repair Test Repair Restart Repair Repair (Simple) Inform User Repair (Simple) Test Repair Test Repair Restart Repair Repair (Complex) Repair (Complex) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Simple) Repair (Simple) Test Repair Test Repair Inform User + Register Analyze Defect Analyze Defect Repair (Complex) Inform User Repair (Complex) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Simple) Inform User Repair (Simple) Test Repair Test Repair + Register Analyze Defect Analyze Defect Inform User Repair (Complex) Repair (Complex) Test Repair Test Repair + Register Analyze Defect Analyze Defect Repair (Simple) Repair (Simple) Test Repair Test Repair Inform User';
