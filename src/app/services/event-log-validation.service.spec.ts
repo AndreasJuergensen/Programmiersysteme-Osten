@@ -26,18 +26,6 @@ describe('EventLogValidationService False Cases', () => {
         expect(result).toBeFalse();
     });
 
-    it('too many whitespaces means more than one whitespace betweens Strings', () => {
-        const input: string = 'A   B C+ Z   X';
-        const result = sut.validateInput(input);
-        expect(result).toBeFalse();
-    });
-
-    it('too many whitespaces means more than one whitespace betweens Strings  2', () => {
-        const input: string = 'A  B';
-        const result = sut.validateInput(input);
-        expect(result).toBeFalse();
-    });
-
     it('several numbers after each other', () => {
         const input: string = 'A11';
         const result = sut.checkForMultiplicityPattern(input);
@@ -57,6 +45,25 @@ describe('EventLogValidationService True Cases', () => {
     beforeEach(() => {
         sut = new EventLogValidationService();
     });
+
+    it('too many whitespaces means more than one whitespace betweens Strings', () => {
+        const input: string = 'A   B C+ Z   X';
+        const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
+
+    it('too many whitespaces means more than one whitespace betweens Strings 2', () => {
+        const input: string = 'A  B';
+        const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
+
+    it('too many whitespaces means more than one whitespace betweens Strings 3', () => {
+        const input: string = 'A    B   +  C     I';
+        const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
+
     it('valid string / event log ', () => {
         const input: string = 'A B C + X Y Z + Test Test1 Test2';
         const result = sut.validateInput(input);

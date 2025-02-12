@@ -21,8 +21,9 @@ export class EventLogParserService {
     }
 
     private parseTrace(trace: string): Trace {
-        const activities = trace
-            .trim()
+        const normalizedTrace = trace.trim().replace(/[\s\n\r]+/g, ' ');
+
+        const activities = normalizedTrace
             .split(' ')
             .map((activity) => this.parseActivity(activity));
 
