@@ -30,9 +30,7 @@ export class FallThroughHandlingService {
             this._collectSelectedElementsService.selectedActivity;
         if (activity === undefined) {
             this._showFeedbackService.showMessage(
-                'Please select the activity you want to detach first.' +
-                    "If you aren't sure which one fulfills the AOPT-property, " +
-                    'showing the event logs via context-menu might help.',
+                'Please select the activity you want to detach from the event log first.',
                 true,
             );
             return;
@@ -69,7 +67,9 @@ export class FallThroughHandlingService {
                     return;
                 }
                 this._showFeedbackService.showMessage(
-                    'Activity-Once-Per-Trace fall-through is not valid for the selected activity.',
+                    'Activity-Once-Per-Trace fall-through is not valid for the selected activity. ' +
+                        "If you aren't sure which one fulfills the AOPT-property, " +
+                        'showing the event logs via context-menu might help.',
                     true,
                 );
                 return;
