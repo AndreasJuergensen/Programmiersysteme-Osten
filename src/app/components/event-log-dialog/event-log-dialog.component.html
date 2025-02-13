@@ -1,29 +1,29 @@
 <mat-dialog-content class="mat-typography dialog-content">
-    <mat-form-field appearance="fill" class="full-width">
+    <mat-form-field appearance="fill" class="full-width flex-grow-1">
         <textarea
             matInput
             placeholder="Enter your event-log here, e. g.:  A + More Activities + B W Q + Z"
             [formControl]="eventLogControl"
             (keydown)="onKeyDown($event)"
             #textarea
-            rows="15"
         ></textarea>
-        <mat-hint
-            >Activities per trace may concatenated by exactly one whitespace.
+        <mat-hint>
+            Activities per trace may concatenated by exactly one whitespace.
             Traces may concatenated by a plus (+). Empty input and
-            multiplicity-patterns like '3*A' or 'B*4' can't be used.</mat-hint
-        >
+            multiplicity-patterns like '3*A' or 'B*4' can't be used.
+        </mat-hint>
         <mat-error
             *ngIf="
                 eventLogControl.hasError('required') && eventLogControl.dirty
             "
-            >There is no empty input allowed!
+        >
+            There is no empty input allowed!
         </mat-error>
-        <mat-error *ngIf="eventLogControl.hasError('multiplicityRegEx')"
-            >The Input of multiplicity-patterns through a "*" is not possible.
+        <mat-error *ngIf="eventLogControl.hasError('multiplicityRegEx')">
+            The Input of multiplicity-patterns through a "*" is not possible.
         </mat-error>
-        <mat-error *ngIf="eventLogControl.hasError('invalidInput')"
-            >Invalid Input! Reason: A plus at the beginning or the end of the
+        <mat-error *ngIf="eventLogControl.hasError('invalidInput')">
+            Invalid Input! Reason: A plus at the beginning or the end of the
             string, too many whitespaces in a row between activities or too many
             plus signs.
         </mat-error>
