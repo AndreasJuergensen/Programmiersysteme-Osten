@@ -2,10 +2,6 @@
     font-family: "Courier New", sans-serif !important;
 }
 
-h2 {
-    font-weight: bold !important;
-}
-
 button[mat-stroked-button] {
     color: #d42f7c;
 }
@@ -52,34 +48,37 @@ button[mat-stroked-button].submit:hover {
     --mdc-filled-text-field-focus-label-text-color: none !important;
 }
 
-.file-input {
-    display: none;
-}
-
-.mat-mdc-dialog-actions {
-    display: flex;
-    flex-direction: row;
-    padding: 50px 0 20px 0;
-}
-
 .mat-mdc-input-element {
     padding: 5px 0 0 0;
 }
 
-.mat-mdc-dialog-content {
-    padding-bottom: 0;
-}
-
-.file-upload-wrapper {
-    flex: 1 0 0;
-}
-
-.file-upload {
+.dialog-content {
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
+    height: calc(100vh - 100px);
+    overflow: hidden;
 }
 
-.filename {
-    margin-left: 8px;
+textarea {
+    box-sizing: border-box;
+    flex-grow: 1;
+    resize: none;
+    overflow: auto;
+}
+
+.sticky-actions {
+    position: sticky;
+    bottom: 5px;
+    padding: 0px;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.flex-grow-1 {
+    flex-grow: 1;
 }

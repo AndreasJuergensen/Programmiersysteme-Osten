@@ -389,7 +389,12 @@ class DialogOpening {
         filename?: string;
     }): MatDialogRef<EventLogDialogComponent, EventLog> {
         this.contextMenuService.hide();
-        const config: MatDialogConfig = { width: '800px', data: data };
+        const config: MatDialogConfig = {
+            width: '99vw',
+            maxHeight: 'calc(99vh - 30px)',
+            data: data,
+            autoFocus: true,
+        };
         const dialogRef = this.matDialog.open<
             EventLogDialogComponent,
             MatDialogConfig,
