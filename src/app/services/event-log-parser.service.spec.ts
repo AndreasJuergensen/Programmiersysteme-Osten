@@ -32,6 +32,21 @@ describe('EventLogParserService', () => {
         expect(result).toEqual(expectedEventLog);
     });
 
+    it('one simple trace with many whitespaces', () => {
+        const eventLogStr: string = ' A    B C ';
+        const result: EventLog = sut.parse(eventLogStr);
+
+        const expectedEventLog = new EventLog([
+            new Trace([
+                new Activity('A'),
+                new Activity('B'),
+                new Activity('C'),
+            ]),
+        ]);
+
+        expect(result).toEqual(expectedEventLog);
+    });
+
     it('multiletter activities', () => {
         const eventLogStr: string = 'ABC XYZ';
 

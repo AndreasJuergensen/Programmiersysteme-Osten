@@ -11,7 +11,8 @@
         <mat-hint
             >Activities per trace may concatenated by exactly one whitespace.
             Traces may concatenated by a plus (+). Empty input and
-            multiplicity-patterns like '3*A B C', 'A B C*4' can't be used.
+            multiplicity-patterns like '3*A B C', 'A B C*4', '5*(U Z)' or '(R
+            T)*2' can't be used.
         </mat-hint>
         <mat-error
             *ngIf="
@@ -24,8 +25,7 @@
         </mat-error>
         <mat-error *ngIf="eventLogControl.hasError('invalidInput')"
             >Invalid Input! Reason: A plus at the beginning or the end of the
-            string, too many whitespaces in a row between activities or too many
-            plus signs.
+            string, or too many plus signs. Or only whitespaces entered.
         </mat-error>
     </mat-form-field>
 </mat-dialog-content>

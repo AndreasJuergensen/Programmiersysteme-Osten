@@ -78,8 +78,8 @@ export class ContextMenuComponent implements OnInit {
                     ? position.x - 230
                     : position.x + 2;
             const yPosition =
-                position.y > window.innerHeight - 407
-                    ? window.innerHeight - 407
+                position.y > window.innerHeight - 448
+                    ? window.innerHeight - 448
                     : position.y;
             this.position = { x: xPosition + 'px', y: yPosition + 'px' };
             this.isRightToLeft = position.x > window.innerWidth - 620;
@@ -116,6 +116,7 @@ export class ContextMenuComponent implements OnInit {
         this.resettingSelection = new ResettingSelection(
             collectSelectedElementsService,
             contextMenuService,
+            this.disabling,
         );
         this.executingCut = new ExecutingCut(
             executeCutService,
@@ -147,6 +148,29 @@ export class ContextMenuComponent implements OnInit {
         document
             .getElementById('drawingArea')
             ?.addEventListener('scroll', hide);
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 's') {
+                this.executingCut.executeSequenceCut();
+            } else if (event.key === 'p') {
+                this.executingCut.executeParallelCut();
+            } else if (event.key === 'e') {
+                this.executingCut.executeExclusiveCut();
+            } else if (event.key === 'l') {
+                this.executingCut.executeLoopCut();
+            } else if (event.key === '1') {
+                this.executingFallThrough.executeActivityOncePerTraceFallThrough();
+            } else if (event.key === 'f') {
+                this.executingFallThrough.executeFlowerModelFallThrough();
+            } else if (event.key === 'u') {
+                this.undoing.undoLastUpdate();
+            } else if (event.key === 'r') {
+                this.resettingSelection.resetSelection();
+            } else if (event.key === 'a') {
+                this.showingArcFeedback.toggleArcFeedback();
+            } else if (event.key === 't') {
+                this.showingEventLog.toggleEventLogs();
+            }
+        });
     }
 }
 
@@ -224,6 +248,7 @@ class ExecutingCut {
     }
 
     private executeCut(cutType: CutType): void {
+        this.contextMenuService.hide();
         this.selectedCutType = cutType;
         this.collectedArcs = this.collectSelectedElementsService.collectedArcs;
 
@@ -263,7 +288,6 @@ class ExecutingCut {
         } else {
             this.selectedCutType = undefined;
         }
-        this.contextMenuService.hide();
     }
 }
 
@@ -271,9 +295,11 @@ class ResettingSelection {
     constructor(
         private collectSelectedElementsService: CollectSelectedElementsService,
         private contextMenuService: ContextMenuService,
+        private disabling: Disabling,
     ) {}
 
     resetSelection() {
+        if (this.disabling.isResetSelectionDisabled()) return;
         this.collectSelectedElementsService.resetSelectedElements();
         this.contextMenuService.hide();
     }
@@ -295,7 +321,9 @@ class ShowingEventLog {
     }
 
     buttonText(): string {
-        return this.showEventLogs ? 'Hide Event Logs' : 'Show Event Logs';
+        return this.showEventLogs
+            ? 'Hide Event Logs (t)'
+            : 'Show Event Logs (t)';
     }
 
     toggleEventLogs() {
@@ -321,7 +349,9 @@ class ShowingArcFeedback {
     }
 
     buttonText(): string {
-        return this.showArcFeedback ? 'Hide Arc Feedback' : 'Show Arc Feedback';
+        return this.showArcFeedback
+            ? 'Hide Arc Feedback (a)'
+            : 'Show Arc Feedback (a)';
     }
 
     toggleArcFeedback() {
@@ -450,7 +480,7 @@ class Examples {
             new Trace([new Activity('Request')]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "Exclusive Cut Example");
     }
 
     generateSequenceExample(): void {
@@ -467,7 +497,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "Sequence Cut Example");
     }
 
     public generateParallelExample(): void {
@@ -476,7 +506,7 @@ class Examples {
             new Trace([new Activity('Order'), new Activity('Request')]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "Parallel Cut Example");
     }
 
     generateLoopExample(): void {
@@ -490,7 +520,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "Loop Cut Example");
     }
 
     public generateAOPTExample(): void {
@@ -508,7 +538,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "AOPT Example");
     }
 
     public generateFlowerExample(): void {
@@ -526,7 +556,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "Flower Model Example");
     }
 
     public generateFUHProcessMiningExample(): void {
@@ -569,13 +599,13 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog);
+        this.initializePetriNet(eventLog, "FUH Example");
     }
 
-    private initializePetriNet(eventLog: EventLog): void {
+    private initializePetriNet(eventLog: EventLog, name: string): void {
         Dfg.resetIdCount();
         const dfg: Dfg = this._calculateDfgService.calculate(eventLog);
-        this._petriNetManagementService.initialize(dfg);
+        this._petriNetManagementService.initialize(dfg, name);
         this._contextMenuService.hide();
     }
 }

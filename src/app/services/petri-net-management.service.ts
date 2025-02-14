@@ -63,6 +63,10 @@ export class PetriNetManagementService {
             name: filename ? filename : this.display(eventLog),
         };
         const recentEventLogs = [...this._recentEventLogs$.value];
+        if (recentEventLogs.some((e) => e.eventLog === eventLog)) {
+            const index = recentEventLogs.indexOf(recentEventLog);
+            recentEventLogs.splice(index, 1);
+        }
         const newLength = recentEventLogs.unshift(recentEventLog);
         if (newLength > 5) recentEventLogs.pop();
         this._recentEventLogs$.next(recentEventLogs);
