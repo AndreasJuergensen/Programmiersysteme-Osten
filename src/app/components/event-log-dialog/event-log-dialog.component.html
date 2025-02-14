@@ -1,4 +1,4 @@
-<mat-dialog-content class="mat-typography dialog-content">
+<mat-dialog-content class="mat-typography dialog-content" #dialogContent>
     <mat-form-field appearance="fill" class="full-width flex-grow-1">
         <textarea
             matInput
@@ -6,31 +6,31 @@
             [formControl]="eventLogControl"
             (keydown)="onKeyDown($event)"
             #textarea
+            (input)="adjustTextareaHeight()"
         ></textarea>
-        <mat-hint>
-            Activities per trace may concatenated by exactly one whitespace.
+        <mat-hint
+            >Activities per trace may concatenated by exactly one whitespace.
             Traces may concatenated by a plus (+). Empty input and
-            multiplicity-patterns like '3*A' or 'B*4' can't be used.
+            multiplicity-patterns like '3*A B C', 'A B C*4' can't be used.
         </mat-hint>
         <mat-error
             *ngIf="
                 eventLogControl.hasError('required') && eventLogControl.dirty
             "
-        >
-            There is no empty input allowed!
+            >There is no empty input allowed!
         </mat-error>
-        <mat-error *ngIf="eventLogControl.hasError('multiplicityRegEx')">
-            The Input of multiplicity-patterns through a "*" is not possible.
+        <mat-error *ngIf="eventLogControl.hasError('multiplicityRegEx')"
+            >The Input of multiplicity-patterns through a "*" is not possible.
         </mat-error>
-        <mat-error *ngIf="eventLogControl.hasError('invalidInput')">
-            Invalid Input! Reason: A plus at the beginning or the end of the
+        <mat-error *ngIf="eventLogControl.hasError('invalidInput')"
+            >Invalid Input! Reason: A plus at the beginning or the end of the
             string, too many whitespaces in a row between activities or too many
             plus signs.
         </mat-error>
     </mat-form-field>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end" class="sticky-actions">
+<mat-dialog-actions class="sticky-actions flex-grow-1">
     <button
         mat-stroked-button
         mat-dialog-close
