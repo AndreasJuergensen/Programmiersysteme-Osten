@@ -26,18 +26,6 @@ describe('EventLogValidationService False Cases', () => {
         expect(result).toBeFalse();
     });
 
-    it('too many whitespaces means more than one whitespace betweens Strings', () => {
-        const input: string = 'A   B C+ Z   X';
-        const result = sut.validateInput(input);
-        expect(result).toBeFalse();
-    });
-
-    it('too many whitespaces means more than one whitespace betweens Strings  2', () => {
-        const input: string = 'A  B';
-        const result = sut.validateInput(input);
-        expect(result).toBeFalse();
-    });
-
     it('several numbers after each other', () => {
         const input: string = 'A11';
         const result = sut.checkForMultiplicityPattern(input);
@@ -49,6 +37,12 @@ describe('EventLogValidationService False Cases', () => {
         const result = sut.checkForMultiplicityPattern(input);
         expect(result).toBeFalse();
     });
+
+    it('only whitespaces', () => {
+        const input: string = '   ';
+        const result = sut.validateInput(input);
+        expect(result).toBeFalse();
+    });
 });
 
 describe('EventLogValidationService True Cases', () => {
@@ -57,6 +51,37 @@ describe('EventLogValidationService True Cases', () => {
     beforeEach(() => {
         sut = new EventLogValidationService();
     });
+
+    it('too many whitespaces means more than one whitespace betweens Strings', () => {
+        const input: string = 'A   B C+ Z   X';
+        const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
+
+    it('too many whitespaces means more than one whitespace betweens Strings 2', () => {
+        const input: string = 'A  B';
+        const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
+
+    it('too many whitespaces means more than one whitespace betweens Strings 3', () => {
+        const input: string = 'A    B   +  C     I';
+        const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
+
+    it('whitespaces at the beginning of the string', () => {
+        const input: string = '  AB C D';
+        const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
+
+    it('whitespaces at the end of the string', () => {
+        const input: string = 'AB C D  ';
+        const result = sut.validateInput(input);
+        expect(result).toBeTrue();
+    });
+
     it('valid string / event log ', () => {
         const input: string = 'A B C + X Y Z + Test Test1 Test2';
         const result = sut.validateInput(input);
@@ -90,6 +115,30 @@ describe('EventLogValidationService True Cases', () => {
 
     it('checkForMultiplicityPattern 2.0', () => {
         const input: string = '3*B';
+        const result = sut.checkForMultiplicityPattern(input);
+        expect(result).toBeTrue();
+    });
+
+    it('checkForMultiplicityPattern 3.0', () => {
+        const input: string = '3*B C D';
+        const result = sut.checkForMultiplicityPattern(input);
+        expect(result).toBeTrue();
+    });
+
+    it('checkForMultiplicityPattern 4.0', () => {
+        const input: string = 'B C D*4';
+        const result = sut.checkForMultiplicityPattern(input);
+        expect(result).toBeTrue();
+    });
+
+    it('checkForMultiplicityPattern with optional ()', () => {
+        const input: string = '5*(B C D)';
+        const result = sut.checkForMultiplicityPattern(input);
+        expect(result).toBeTrue();
+    });
+
+    it('checkForMultiplicityPattern with optional ()', () => {
+        const input: string = '(B C D F)*10';
         const result = sut.checkForMultiplicityPattern(input);
         expect(result).toBeTrue();
     });

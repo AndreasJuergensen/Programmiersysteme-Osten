@@ -33,8 +33,7 @@
             </mat-error>
             <mat-error *ngIf="eventLogControl.hasError('invalidInput')"
                 >Invalid Input! Reason: A plus at the beginning or the end of
-                the string, too many whitespaces in a row between activities or
-                too many plus signs.
+                the string, or too many plus signs. Or only whitespaces entered.
             </mat-error>
         </mat-form-field>
         <mat-dialog-actions align="end">
