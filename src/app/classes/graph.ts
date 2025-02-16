@@ -262,7 +262,9 @@ export class Edge {
     }
 
     isNodeOnEdgeAndOnSameHorizontalLevel(node: Node): boolean {
-        return node.x < this._target.x && node.x > this._source.x;
+        return this._source.x < this._target.x
+            ? node.x < this._target.x && node.x > this._source.x
+            : node.x > this._target.x && node.x < this._source.x;
     }
 
     distanceToNode(node: Node): number {
