@@ -162,29 +162,33 @@ export class BoxNode extends Node {
 
         let nodeWidth: number = 0;
         let nodeHeight: number = 0;
+        let nodeStrokeWidth: number = 0;
 
         if (node instanceof PlaceNode) {
             nodeWidth = environment.drawingElements.places.radius * 2;
             nodeHeight = nodeWidth;
+            nodeStrokeWidth = environment.drawingElements.places.strokeWidth;
         }
 
         if (node instanceof TransitionNode) {
             nodeWidth = environment.drawingElements.transitions.width;
             nodeHeight = environment.drawingElements.transitions.height;
+            nodeStrokeWidth =
+                environment.drawingElements.transitions.strokeWidth;
         }
 
-        const strokeWidth: number =
+        const boxStrokeWidth: number =
             environment.drawingElements.boxes.strokeWidth;
 
-        const xBoxLeft: number = this.x - (this._width + strokeWidth) / 2;
-        const xBoxRight: number = this.x + (this._width + strokeWidth) / 2;
-        const yBoxTop: number = this.y - (this._height + strokeWidth) / 2;
-        const yBoxBottom: number = this.y + (this._height + strokeWidth) / 2;
+        const xBoxLeft: number = this.x - (this._width + boxStrokeWidth) / 2;
+        const xBoxRight: number = this.x + (this._width + boxStrokeWidth) / 2;
+        const yBoxTop: number = this.y - (this._height + boxStrokeWidth) / 2;
+        const yBoxBottom: number = this.y + (this._height + boxStrokeWidth) / 2;
 
-        const xNodeLeft: number = node.x - nodeWidth / 2;
-        const xNodeRight: number = node.x + nodeWidth / 2;
-        const yNodeTop: number = node.y - nodeHeight / 2;
-        const yNodeBottom: number = node.y + nodeHeight / 2;
+        const xNodeLeft: number = node.x - (nodeWidth + nodeStrokeWidth) / 2;
+        const xNodeRight: number = node.x + (nodeWidth + nodeStrokeWidth) / 2;
+        const yNodeTop: number = node.y - (nodeHeight + nodeStrokeWidth) / 2;
+        const yNodeBottom: number = node.y + (nodeHeight + nodeStrokeWidth) / 2;
 
         return (
             this.isNodeOnXOutsideOfBox(
@@ -275,10 +279,6 @@ export class Edge {
     }
 
     intersectsBox(node: BoxNode): boolean {
-        if (node.id === 'dfg2') {
-            const boxRightDownCornerX = node.x + node.width / 2;
-            const boxRightDownCornerY = node.y + node.height / 2;
-        }
         const boxStroke: number = environment.drawingElements.boxes.strokeWidth;
 
         const xBoxLeft: number = node.x - (node.width + boxStroke) / 2;
@@ -322,10 +322,6 @@ export class Edge {
             )
         );
     }
-
-    // distanceToBox(node: BoxNode): number {
-
-    // }
 
     asJson(): EdgeJson {
         return {
