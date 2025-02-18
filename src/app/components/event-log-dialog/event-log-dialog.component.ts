@@ -177,6 +177,8 @@ export class EventLogDialogComponent implements OnInit, AfterViewInit {
                 value.substring(0, start) + '\n' + value.substring(end);
 
             textarea.selectionStart = textarea.selectionEnd = start + 1;
+
+            this.adjustTextareaHeight();
         }
     }
 
