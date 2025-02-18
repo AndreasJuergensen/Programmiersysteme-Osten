@@ -448,16 +448,21 @@ export class CalculatePetriNetService {
 
         do {
             nodeWasMoved = false;
-            nodes.reverse().forEach((node) => {
-                if (this.checkNodeOverlap(node, nodes)) {
+            const nodesReversed = nodes.reverse();
+            for (const node of nodesReversed) {
+                const haveNodeOverlap = this.checkNodeOverlap(node, nodes);
+                if (haveNodeOverlap) {
+                    node.addYOffset(gapY);
+                    nodeWasMoved = true;
+                    continue;
+                }
+
+                const haveEdgeOverlap = this.checkEdgeOverlap(node, edges);
+                if (haveEdgeOverlap) {
                     node.addYOffset(gapY);
                     nodeWasMoved = true;
                 }
-
-                if (this.checkEdgeOverlap(node, edges)) {
-                    nodeWasMoved = false;
-                }
-            });
+            }
         } while (nodeWasMoved);
     }
 
@@ -474,7 +479,8 @@ export class CalculatePetriNetService {
             }
 
             if (node instanceof BoxNode) {
-                if (!(node as BoxNode).isNodeOutsideOfBox(n)) {
+                const isOutside = (node as BoxNode).isNodeOutsideOfBox(n);
+                if (!isOutside) {
                     return true;
                 }
             }
