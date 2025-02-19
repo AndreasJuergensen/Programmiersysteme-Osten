@@ -1,4 +1,13 @@
-import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
+import {
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    HostListener,
+    Inject,
+    OnInit,
+    ViewChild,
+} from '@angular/core';
 import {
     FormControl,
     FormsModule,
@@ -18,7 +27,6 @@ import { EventLog } from 'src/app/classes/event-log';
 import { EventLogParserService } from 'src/app/services/event-log-parser.service';
 import { CommonModule } from '@angular/common';
 import { EventLogValidationService } from 'src/app/services/event-log-validation.service';
-import { ParseXesService } from 'src/app/services/parse-xes.service';
 
 @Component({
     selector: 'app-event-log-dialog',
@@ -36,7 +44,12 @@ import { ParseXesService } from 'src/app/services/parse-xes.service';
     templateUrl: './event-log-dialog.component.html',
     styleUrl: './event-log-dialog.component.css',
 })
-export class EventLogDialogComponent implements OnInit {
+export class EventLogDialogComponent implements OnInit, AfterViewInit {
+    @ViewChild('dialogContent', { static: false })
+    dialogContent!: ElementRef;
+    @ViewChild('textarea', { static: true })
+    textarea!: ElementRef<HTMLTextAreaElement>;
+
     public eventLogControl = new FormControl('', {
         validators: [
             Validators.required,
@@ -59,6 +72,37 @@ export class EventLogDialogComponent implements OnInit {
         this.eventLogControl.markAsTouched();
         this.eventLogControl.updateValueAndValidity();
         this.data && this.eventLogControl.setValue(this.data.eventLog);
+    }
+
+    ngAfterViewInit(): void {
+        if (this.dialogContent && this.textarea) {
+            setTimeout(() => this.adjustTextareaHeight(), 0);
+        }
+    }
+
+    @HostListener('window:resize')
+    onResize() {
+        this.adjustTextareaHeight();
+    }
+
+    adjustTextareaHeight() {
+        if (!this.dialogContent || !this.textarea) return;
+
+        const dialogContent = this.dialogContent.nativeElement;
+        const textarea = this.textarea.nativeElement;
+
+        if (!dialogContent || !textarea) return;
+
+        const availableHeight = dialogContent.clientHeight - 100;
+
+        textarea.style.height = 'auto';
+        const newHeight = textarea.scrollHeight;
+
+        textarea.style.height = `${Math.min(newHeight, availableHeight)}px`;
+
+        textarea.rows = Math.floor(newHeight / 26);
+
+        this.cdr.detectChanges();
     }
 
     private validateFormControlInput(
@@ -133,6 +177,8 @@ export class EventLogDialogComponent implements OnInit {
                 value.substring(0, start) + '\n' + value.substring(end);
 
             textarea.selectionStart = textarea.selectionEnd = start + 1;
+
+            this.adjustTextareaHeight();
         }
     }
 

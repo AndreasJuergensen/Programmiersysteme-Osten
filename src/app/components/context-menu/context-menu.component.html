@@ -143,7 +143,7 @@
         (click)="resettingSelection.resetSelection()"
     >
         <mat-icon>refresh</mat-icon>
-        <div>Reset Selection</div>
+        <div>Reset Selection (r)</div>
     </div>
     <div
         class="sub-menu-wrapper"
@@ -159,7 +159,7 @@
                 (click)="executingCut.executeExclusiveCut()"
             >
                 <mat-icon>call_split</mat-icon>
-                <div>Exclusive Cut</div>
+                <div>Exclusive Cut (e)</div>
             </div>
             <div
                 class="menu-button"
@@ -167,7 +167,7 @@
                 (click)="executingCut.executeSequenceCut()"
             >
                 <mat-icon>straight</mat-icon>
-                <div>Sequence Cut</div>
+                <div>Sequence Cut (s)</div>
             </div>
             <div
                 class="menu-button"
@@ -175,7 +175,7 @@
                 (click)="executingCut.executeParallelCut()"
             >
                 <mat-icon>alt_route</mat-icon>
-                <div>Parallel Cut</div>
+                <div>Parallel Cut (p)</div>
             </div>
             <div
                 class="menu-button"
@@ -183,7 +183,7 @@
                 (click)="executingCut.executeLoopCut()"
             >
                 <mat-icon>repeat</mat-icon>
-                <div>Loop Cut</div>
+                <div>Loop Cut (l)</div>
             </div>
         </div>
     </div>
@@ -203,7 +203,7 @@
                 "
             >
                 <mat-icon>looks_one</mat-icon>
-                <div>Activity Once Per Trace Fall Through</div>
+                <div>Activity Once Per Trace Fall Through (1)</div>
             </div>
             <div
                 class="menu-button"
@@ -211,7 +211,7 @@
                 (click)="executingFallThrough.executeFlowerModelFallThrough()"
             >
                 <mat-icon>filter_vintage</mat-icon>
-                <div>Flower Model Fall Through</div>
+                <div>Flower Model Fall Through (f)</div>
             </div>
         </div>
     </div>
@@ -222,7 +222,7 @@
         mat-button
     >
         <mat-icon>undo</mat-icon>
-        <div>Undo Last Split</div>
+        <div>Undo Last Split (u)</div>
     </div>
     <div class="hr"></div>
     <!-- <div
@@ -308,7 +308,7 @@
             <mat-icon>output</mat-icon>
             <div>Export</div>
         </div>
-        <div class="context-menu sub-menu">
+        <div class="context-menu export sub-menu">
             <div class="menu-button" mat-button (click)="exporting.exportPn()">
                 <div>to PN</div>
             </div>
