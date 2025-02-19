@@ -31,6 +31,7 @@ import { ParseXesService } from 'src/app/services/parse-xes.service';
 import { EventLogParserService } from 'src/app/services/event-log-parser.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Arcs } from 'src/app/classes/dfg/arcs';
+//import { SimpleDialogComponent } from '../simple-dialog/simple-dialog.component';
 
 @Component({
     selector: 'app-context-menu',
@@ -54,6 +55,7 @@ export class ContextMenuComponent implements OnInit {
     readonly executingCut: ExecutingCut;
     readonly executingFallThrough: ExecutingFallThrough;
     readonly showingArcFeedback: ShowingArcFeedback;
+    readonly showingHintForPossibleCut: ShowingHintForPossibleCut;
 
     constructor(
         private readonly contextMenuService: ContextMenuService,
@@ -133,6 +135,14 @@ export class ContextMenuComponent implements OnInit {
             contextMenuService,
             this.disabling,
             collectSelectedElementsService,
+        );
+        this.showingHintForPossibleCut = new ShowingHintForPossibleCut(
+            matDialog,
+            petriNetManagementService,
+            this.disabling,
+            feedbackService,
+            collectSelectedElementsService,
+            contextMenuService,
         );
     }
     ngOnInit(): void {
@@ -232,7 +242,7 @@ class ExecutingCut {
             undefined
         ) {
             this.feedbackService.showMessage(
-               "Please select arcs in a DFG by clicking or click-hovering them, to define a cut first.",
+                'Please select arcs in a DFG by clicking or click-hovering them, to define a cut first.',
                 true,
             );
             return;
@@ -604,6 +614,7 @@ class Disabling {
     private hasRecentEventLogs: boolean = false;
     private isArcFeedbackReady: boolean = false;
     private isElementSelected: boolean = false;
+    private isHintAvailable: boolean = false;
 
     constructor(
         readonly applicationStateService: ApplicationStateService,
@@ -638,6 +649,16 @@ class Disabling {
         collectSelectedElementsService.isElementSelected$.subscribe(
             (isElementSelected) => {
                 this.isElementSelected = isElementSelected;
+            },
+        );
+
+        collectSelectedElementsService.selectedDFGBoxId$.subscribe(
+            (selectedDFGBoxId) => {
+                if (selectedDFGBoxId !== undefined) {
+                    this.isHintAvailable = true;
+                } else {
+                    this.isHintAvailable = false;
+                }
             },
         );
     }
@@ -689,5 +710,92 @@ class Disabling {
 
     isRecentEventLogsDisabled(): boolean {
         return !this.hasRecentEventLogs;
+    }
+
+    isHintDisabled(): boolean {
+        return !this.isHintAvailable;
+    }
+}
+
+class ShowingHintForPossibleCut {
+    private dfgs: Dfg[] = [];
+    private selectedDFGBoxId: string | undefined;
+
+    constructor(
+        private matDialog: MatDialog,
+        private petriNetManagementService: PetriNetManagementService,
+        private disabling: Disabling,
+        private feedbackService: ShowFeedbackService,
+        private collectSelectedElementsService: CollectSelectedElementsService,
+        private contextMenuService: ContextMenuService,
+    ) {
+        this.petriNetManagementService.petriNet$.subscribe((petriNet) => {
+            this.dfgs = petriNet.getDFGs();
+        });
+
+        collectSelectedElementsService.selectedDFGBoxId$.subscribe(
+            (selectedDFGBoxId) => {
+                this.selectedDFGBoxId = selectedDFGBoxId;
+            },
+        );
+    }
+
+    showHintForPossibleCut() {
+        if (!this.disabling.isHintDisabled()) {
+            const selectedDFG = this.dfgs.find(
+                (dfg) => dfg.id === this.selectedDFGBoxId,
+            );
+            if (
+                selectedDFG !== undefined &&
+                selectedDFG.getPossibleCut() !== undefined
+            ) {
+                this.feedbackService.showMessage(
+                    `Possible cut is ${this.pascalToNormal(selectedDFG.getPossibleCut()!.toString())}.`,
+                    false,
+                );
+            } else {
+                this.feedbackService.showMessage(
+                    `A Fall Through is possible.`,
+                    false,
+                );
+            }
+            this.contextMenuService.hide();
+        }
+    }
+
+    // showHintForPossibleCut() {
+    //     let content = '';
+
+    //     if (!this.disabling.isHintDisabled()) {
+    //         this.dfgs.forEach((dfg) => {
+    //             if (dfg.getPossibleCut() !== undefined) {
+    //                 content =
+    //                     content +
+    //                     `For ${dfg.id} a ${this.pascalToNormal(dfg.getPossibleCut()!.toString())} is the possible cut.` +
+    //                     '\n';
+    //             } else {
+    //                 content =
+    //                     content +
+    //                     `For ${dfg.id} only a Fall Through is possible.` +
+    //                     '\n';
+    //             }
+    //         });
+
+    //         const config: MatDialogConfig = {
+    //             width: '800px',
+    //             data: { content },
+    //         };
+    //         const dialogRef = this.matDialog.open<
+    //             SimpleDialogComponent,
+    //             MatDialogConfig
+    //         >(SimpleDialogComponent, config);
+
+    //         return dialogRef;
+    //     }
+    //     return;
+    // }
+
+    private pascalToNormal(text: string): string {
+        return text.replace(/([a-z])([A-Z])/g, '$1 $2');
     }
 }

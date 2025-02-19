@@ -4,7 +4,7 @@ import { PetriNet } from '../classes/petrinet/petri-net';
 import { Dfg } from '../classes/dfg/dfg';
 import { Arc } from '../components/drawing-area/models';
 import { PetriNetManagementService } from './petri-net-management.service';
-import { Activity } from '../classes/dfg/activities';
+import { Activities, Activity } from '../classes/dfg/activities';
 import { CutType } from './execute-cut.service';
 import { BehaviorSubject } from 'rxjs';
 
@@ -22,7 +22,8 @@ export class CollectSelectedElementsService {
     private _selectedDFGBox: Dfg | undefined;
     private _isElementSelected$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false);
-
+    private _selectedDFGBoxId$: BehaviorSubject<string | undefined> =
+        new BehaviorSubject<string | undefined>(undefined);
     private _arcClassListAttributes: Map<string, string[]> = new Map<
         string,
         string[]
@@ -59,6 +60,10 @@ export class CollectSelectedElementsService {
         return this._isElementSelected$.asObservable();
     }
 
+    get selectedDFGBoxId$() {
+        return this._selectedDFGBoxId$.asObservable();
+    }
+
     isAnyElementSelected(): void {
         if (
             this._currentCollectedArcsDFG !== undefined ||
@@ -69,6 +74,14 @@ export class CollectSelectedElementsService {
             return;
         }
         this._isElementSelected$.next(false);
+    }
+
+    selectedDFGBox(): void {
+        if (this._selectedDFGBox !== undefined) {
+            this._selectedDFGBoxId$.next(this._selectedDFGBox?.id);
+        } else {
+            this._selectedDFGBoxId$.next(undefined);
+        }
     }
 
     /**
@@ -162,6 +175,7 @@ export class CollectSelectedElementsService {
         ) {
             this._selectedDFGBox = undefined;
             this.isAnyElementSelected();
+            this.selectedDFGBox();
             return;
         }
         for (const dfg of this._petriNet.getDFGs()) {
@@ -170,6 +184,7 @@ export class CollectSelectedElementsService {
             }
         }
         this.isAnyElementSelected();
+        this.selectedDFGBox();
     }
 
     public resetSelectedElements(): void {
@@ -220,6 +235,7 @@ export class CollectSelectedElementsService {
     resetSelectedDFGBox(): void {
         this._selectedDFGBox = undefined;
         this.isAnyElementSelected();
+        this.selectedDFGBox();
         const svg: SVGSVGElement = document.getElementsByTagName(
             'svg',
         )[0] as SVGSVGElement;
