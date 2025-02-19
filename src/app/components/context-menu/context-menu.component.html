@@ -235,14 +235,6 @@
     </div> -->
     <div
         class="menu-button"
-        [class.disabled]="disabling.isHintDisabled()"
-        mat-button
-        (click)="showingHintForPossibleCut.showHintForPossibleCut()"
-    >
-        <div>Show possible Cut</div>
-    </div>
-    <div
-        class="menu-button"
         [class.disabled]="disabling.isToggleEventLogsDisabled()"
         mat-button
         (click)="showingEventLog.toggleEventLogs()"
@@ -250,6 +242,17 @@
         <div>
             {{ showingEventLog.buttonText() }}
         </div>
+    </div>
+    <div
+        class="menu-button"
+        [class.disabled]="disabling.isHintDisabled()"
+        mat-button
+        [matTooltip]="'Select a DFG Box first'"
+        [matTooltipDisabled]="disabling.isHoverForHintDisabled()"
+        matTooltipPosition="right"
+        (click)="showingHintForPossibleCut.showHintForPossibleCut()"
+    >
+        <div>Show possible Cut (h)</div>
     </div>
     <div
         class="legend-menu-wrapper"

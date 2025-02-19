@@ -179,6 +179,8 @@ export class ContextMenuComponent implements OnInit {
                 this.showingArcFeedback.toggleArcFeedback();
             } else if (event.key === 't') {
                 this.showingEventLog.toggleEventLogs();
+            } else if (event.key === 'h') {
+                this.showingHintForPossibleCut.showHintForPossibleCut();
             }
         });
     }
@@ -490,7 +492,7 @@ class Examples {
             new Trace([new Activity('Request')]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "Exclusive Cut Example");
+        this.initializePetriNet(eventLog, 'Exclusive Cut Example');
     }
 
     generateSequenceExample(): void {
@@ -507,7 +509,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "Sequence Cut Example");
+        this.initializePetriNet(eventLog, 'Sequence Cut Example');
     }
 
     public generateParallelExample(): void {
@@ -516,7 +518,7 @@ class Examples {
             new Trace([new Activity('Order'), new Activity('Request')]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "Parallel Cut Example");
+        this.initializePetriNet(eventLog, 'Parallel Cut Example');
     }
 
     generateLoopExample(): void {
@@ -530,7 +532,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "Loop Cut Example");
+        this.initializePetriNet(eventLog, 'Loop Cut Example');
     }
 
     public generateAOPTExample(): void {
@@ -548,7 +550,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "AOPT Example");
+        this.initializePetriNet(eventLog, 'AOPT Example');
     }
 
     public generateFlowerExample(): void {
@@ -566,7 +568,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "Flower Model Example");
+        this.initializePetriNet(eventLog, 'Flower Model Example');
     }
 
     public generateFUHProcessMiningExample(): void {
@@ -609,7 +611,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "FUH Example");
+        this.initializePetriNet(eventLog, 'FUH Example');
     }
 
     private initializePetriNet(eventLog: EventLog, name: string): void {
@@ -749,6 +751,10 @@ class Disabling {
 
     isHintDisabled(): boolean {
         return !this.isHintAvailable;
+    }
+
+    isHoverForHintDisabled(): boolean {
+        return this.isPetriNetEmpty;
     }
 }
 
