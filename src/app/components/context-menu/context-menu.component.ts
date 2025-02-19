@@ -55,6 +55,8 @@ export class ContextMenuComponent implements OnInit {
     readonly executingFallThrough: ExecutingFallThrough;
     readonly showingArcFeedback: ShowingArcFeedback;
 
+    private keydownListener: any;
+
     constructor(
         private readonly contextMenuService: ContextMenuService,
         readonly exportService: ExportService,
@@ -107,6 +109,7 @@ export class ContextMenuComponent implements OnInit {
             contextMenuService,
             parseXesService,
             eventLogParserService,
+            this,
         );
         this.showingEventLog = new ShowingEventLog(
             applicationStateService,
@@ -148,7 +151,8 @@ export class ContextMenuComponent implements OnInit {
         document
             .getElementById('drawingArea')
             ?.addEventListener('scroll', hide);
-        document.addEventListener('keydown', (event) => {
+
+        this.keydownListener = (event: KeyboardEvent) => {
             if (event.key === 's') {
                 this.executingCut.executeSequenceCut();
             } else if (event.key === 'p') {
@@ -170,7 +174,16 @@ export class ContextMenuComponent implements OnInit {
             } else if (event.key === 't') {
                 this.showingEventLog.toggleEventLogs();
             }
-        });
+        };
+        document.addEventListener('keydown', this.keydownListener);
+    }
+
+    disableKeydownListener(): void {
+        document.removeEventListener('keydown', this.keydownListener);
+    }
+
+    enableKeydownListener(): void {
+        document.addEventListener('keydown', this.keydownListener);
     }
 }
 
@@ -376,6 +389,7 @@ class DialogOpening {
         private contextMenuService: ContextMenuService,
         private parseXesService: ParseXesService,
         private eventLogParserService: EventLogParserService,
+        private contextMenuComponent: ContextMenuComponent,
     ) {
         petriNetManagementService.recentEventLogs$.subscribe(
             (recentEventLogs) => {
@@ -401,8 +415,13 @@ class DialogOpening {
             EventLog
         >(EventLogDialogComponent, config);
 
+        dialogRef.afterOpened().subscribe(() => {
+            this.contextMenuComponent.disableKeydownListener();
+        });
+
         const sub: Subscription = dialogRef.afterClosed().subscribe({
             next: (eventLog) => {
+                this.contextMenuComponent.enableKeydownListener();
                 if (!eventLog) return;
                 Dfg.resetIdCount();
                 const dfg: Dfg = this.calculateDfgService.calculate(eventLog);
@@ -480,7 +499,7 @@ class Examples {
             new Trace([new Activity('Request')]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "Exclusive Cut Example");
+        this.initializePetriNet(eventLog, 'Exclusive Cut Example');
     }
 
     generateSequenceExample(): void {
@@ -497,7 +516,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "Sequence Cut Example");
+        this.initializePetriNet(eventLog, 'Sequence Cut Example');
     }
 
     public generateParallelExample(): void {
@@ -506,7 +525,7 @@ class Examples {
             new Trace([new Activity('Order'), new Activity('Request')]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "Parallel Cut Example");
+        this.initializePetriNet(eventLog, 'Parallel Cut Example');
     }
 
     generateLoopExample(): void {
@@ -520,7 +539,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "Loop Cut Example");
+        this.initializePetriNet(eventLog, 'Loop Cut Example');
     }
 
     public generateAOPTExample(): void {
@@ -538,7 +557,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "AOPT Example");
+        this.initializePetriNet(eventLog, 'AOPT Example');
     }
 
     public generateFlowerExample(): void {
@@ -556,7 +575,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "Flower Model Example");
+        this.initializePetriNet(eventLog, 'Flower Model Example');
     }
 
     public generateFUHProcessMiningExample(): void {
@@ -599,7 +618,7 @@ class Examples {
             ]),
         ];
         const eventLog: EventLog = new EventLog(traces);
-        this.initializePetriNet(eventLog, "FUH Example");
+        this.initializePetriNet(eventLog, 'FUH Example');
     }
 
     private initializePetriNet(eventLog: EventLog, name: string): void {
