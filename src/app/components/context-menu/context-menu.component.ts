@@ -57,6 +57,8 @@ export class ContextMenuComponent implements OnInit {
     readonly showingArcFeedback: ShowingArcFeedback;
     readonly showingHintForPossibleCut: ShowingHintForPossibleCut;
 
+    private keydownListener: any;
+
     constructor(
         private readonly contextMenuService: ContextMenuService,
         readonly exportService: ExportService,
@@ -109,6 +111,7 @@ export class ContextMenuComponent implements OnInit {
             contextMenuService,
             parseXesService,
             eventLogParserService,
+            this,
         );
         this.showingEventLog = new ShowingEventLog(
             applicationStateService,
@@ -158,7 +161,8 @@ export class ContextMenuComponent implements OnInit {
         document
             .getElementById('drawingArea')
             ?.addEventListener('scroll', hide);
-        document.addEventListener('keydown', (event) => {
+
+        this.keydownListener = (event: KeyboardEvent) => {
             if (event.key === 's') {
                 this.executingCut.executeSequenceCut();
             } else if (event.key === 'p') {
@@ -182,7 +186,16 @@ export class ContextMenuComponent implements OnInit {
             } else if (event.key === 'h') {
                 this.showingHintForPossibleCut.showHintForPossibleCut();
             }
-        });
+        };
+        document.addEventListener('keydown', this.keydownListener);
+    }
+
+    disableKeydownListener(): void {
+        document.removeEventListener('keydown', this.keydownListener);
+    }
+
+    enableKeydownListener(): void {
+        document.addEventListener('keydown', this.keydownListener);
     }
 }
 
@@ -388,6 +401,7 @@ class DialogOpening {
         private contextMenuService: ContextMenuService,
         private parseXesService: ParseXesService,
         private eventLogParserService: EventLogParserService,
+        private contextMenuComponent: ContextMenuComponent,
     ) {
         petriNetManagementService.recentEventLogs$.subscribe(
             (recentEventLogs) => {
@@ -413,8 +427,13 @@ class DialogOpening {
             EventLog
         >(EventLogDialogComponent, config);
 
+        dialogRef.afterOpened().subscribe(() => {
+            this.contextMenuComponent.disableKeydownListener();
+        });
+
         const sub: Subscription = dialogRef.afterClosed().subscribe({
             next: (eventLog) => {
+                this.contextMenuComponent.enableKeydownListener();
                 if (!eventLog) return;
                 Dfg.resetIdCount();
                 const dfg: Dfg = this.calculateDfgService.calculate(eventLog);
