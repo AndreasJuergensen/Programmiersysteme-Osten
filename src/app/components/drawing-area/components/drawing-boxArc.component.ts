@@ -4,6 +4,7 @@ import { environment } from 'src/environments/environment';
 import { CollectSelectedElementsService } from 'src/app/services/collect-selected-elements.service';
 import { ShowFeedbackService } from 'src/app/services/show-feedback.service';
 import { PetriNetManagementService } from 'src/app/services/petri-net-management.service';
+import { DragAndDropService } from 'src/app/services/drag-and-drop.service';
 
 @Component({
     selector: 'svg:g[app-drawing-boxArc]',
@@ -146,12 +147,18 @@ export class DrawingBoxArcComponent {
         private collectSelectedElementsService: CollectSelectedElementsService,
         private feedbackService: ShowFeedbackService,
         private petriNetManagementService: PetriNetManagementService,
-    ) {}
+        private dragAndDropService: DragAndDropService,
+    ) {
+        this.dragAndDropService.activitySelected.subscribe((value) => {
+            this.activitySelected = value;
+        });
+    }
 
     private arcId: string = '';
     readonly width: number = environment.drawingElements.arcs.width;
     readonly color: string = environment.drawingElements.arcs.color;
     private timeoutId: any;
+    private activitySelected: boolean = false;
 
     ngOnInit() {
         this.arcId = `arc_${this.boxArc.start.id}_${this.boxArc.end.id}`;
@@ -215,7 +222,8 @@ export class DrawingBoxArcComponent {
         if (svg && path) {
             if (
                 !svg.classList.contains('mouseDown') &&
-                !path.classList.contains('active')
+                !path.classList.contains('active') &&
+                !this.activitySelected
             ) {
                 this.collectSelectedElementsService.setArcClassListAttributes(
                     this.arcId,

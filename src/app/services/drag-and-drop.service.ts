@@ -41,6 +41,17 @@ export class DragAndDropService {
         return this._boxDimensions$.asObservable();
     }
 
+    private readonly activitySelected$: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false);
+
+    get activitySelected(): Observable<boolean> {
+        return this.activitySelected$.asObservable();
+    }
+
+    setActivitySelected(value: boolean): void {
+        this.activitySelected$.next(value);
+    }
+
     passBoxObjects(box: Box[]): void {
         this._boxDimensions$.next(box);
     }
