@@ -236,6 +236,17 @@
         </div>
     </div>
     <div
+        class="menu-button"
+        [class.disabled]="disabling.isHintDisabled()"
+        mat-button
+        [matTooltip]="'Select a DFG Box first'"
+        [matTooltipDisabled]="disabling.isHoverForHintDisabled()"
+        matTooltipPosition="right"
+        (click)="showingHintForPossibleCut.showHintForPossibleCut()"
+    >
+        <div>Show possible Cut (h)</div>
+    </div>
+    <div
         class="legend-menu-wrapper"
         [class.disabled]="disabling.isToggleFeedbackDisabled()"
         [matTooltip]="

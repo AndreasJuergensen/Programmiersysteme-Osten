@@ -54,6 +54,7 @@ export class ContextMenuComponent implements OnInit {
     readonly executingCut: ExecutingCut;
     readonly executingFallThrough: ExecutingFallThrough;
     readonly showingArcFeedback: ShowingArcFeedback;
+    readonly showingHintForPossibleCut: ShowingHintForPossibleCut;
 
     private keydownListener: any;
 
@@ -138,6 +139,14 @@ export class ContextMenuComponent implements OnInit {
             this.disabling,
             collectSelectedElementsService,
         );
+        this.showingHintForPossibleCut = new ShowingHintForPossibleCut(
+            matDialog,
+            petriNetManagementService,
+            this.disabling,
+            feedbackService,
+            collectSelectedElementsService,
+            contextMenuService,
+        );
     }
     ngOnInit(): void {
         const hide = () => {
@@ -173,6 +182,8 @@ export class ContextMenuComponent implements OnInit {
                 this.showingArcFeedback.toggleArcFeedback();
             } else if (event.key === 't') {
                 this.showingEventLog.toggleEventLogs();
+            } else if (event.key === 'h') {
+                this.showingHintForPossibleCut.showHintForPossibleCut();
             }
         };
         document.addEventListener('keydown', this.keydownListener);
@@ -658,6 +669,7 @@ class Disabling {
     private hasRecentEventLogs: boolean = false;
     private isArcFeedbackReady: boolean = false;
     private isElementSelected: boolean = false;
+    private isHintAvailable: boolean = false;
 
     constructor(
         readonly applicationStateService: ApplicationStateService,
@@ -692,6 +704,16 @@ class Disabling {
         collectSelectedElementsService.isElementSelected$.subscribe(
             (isElementSelected) => {
                 this.isElementSelected = isElementSelected;
+            },
+        );
+
+        collectSelectedElementsService.selectedDFGBoxId$.subscribe(
+            (selectedDFGBoxId) => {
+                if (selectedDFGBoxId !== undefined) {
+                    this.isHintAvailable = true;
+                } else {
+                    this.isHintAvailable = false;
+                }
             },
         );
     }
@@ -743,5 +765,64 @@ class Disabling {
 
     isRecentEventLogsDisabled(): boolean {
         return !this.hasRecentEventLogs;
+    }
+
+    isHintDisabled(): boolean {
+        return !this.isHintAvailable;
+    }
+
+    isHoverForHintDisabled(): boolean {
+        return this.isPetriNetEmpty;
+    }
+}
+
+class ShowingHintForPossibleCut {
+    private dfgs: Dfg[] = [];
+    private selectedDFGBoxId: string | undefined;
+
+    constructor(
+        private matDialog: MatDialog,
+        private petriNetManagementService: PetriNetManagementService,
+        private disabling: Disabling,
+        private feedbackService: ShowFeedbackService,
+        private collectSelectedElementsService: CollectSelectedElementsService,
+        private contextMenuService: ContextMenuService,
+    ) {
+        this.petriNetManagementService.petriNet$.subscribe((petriNet) => {
+            this.dfgs = petriNet.getDFGs();
+        });
+
+        collectSelectedElementsService.selectedDFGBoxId$.subscribe(
+            (selectedDFGBoxId) => {
+                this.selectedDFGBoxId = selectedDFGBoxId;
+            },
+        );
+    }
+
+    showHintForPossibleCut() {
+        if (!this.disabling.isHintDisabled()) {
+            const selectedDFG = this.dfgs.find(
+                (dfg) => dfg.id === this.selectedDFGBoxId,
+            );
+            if (
+                selectedDFG !== undefined &&
+                selectedDFG.getPossibleCut() !== undefined
+            ) {
+                this.feedbackService.showMessage(
+                    `A ${this.pascalToNormal(selectedDFG.getPossibleCut()!.toString())} is possible.`,
+                    false,
+                );
+            } else {
+                this.feedbackService.showMessage(
+                    `A Fall Through is possible.`,
+                    false,
+                );
+            }
+            this.contextMenuService.hide();
+        }
+    }
+
+    private pascalToNormal(text: string): string {
+        return text.replace(/([a-z])([A-Z])/g, '$1 $2');
     }
 }
