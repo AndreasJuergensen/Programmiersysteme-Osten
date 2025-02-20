@@ -249,6 +249,7 @@ export class DrawingActivityComponent {
     onMouseDown(event: MouseEvent) {
         if (event.button === 0) {
             this.dragging = true;
+            this._dragAndDropService.setActivitySelected(true);
         }
         this.offsetX = event.clientX - this.activity.x;
         this.offsetY = event.clientY - this.activity.y;
@@ -321,6 +322,7 @@ export class DrawingActivityComponent {
         }
 
         this.dragging = false;
+        this._dragAndDropService.setActivitySelected(false);
 
         document.removeEventListener('mousemove', this.onMouseMove);
         document.removeEventListener('mouseup', this.onMouseUp);
